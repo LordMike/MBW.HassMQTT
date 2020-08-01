@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>The MBW.HassMQTT packages will help in creating .NET applications that integrate with Home Assistant using its MQTT transport. 
+
+      This package contains core services such as value managers and senders
+    </Description>
   </PropertyGroup>
 
   <ItemGroup>

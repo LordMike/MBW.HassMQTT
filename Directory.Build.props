@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
 
   <PropertyGroup>
     <Version>0.1.0</Version>
@@ -7,6 +7,18 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <PackageOutputPath>$(SolutionDir)/build</PackageOutputPath>
+  </PropertyGroup>
+
+  <!-- Nuget -->
+  <PropertyGroup>
+    <Authors>LordMike</Authors>
+    <Company>MBWarez</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/LordMike/MBW.HassMQTT</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/LordMike/MBW.HassMQTT.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>home-assistant hass mqtt discovery</PackageTags>
+    <Copyright>Michael Bisbjerg @ 2020</Copyright>
   </PropertyGroup>
 
 </Project>
