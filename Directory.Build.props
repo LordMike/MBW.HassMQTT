@@ -1,6 +1,10 @@
 ﻿<Project>
 
   <PropertyGroup>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <PackageOutputPath>$(SolutionDir)/build</PackageOutputPath>
   </PropertyGroup>
