@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Enums.NET" Version="3.0.3" />
+    <PackageReference Include="MQTTnet" Version="3.0.11" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MBW.HassMQTT.Abstracts\MBW.HassMQTT.Abstracts.csproj" />
+    <ProjectReference Include="..\MBW.HassMQTT.DiscoveryModels\MBW.HassMQTT.DiscoveryModels.csproj" />
+  </ItemGroup>
+
+</Project>
