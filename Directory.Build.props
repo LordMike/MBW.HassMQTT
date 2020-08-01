@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <PackageOutputPath>./build</PackageOutputPath>
+    <PackageOutputPath>$(SolutionDir)/build</PackageOutputPath>
   </PropertyGroup>
 
 </Project>

@@ -25,4 +25,4 @@ jobs:
     - uses: actions/upload-artifact@v2-preview
       with:
         name: Nupkg
-        path: */build/*.nupkg
+        path: build/*.nupkg
