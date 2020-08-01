@@ -15,7 +15,7 @@ There will be little to no support on this.
 
 | Name | Nuget | Note |
 |---|---|---|
-| MBW.HassMQTT | ![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT) | Core services such as value managers and senders |
-| MBW.HassMQTT.Abstracts | ![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.Abstracts) | Common interfaces |
-| MBW.HassMQTT.CommonServices | ![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.CommonServices) | Addon service such as notifying HASS of downtime with MQTT LWT |
-| MBW.HassMQTT.DiscoveryModels | ![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.DiscoveryModels) | HASS MQTT discovery models |
+| MBW.HassMQTT | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT)](https://www.nuget.org/packages/MBW.HassMQTT/) | Core services such as value managers and senders |
+| MBW.HassMQTT.Abstracts | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.Abstracts)](https://www.nuget.org/packages/MBW.HassMQTT.Abstracts/) | Common interfaces |
+| MBW.HassMQTT.CommonServices | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.CommonServices)](https://www.nuget.org/packages/MBW.HassMQTT.CommonServices/) | Addon service such as notifying HASS of downtime with MQTT LWT |
+| MBW.HassMQTT.DiscoveryModels | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.DiscoveryModels)](https://www.nuget.org/packages/MBW.HassMQTT.DiscoveryModels/) | HASS MQTT discovery models |
