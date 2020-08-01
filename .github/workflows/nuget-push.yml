@@ -25,6 +25,6 @@ jobs:
         name: Nupkg
         path: build/*.nupkg
     - name: push
-      run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k $NUGET_KEY build/*.nupkg
+      run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k $NUGET_KEY build/
       env:
         NUGET_KEY: ${{ secrets.NUGET_KEY }}
