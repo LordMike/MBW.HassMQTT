@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Text;
+using MBW.HassMQTT.DiscoveryModels;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -10,7 +13,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
 {
     public static class HassConnectedEntityServiceExtensions
     {
-        public static IServiceCollection AddHassConnectedEntityServiceExtensions(this IServiceCollection services, string systemName, Action<HassConnectedEntityServiceConfig> configuration = null)
+        public static IServiceCollection AddHassConnectedEntityService(this IServiceCollection services, string systemName, Action<HassConnectedEntityServiceConfig> configuration = null)
         {
             services
                 .AddSingleton<AvailabilityDecoratorService>()
@@ -40,6 +43,16 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
                 Payload = Encoding.UTF8.GetBytes(config.ProblemMessage),
                 Retain = true
             });
+        }
+
+        public static IDiscoveryDocumentBuilder<TEntity> ConfigureAliveService<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : MqttEntitySensorDiscoveryBase
+        {
+            AvailabilityDecoratorService decorator = builder.HassMqttManager.GetService<AvailabilityDecoratorService>();
+
+            if (decorator == null)
+                throw new InvalidOperationException($"Unable to locate the Alive services. Did you forget to configure services.{nameof(AddHassConnectedEntityService)}?");
+
+            return builder.ConfigureDiscovery(decorator.ApplyAvailabilityInformation);
         }
     }
 }

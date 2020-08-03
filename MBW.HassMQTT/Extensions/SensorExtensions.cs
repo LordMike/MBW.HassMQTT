@@ -9,6 +9,10 @@ namespace MBW.HassMQTT.Extensions
 {
     public static class SensorExtensions
     {
+        public delegate void DiscoveryConfigure<TEntity>(TEntity discovery) where TEntity : MqttSensorDiscoveryBase;
+
+        public delegate void DeviceConfigure(MqttDeviceDocument device);
+
         public static IDiscoveryDocumentBuilder<TEntity> ConfigureTopics<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, params HassTopicKind[] topicKinds) where TEntity : MqttSensorDiscoveryBase
         {
             foreach (HassTopicKind topicKind in topicKinds)
@@ -17,6 +21,18 @@ namespace MBW.HassMQTT.Extensions
                 builder.Discovery.SetTopic(topicKind, topic);
             }
 
+            return builder;
+        }
+
+        public static IDiscoveryDocumentBuilder<TEntity> ConfigureDiscovery<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, DiscoveryConfigure<TEntity> configure) where TEntity : MqttSensorDiscoveryBase
+        {
+            configure(builder.Discovery);
+            return builder;
+        }
+
+        public static IDiscoveryDocumentBuilder<TEntity> ConfigureDevice<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, DeviceConfigure configure) where TEntity : MqttSensorDiscoveryBase
+        {
+            configure(builder.Discovery.Device);
             return builder;
         }
 

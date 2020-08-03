@@ -48,7 +48,7 @@ namespace MBW.HassMQTT
 
         public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId) where TEntity : MqttSensorDiscoveryBase
         {
-            string uniqueId = $"{deviceId}_{entityId}";
+            string uniqueId = $"{deviceId}_{entityId}".ToLower();
 
             if (_discoveryDocuments.TryGetValue(uniqueId, out IDiscoveryDocumentBuilder builder))
                 return (IDiscoveryDocumentBuilder<TEntity>)builder;
@@ -64,7 +64,7 @@ namespace MBW.HassMQTT
 
             _discoveryDocuments[uniqueId] = builder;
 
-            if (_config.AutoConfigureAttributesTopics && builder.Discovery is IHasAttributesTopic)
+            if (_config.AutoConfigureAttributesTopics && builder.DiscoveryUntyped is IHasAttributesTopic)
                 ((IDiscoveryDocumentBuilder<TEntity>)builder).ConfigureTopics(HassTopicKind.JsonAttributes);
 
             return (IDiscoveryDocumentBuilder<TEntity>)builder;
@@ -95,28 +95,6 @@ namespace MBW.HassMQTT
         {
             if (string.IsNullOrWhiteSpace(topic))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(topic));
-
-            if (_values.TryGetValue(topic, out MqttStateValueTopic sensor))
-                return sensor;
-
-            return _values[topic] = new MqttStateValueTopic(topic);
-        }
-
-        [Obsolete]
-        public MqttAttributesTopic GetAttributesValue(string deviceId, string entityId)
-        {
-            string topic = TopicBuilder.GetAttributesTopic(deviceId, entityId);
-
-            if (_attributes.TryGetValue(topic, out MqttAttributesTopic sensor))
-                return sensor;
-
-            return _attributes[topic] = new MqttAttributesTopic(topic);
-        }
-        
-        [Obsolete]
-        public MqttStateValueTopic GetEntityStateValue(string deviceId, string entityId, string kind)
-        {
-            string topic = TopicBuilder.GetEntityTopic(deviceId, entityId, kind);
 
             if (_values.TryGetValue(topic, out MqttStateValueTopic sensor))
                 return sensor;
@@ -160,9 +138,9 @@ namespace MBW.HassMQTT
             {
                 int discoveryDocs = 0, values = 0, attributes = 0;
 
-                foreach (IDiscoveryDocumentBuilder value in _discoveryDocuments.Values.Where(s => s.Discovery.Dirty))
+                foreach (IDiscoveryDocumentBuilder value in _discoveryDocuments.Values.Where(s => s.DiscoveryUntyped.Dirty))
                 {
-                    await SendValue(value.Discovery, true, token);
+                    await SendValue(value.DiscoveryUntyped, true, token);
                     discoveryDocs++;
                 }
 
@@ -185,6 +163,11 @@ namespace MBW.HassMQTT
             {
                 _lockObject.Set();
             }
+        }
+
+        internal T GetService<T>()
+        {
+            return _serviceProvider.GetService<T>();
         }
     }
 }

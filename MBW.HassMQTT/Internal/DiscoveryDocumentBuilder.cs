@@ -3,7 +3,7 @@ using MBW.HassMQTT.Interfaces;
 
 namespace MBW.HassMQTT.Internal
 {
-    public class DiscoveryDocumentBuilder<TEntity> : IDiscoveryDocumentBuilder<TEntity>, ISensorContainer where TEntity : MqttSensorDiscoveryBase
+    internal class DiscoveryDocumentBuilder<TEntity> : IDiscoveryDocumentBuilder<TEntity>, ISensorContainer where TEntity : MqttSensorDiscoveryBase
     {
         private HassMqttManager _hassMqttManager;
 
@@ -15,11 +15,11 @@ namespace MBW.HassMQTT.Internal
         HassMqttManager IDiscoveryDocumentBuilder.HassMqttManager => _hassMqttManager;
 
         MqttSensorDiscoveryBase ISensorContainer.Discovery => Discovery;
-        MqttSensorDiscoveryBase IDiscoveryDocumentBuilder.Discovery => Discovery;
+        MqttSensorDiscoveryBase IDiscoveryDocumentBuilder.DiscoveryUntyped => Discovery;
 
         public TEntity Discovery { get; internal set; }
 
-        public DiscoveryDocumentBuilder(HassMqttManager hassMqttManager)
+        internal DiscoveryDocumentBuilder(HassMqttManager hassMqttManager)
         {
             _hassMqttManager = hassMqttManager;
         }

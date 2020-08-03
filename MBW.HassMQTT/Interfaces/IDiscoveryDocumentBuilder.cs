@@ -8,7 +8,7 @@ namespace MBW.HassMQTT.Interfaces
         string EntityId { get; }
         internal HassMqttManager HassMqttManager { get; }
 
-        internal MqttSensorDiscoveryBase Discovery { get; }
+        internal MqttSensorDiscoveryBase DiscoveryUntyped { get; }
     }
     
     public interface IDiscoveryDocumentBuilder<TEntity> : IDiscoveryDocumentBuilder where TEntity : MqttSensorDiscoveryBase

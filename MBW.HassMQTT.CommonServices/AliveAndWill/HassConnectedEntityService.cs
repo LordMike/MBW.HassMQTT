@@ -47,21 +47,25 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
 
         private void CreateSystemEntities()
         {
-            IDiscoveryDocumentBuilder<MqttBinarySensor> builder = _hassMqttManager.ConfigureSensor<MqttBinarySensor>(_config.DeviceId, _config.EntityId)
-                .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes);
+            _hassMqttManager.ConfigureSensor<MqttBinarySensor>(_config.DeviceId, _config.EntityId)
+                .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                .ConfigureDevice(device =>
+                {
+                    Assembly entryAssembly = Assembly.GetEntryAssembly();
+                    if (entryAssembly != null)
+                        device.SwVersion = entryAssembly.GetName().Version.ToString(3);
 
-            builder.Discovery.Device.Name = _config.DiscoveryDeviceName;
-            builder.Discovery.Device.Identifiers = new[] { _config.DeviceId };
-
-            Assembly entryAssembly = Assembly.GetEntryAssembly();
-            if (entryAssembly != null)
-                builder.Discovery.Device.SwVersion = entryAssembly.GetName().Version.ToString(3);
-
-            builder.Discovery.Name = _config.DiscoveryEntityName;
-            builder.Discovery.DeviceClass = HassDeviceClass.Problem;
-
-            builder.Discovery.PayloadOn = ProblemMessage;
-            builder.Discovery.PayloadOff = OkMessage;
+                    device.Name = _config.DiscoveryDeviceName;
+                    device.Identifiers = new[] { _config.DeviceId };
+                })
+                .ConfigureDiscovery(discovery =>
+                {
+                    discovery.Name = _config.DiscoveryEntityName;
+                    discovery.DeviceClass = HassDeviceClass.Problem;
+            
+                    discovery.PayloadOn = ProblemMessage;
+                    discovery.PayloadOff = OkMessage;
+                });
         }
 
         public void SetAttribute(string name, object value)
