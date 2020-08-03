@@ -1,4 +1,7 @@
-﻿using MBW.HassMQTT.DiscoveryModels.Enum;
+﻿using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
@@ -6,9 +9,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// https://www.home-assistant.io/integrations/camera.mqtt/
     /// </summary>
     [DeviceType(HassDeviceType.Camera)]
-    public class MqttCamera : MqttSensorDiscoveryBase
+    public class MqttCamera : MqttSensorDiscoveryBase, IHasAttributesTopic
     {
-        public MqttCamera(string topic, string uniqueId) : base(topic, uniqueId)
+        public MqttCamera(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
 
@@ -22,18 +25,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
             set => SetValue("availability_topic", value);
         }
 
-        /// <summary>
-        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the JSON dictionary from messages received on the `json_attributes_topic`.
-        /// </summary>
+        /// <inheritdoc cref="IHasAttributesTopic.JsonAttributesTemplate"/>
         public string JsonAttributesTemplate
         {
             get => GetValue<string>("json_attributes_template", default);
             set => SetValue("json_attributes_template", value);
         }
 
-        /// <summary>
-        /// The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Implies `force_update` of the current sensor state when a message is received on this topic.
-        /// </summary>
+        /// <inheritdoc cref="IHasAttributesTopic.JsonAttributesTopic"/>
         public string JsonAttributesTopic
         {
             get => GetValue<string>("json_attributes_topic", default);
@@ -43,6 +42,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The name of the camera.
         /// </summary>
+        [PublicAPI]
         public string Name
         {
             get => GetValue<string>("name", default);
@@ -52,6 +52,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to subscribe to.
         /// </summary>
+        [PublicAPI]
         public string Topic
         {
             get => GetValue<string>("topic", default);

@@ -2,7 +2,7 @@
 {
     public class HassConfiguration
     {
-        public string HomeassistantDiscoveryPrefix { get; set; } = "homeassistant";
+        public string DiscoveryPrefix { get; set; } = "homeassistant";
 
         public string TopicPrefix { get; set; }
     }

@@ -1,4 +1,6 @@
-﻿using MBW.HassMQTT.DiscoveryModels.Enum;
+﻿using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
@@ -8,13 +10,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     [DeviceType(HassDeviceType.Cover)]
     public class MqttCover : MqttEntitySensorDiscoveryBase
     {
-        public MqttCover(string topic, string uniqueId) : base(topic, uniqueId)
+        public MqttCover(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
 
         /// <summary>
         /// The MQTT topic to publish commands to control the cover.
         /// </summary>
+        [PublicAPI]
         public string CommandTopic
         {
             get => GetValue<string>("command_topic", default);
@@ -24,6 +27,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Sets the [class of the device](/integrations/cover/), changing the device state and icon that is displayed on the frontend.
         /// </summary>
+        [PublicAPI]
         public string DeviceClass
         {
             get => GetValue<string>("device_class", default);
@@ -31,26 +35,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
 
         /// <summary>
-        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation.
-        /// </summary>
-        public string JsonAttributesTemplate
-        {
-            get => GetValue<string>("json_attributes_template", default);
-            set => SetValue("json_attributes_template", value);
-        }
-
-        /// <summary>
-        /// The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation.
-        /// </summary>
-        public string JsonAttributesTopic
-        {
-            get => GetValue<string>("json_attributes_topic", default);
-            set => SetValue("json_attributes_topic", value);
-        }
-
-        /// <summary>
         /// The name of the cover.
         /// </summary>
+        [PublicAPI]
         public string Name
         {
             get => GetValue<string>("name", default);
@@ -60,6 +47,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if switch works in optimistic mode.
         /// </summary>
+        [PublicAPI]
         public string Optimistic
         {
             get => GetValue<string>("optimistic", default);
@@ -69,6 +57,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The command payload that closes the cover.
         /// </summary>
+        [PublicAPI]
         public string PayloadClose
         {
             get => GetValue<string>("payload_close", default);
@@ -78,6 +67,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The command payload that opens the cover.
         /// </summary>
+        [PublicAPI]
         public string PayloadOpen
         {
             get => GetValue<string>("payload_open", default);
@@ -87,6 +77,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The command payload that stops the cover.
         /// </summary>
+        [PublicAPI]
         public string PayloadStop
         {
             get => GetValue<string>("payload_stop", default);
@@ -96,6 +87,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Number which represents closed position.
         /// </summary>
+        [PublicAPI]
         public int PositionClosed
         {
             get => GetValue<int>("position_closed", default);
@@ -105,6 +97,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Number which represents open position.
         /// </summary>
+        [PublicAPI]
         public int PositionOpen
         {
             get => GetValue<int>("position_open", default);
@@ -114,6 +107,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic subscribed to receive cover position messages. If `position_topic` is set `state_topic` is ignored.
         /// </summary>
+        [PublicAPI]
         public string PositionTopic
         {
             get => GetValue<string>("position_topic", default);
@@ -123,6 +117,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The maximum QoS level to be used when receiving and publishing messages.
         /// </summary>
+        [PublicAPI]
         public int Qos
         {
             get => GetValue<int>("qos", default);
@@ -132,6 +127,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines if published messages should have the retain flag set.
         /// </summary>
+        [PublicAPI]
         public bool Retain
         {
             get => GetValue<bool>("retain", default);
@@ -141,6 +137,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/topics/templating/) to define the position to be sent to the `set_position_topic` topic. Incoming position value is available for use in the template `{{position}}`. If no template is defined, the position (0-100) will be calculated according to `position_open` and `position_closed` values.
         /// </summary>
+        [PublicAPI]
         public string SetPositionTemplate
         {
             get => GetValue<string>("set_position_template", default);
@@ -150,6 +147,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish position commands to. You need to set position_topic as well if you want to use position topic. Use template if position topic wants different values than within range `position_closed` - `position_open`. If template is not defined and `position_closed != 100` and `position_open != 0` then proper position value is calculated from percentage position.
         /// </summary>
+        [PublicAPI]
         public string SetpositionTopic
         {
             get => GetValue<string>("set_position_topic", default);
@@ -159,6 +157,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload that represents the closed state.
         /// </summary>
+        [PublicAPI]
         public string StateClosed
         {
             get => GetValue<string>("state_closed", default);
@@ -168,6 +167,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload that represents the closing state.
         /// </summary>
+        [PublicAPI]
         public string StateClosing
         {
             get => GetValue<string>("state_closing", default);
@@ -177,6 +177,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload that represents the open state.
         /// </summary>
+        [PublicAPI]
         public string StateOpen
         {
             get => GetValue<string>("state_open", default);
@@ -186,6 +187,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload that represents the opening state.
         /// </summary>
+        [PublicAPI]
         public string StateOpening
         {
             get => GetValue<string>("state_opening", default);
@@ -195,6 +197,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic subscribed to receive cover state messages. Use only if not using `position_topic`. State topic can only read open/close state. Cannot read position state. If `position_topic` is set `state_topic` is ignored.
         /// </summary>
+        [PublicAPI]
         public string StateTopic
         {
             get => GetValue<string>("state_topic", default);
@@ -204,6 +207,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The value that will be sent on a `close_cover_tilt` command.
         /// </summary>
+        [PublicAPI]
         public int TiltClosedValue
         {
             get => GetValue<int>("tilt_closed_value", default);
@@ -213,6 +217,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish commands to control the cover tilt.
         /// </summary>
+        [PublicAPI]
         public string TiltCommandTopic
         {
             get => GetValue<string>("tilt_command_topic", default);
@@ -222,6 +227,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that determines if open/close are flipped; higher values toward closed and lower values toward open.
         /// </summary>
+        [PublicAPI]
         public bool TiltInvertState
         {
             get => GetValue<bool>("tilt_invert_state", default);
@@ -231,6 +237,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The maximum tilt value
         /// </summary>
+        [PublicAPI]
         public int TiltMax
         {
             get => GetValue<int>("tilt_max", default);
@@ -240,6 +247,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The minimum tilt value.
         /// </summary>
+        [PublicAPI]
         public int TiltMin
         {
             get => GetValue<int>("tilt_min", default);
@@ -249,6 +257,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The value that will be sent on an `open_cover_tilt` command.
         /// </summary>
+        [PublicAPI]
         public int TiltOpenedValue
         {
             get => GetValue<int>("tilt_opened_value", default);
@@ -258,6 +267,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that determines if tilt works in optimistic mode.
         /// </summary>
+        [PublicAPI]
         public bool TiltOptimistic
         {
             get => GetValue<bool>("tilt_optimistic", default);
@@ -267,6 +277,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/topics/templating/) that can be used to extract the payload for the `tilt_status_topic` topic. 
         /// </summary>
+        [PublicAPI]
         public string TiltStatusTemplate
         {
             get => GetValue<string>("tilt_status_template", default);
@@ -276,6 +287,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic subscribed to receive tilt status update values.
         /// </summary>
+        [PublicAPI]
         public string TiltStatusTopic
         {
             get => GetValue<string>("tilt_status_topic", default);
@@ -285,6 +297,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the payload.
         /// </summary>
+        [PublicAPI]
         public string ValueTemplate
         {
             get => GetValue<string>("value_template", default);

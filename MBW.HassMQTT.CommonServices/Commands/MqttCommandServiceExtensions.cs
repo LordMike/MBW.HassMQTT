@@ -1,4 +1,5 @@
 using System;
+using MBW.HassMQTT.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MBW.HassMQTT.CommonServices.Commands

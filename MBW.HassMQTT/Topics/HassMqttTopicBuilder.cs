@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Text;
 
 namespace MBW.HassMQTT.Topics
@@ -11,7 +12,7 @@ namespace MBW.HassMQTT.Topics
 
         public HassMqttTopicBuilder(HassConfiguration hassOptions)
         {
-            _discoveryPrefix = hassOptions.HomeassistantDiscoveryPrefix.TrimEnd('/');
+            _discoveryPrefix = hassOptions.DiscoveryPrefix.TrimEnd('/');
             _servicePrefix = hassOptions.TopicPrefix.TrimEnd('/');
         }
 
@@ -26,6 +27,8 @@ namespace MBW.HassMQTT.Topics
                 sb.Append(Seperator);
                 sb.Append(segment);
             }
+
+            Debug.Assert(sb.Capacity == sb.Length);
 
             return sb.ToString();
         }

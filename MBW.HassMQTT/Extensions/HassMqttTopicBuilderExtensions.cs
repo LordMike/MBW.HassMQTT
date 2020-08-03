@@ -1,8 +1,9 @@
 ﻿using EnumsNET;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
+using MBW.HassMQTT.Topics;
 
-namespace MBW.HassMQTT.Topics
+namespace MBW.HassMQTT.Extensions
 {
     public static class HassMqttTopicBuilderExtensions
     {

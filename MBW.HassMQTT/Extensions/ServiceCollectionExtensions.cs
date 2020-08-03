@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 
-namespace MBW.HassMQTT
+namespace MBW.HassMQTT.Extensions
 {
     public static class ServiceCollectionExtensions
     {

@@ -1,4 +1,6 @@
-﻿using MBW.HassMQTT.DiscoveryModels.Enum;
+﻿using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
@@ -8,13 +10,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     [DeviceType(HassDeviceType.Lock)]
     public class MqttLock : MqttEntitySensorDiscoveryBase
     {
-        public MqttLock(string topic, string uniqueId) : base(topic, uniqueId)
+        public MqttLock(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
 
         /// <summary>
         /// The MQTT topic to publish commands to change the lock state.
         /// </summary>
+        [PublicAPI]
         public string CommandTopic
         {
             get => GetValue<string>("command_topic", default);
@@ -22,26 +25,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
 
         /// <summary>
-        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation.
-        /// </summary>
-        public string JsonAttributesTemplate
-        {
-            get => GetValue<string>("json_attributes_template", default);
-            set => SetValue("json_attributes_template", value);
-        }
-
-        /// <summary>
-        /// The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation.
-        /// </summary>
-        public string JsonAttributesTopic
-        {
-            get => GetValue<string>("json_attributes_topic", default);
-            set => SetValue("json_attributes_topic", value);
-        }
-
-        /// <summary>
         /// The name of the lock.
         /// </summary>
+        [PublicAPI]
         public string Name
         {
             get => GetValue<string>("name", default);
@@ -51,6 +37,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if lock works in optimistic mode.
         /// </summary>
+        [PublicAPI]
         public string Optimistic
         {
             get => GetValue<string>("optimistic", default);
@@ -60,6 +47,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload that represents enabled/locked state.
         /// </summary>
+        [PublicAPI]
         public string PayloadLock
         {
             get => GetValue<string>("payload_lock", default);
@@ -69,6 +57,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload that represents disabled/unlocked state.
         /// </summary>
+        [PublicAPI]
         public string PayloadUnlock
         {
             get => GetValue<string>("payload_unlock", default);
@@ -78,6 +67,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The maximum QoS level of the state topic.
         /// </summary>
+        [PublicAPI]
         public int Qos
         {
             get => GetValue<int>("qos", default);
@@ -87,6 +77,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// If the published message should have the retain flag on or not.
         /// </summary>
+        [PublicAPI]
         public bool Retain
         {
             get => GetValue<bool>("retain", default);
@@ -96,6 +87,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The value that represents the lock to be in locked state
         /// </summary>
+        [PublicAPI]
         public string StateLocked
         {
             get => GetValue<string>("state_locked", default);
@@ -105,6 +97,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic subscribed to receive state updates.
         /// </summary>
+        [PublicAPI]
         public string StateTopic
         {
             get => GetValue<string>("state_topic", default);
@@ -114,6 +107,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The value that represents the lock to be in unlocked state
         /// </summary>
+        [PublicAPI]
         public string StateUnlocked
         {
             get => GetValue<string>("state_unlocked", default);
@@ -123,6 +117,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the payload.
         /// </summary>
+        [PublicAPI]
         public string ValueTemplate
         {
             get => GetValue<string>("value_template", default);

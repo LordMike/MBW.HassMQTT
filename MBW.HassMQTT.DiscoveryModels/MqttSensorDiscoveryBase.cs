@@ -1,4 +1,7 @@
-﻿using MBW.HassMQTT.Abstracts.Interfaces;
+﻿using System;
+using System.Reflection;
+using MBW.HassMQTT.Abstracts.Interfaces;
+using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 using Newtonsoft.Json.Linq;
 
@@ -24,9 +27,9 @@ namespace MBW.HassMQTT.DiscoveryModels
             set => _discover.SetIfChanged("unique_id", value, SetDirty);
         }
 
-        public MqttSensorDiscoveryBase(string topic, string uniqueId)
+        public MqttSensorDiscoveryBase(string discoveryTopic, string uniqueId)
         {
-            PublishTopic = topic;
+            PublishTopic = discoveryTopic;
             _discover = new JObject();
 
             JObject deviceDoc = new JObject();
@@ -59,6 +62,28 @@ namespace MBW.HassMQTT.DiscoveryModels
         {
             // To avoid 200x lambdas
             Dirty = true;
+        }
+
+        public void SetTopic(HassTopicKind topicKind, string topic)
+        {
+            Type type = GetType();
+            PropertyInfo prop = type.GetProperty($"{topicKind}Topic");
+
+            if (prop == null)
+                throw new NotSupportedException($"Unable to set topic {topicKind} on {type.Name}");
+
+            prop.SetValue(this, topic);
+        }
+
+        public string GetTopic(HassTopicKind topicKind)
+        {
+            Type type = GetType();
+            PropertyInfo prop = type.GetProperty($"{topicKind}Topic");
+
+            if (prop == null)
+                throw new NotSupportedException($"Unable to get the topic {topicKind} on {type.Name}");
+
+            return prop.GetValue(this) as string;
         }
     }
 }

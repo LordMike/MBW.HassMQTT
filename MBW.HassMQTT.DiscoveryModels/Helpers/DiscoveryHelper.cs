@@ -1,5 +1,6 @@
 ﻿using System;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Helpers
 {

@@ -1,4 +1,6 @@
-﻿using MBW.HassMQTT.DiscoveryModels.Enum;
+﻿using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
@@ -8,13 +10,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     [DeviceType(HassDeviceType.Vacuum)]
     public class MqttVacuumState : MqttEntitySensorDiscoveryBase
     {
-        public MqttVacuumState(string topic, string uniqueId) : base(topic, uniqueId)
+        public MqttVacuumState(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
 
         /// <summary>
         /// The MQTT topic to publish commands to control the vacuum.
         /// </summary>
+        [PublicAPI]
         public string CommandTopic
         {
             get => GetValue<string>("command_topic", default);
@@ -24,6 +27,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// List of possible fan speeds for the vacuum.
         /// </summary>
+        [PublicAPI]
         public string[] FanSpeedList
         {
             get => GetValue<string[]>("fan_speed_list", default);
@@ -31,26 +35,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
 
         /// <summary>
-        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation.
-        /// </summary>
-        public string JsonAttributesTemplate
-        {
-            get => GetValue<string>("json_attributes_template", default);
-            set => SetValue("json_attributes_template", value);
-        }
-
-        /// <summary>
-        /// The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation.
-        /// </summary>
-        public string JsonAttributesTopic
-        {
-            get => GetValue<string>("json_attributes_topic", default);
-            set => SetValue("json_attributes_topic", value);
-        }
-
-        /// <summary>
         /// The name of the vacuum.
         /// </summary>
+        [PublicAPI]
         public string Name
         {
             get => GetValue<string>("name", default);
@@ -60,6 +47,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload to send to the `command_topic` to begin a spot cleaning cycle.
         /// </summary>
+        [PublicAPI]
         public string PayloadCleanSpot
         {
             get => GetValue<string>("payload_clean_spot", default);
@@ -69,6 +57,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload to send to the `command_topic` to locate the vacuum (typically plays a song).
         /// </summary>
+        [PublicAPI]
         public string PayloadLocate
         {
             get => GetValue<string>("payload_locate", default);
@@ -78,6 +67,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload to send to the `command_topic` to pause the vacuum.
         /// </summary>
+        [PublicAPI]
         public string PayloadPause
         {
             get => GetValue<string>("payload_pause", default);
@@ -87,6 +77,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload to send to the `command_topic` to tell the vacuum to return to base.
         /// </summary>
+        [PublicAPI]
         public string PayloadReturnToBase
         {
             get => GetValue<string>("payload_return_to_base", default);
@@ -96,6 +87,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload to send to the `command_topic` to begin the cleaning cycle.
         /// </summary>
+        [PublicAPI]
         public string PayloadStart
         {
             get => GetValue<string>("payload_start", default);
@@ -105,6 +97,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The payload to send to the `command_topic` to stop cleaning.
         /// </summary>
+        [PublicAPI]
         public string PayloadStop
         {
             get => GetValue<string>("payload_stop", default);
@@ -114,6 +107,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The maximum QoS level of the state topic.
         /// </summary>
+        [PublicAPI]
         public int Qos
         {
             get => GetValue<int>("qos", default);
@@ -123,6 +117,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// If the published message should have the retain flag on or not.
         /// </summary>
+        [PublicAPI]
         public bool Retain
         {
             get => GetValue<bool>("retain", default);
@@ -132,6 +127,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The schema to use. Must be `state` to select the state schema.
         /// </summary>
+        [PublicAPI]
         public string Schema
         {
             get => GetValue<string>("schema", default);
@@ -141,6 +137,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish custom commands to the vacuum.
         /// </summary>
+        [PublicAPI]
         public string SendCommandTopic
         {
             get => GetValue<string>("send_command_topic", default);
@@ -150,6 +147,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish commands to control the vacuum's fan speed.
         /// </summary>
+        [PublicAPI]
         public string SetFanSpeedTopic
         {
             get => GetValue<string>("set_fan_speed_topic", default);
@@ -159,6 +157,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic subscribed to receive state messages from the vacuum. Messages received on the `state_topic` must be a valid JSON dictionary, with a mandatory `state` key and optionally `battery_level` and `fan_speed` keys as shown in the [example](#state-mqtt-protocol).
         /// </summary>
+        [PublicAPI]
         public string StateTopic
         {
             get => GetValue<string>("state_topic", default);
@@ -168,6 +167,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// List of features that the vacuum supports (possible values are `start`, `stop`, `pause`, `return_home`, `battery`, `status`, `locate`, `clean_spot`, `fan_speed`, `send_command`).
         /// </summary>
+        [PublicAPI]
         public string[] SupportedFeatures
         {
             get => GetValue<string[]>("supported_features", default);

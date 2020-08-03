@@ -21,4 +21,9 @@
     <Copyright>Michael Bisbjerg @ 2020</Copyright>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Private packages, not to be included in dependencies -->
+    <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,6 @@
-﻿using MBW.HassMQTT.DiscoveryModels.Enum;
+﻿using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
@@ -8,13 +10,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     [DeviceType(HassDeviceType.Light)]
     public class MqttLightJson : MqttEntitySensorDiscoveryBase
     {
-        public MqttLightJson(string topic, string uniqueId) : base(topic, uniqueId)
+        public MqttLightJson(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
 
         /// <summary>
         /// Flag that defines if the light supports brightness.
         /// </summary>
+        [PublicAPI]
         public bool Brightness
         {
             get => GetValue<bool>("brightness", default);
@@ -24,6 +27,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines the maximum brightness value (i.e., 100%) of the MQTT device.
         /// </summary>
+        [PublicAPI]
         public int BrightnessScale
         {
             get => GetValue<int>("brightness_scale", default);
@@ -33,6 +37,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light supports color temperature.
         /// </summary>
+        [PublicAPI]
         public bool ColorTemp
         {
             get => GetValue<bool>("color_temp", default);
@@ -42,6 +47,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish commands to change the light’s state.
         /// </summary>
+        [PublicAPI]
         public string CommandTopic
         {
             get => GetValue<string>("command_topic", default);
@@ -51,6 +57,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light supports effects.
         /// </summary>
+        [PublicAPI]
         public bool Effect
         {
             get => GetValue<bool>("effect", default);
@@ -60,6 +67,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The list of effects the light supports.
         /// </summary>
+        [PublicAPI]
         public string[] EffectList
         {
             get => GetValue<string[]>("effect_list", default);
@@ -69,6 +77,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The duration, in seconds, of a “long” flash.
         /// </summary>
+        [PublicAPI]
         public int FlashTimeLong
         {
             get => GetValue<int>("flash_time_long", default);
@@ -78,6 +87,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The duration, in seconds, of a “short” flash.
         /// </summary>
+        [PublicAPI]
         public int FlashTimeShort
         {
             get => GetValue<int>("flash_time_short", default);
@@ -87,6 +97,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light supports HS colors.
         /// </summary>
+        [PublicAPI]
         public bool Hs
         {
             get => GetValue<bool>("hs", default);
@@ -94,26 +105,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
 
         /// <summary>
-        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the JSON dictionary from messages received on the `json_attributes_topic`. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-template-configuration) documentation.
-        /// </summary>
-        public string JsonAttributesTemplate
-        {
-            get => GetValue<string>("json_attributes_template", default);
-            set => SetValue("json_attributes_template", value);
-        }
-
-        /// <summary>
-        /// The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Usage example can be found in [MQTT sensor](/integrations/sensor.mqtt/#json-attributes-topic-configuration) documentation.
-        /// </summary>
-        public string JsonAttributesTopic
-        {
-            get => GetValue<string>("json_attributes_topic", default);
-            set => SetValue("json_attributes_topic", value);
-        }
-
-        /// <summary>
         /// The maximum color temperature in mireds.
         /// </summary>
+        [PublicAPI]
         public int MaxMireds
         {
             get => GetValue<int>("max_mireds", default);
@@ -123,6 +117,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The minimum color temperature in mireds.
         /// </summary>
+        [PublicAPI]
         public int MinMireds
         {
             get => GetValue<int>("min_mireds", default);
@@ -132,6 +127,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The name of the light.
         /// </summary>
+        [PublicAPI]
         public string Name
         {
             get => GetValue<string>("name", default);
@@ -141,6 +137,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light works in optimistic mode.
         /// </summary>
+        [PublicAPI]
         public bool Optimistic
         {
             get => GetValue<bool>("optimistic", default);
@@ -150,6 +147,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The maximum QoS level of the state topic.
         /// </summary>
+        [PublicAPI]
         public int Qos
         {
             get => GetValue<int>("qos", default);
@@ -159,6 +157,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// If the published message should have the retain flag on or not.
         /// </summary>
+        [PublicAPI]
         public bool Retain
         {
             get => GetValue<bool>("retain", default);
@@ -168,6 +167,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light supports RGB colors.
         /// </summary>
+        [PublicAPI]
         public bool Rgb
         {
             get => GetValue<bool>("rgb", default);
@@ -177,6 +177,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The schema to use. Must be `json` to select the JSON schema.
         /// </summary>
+        [PublicAPI]
         public string Schema
         {
             get => GetValue<string>("schema", default);
@@ -186,6 +187,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic subscribed to receive state updates.
         /// </summary>
+        [PublicAPI]
         public string StateTopic
         {
             get => GetValue<string>("state_topic", default);
@@ -195,6 +197,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light supports white values.
         /// </summary>
+        [PublicAPI]
         public bool WhiteValue
         {
             get => GetValue<bool>("white_value", default);
@@ -204,6 +207,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light supports XY colors.
         /// </summary>
+        [PublicAPI]
         public bool Xy
         {
             get => GetValue<bool>("xy", default);

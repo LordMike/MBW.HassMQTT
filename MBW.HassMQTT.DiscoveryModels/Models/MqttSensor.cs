@@ -1,5 +1,7 @@
 ﻿using EnumsNET;
+using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
@@ -9,22 +11,25 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     [DeviceType(HassDeviceType.Sensor)]
     public class MqttSensor : MqttEntitySensorDiscoveryBase
     {
-        public MqttSensor(string topic, string uniqueId) : base(topic, uniqueId)
+        public MqttSensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
 
         /// <summary>
         /// The [type/class](/integrations/sensor/#device-class) of the sensor to set the icon in the frontend.
         /// </summary>
+        [PublicAPI]
         public HassDeviceClass DeviceClass
         {
-            get => Enums.Parse<HassDeviceClass>(GetValue<string>("device_class", default), true, EnumFormat.EnumMemberValue);
+            get => Enums.Parse<HassDeviceClass>(GetValue<string>("device_class", default), true,
+                EnumFormat.EnumMemberValue);
             set => SetValue("device_class", value.AsString(EnumFormat.EnumMemberValue));
         }
 
         /// <summary>
         /// Defines the number of seconds after the value expires if it's not updated.
         /// </summary>
+        [PublicAPI]
         public int ExpireAfter
         {
             get => GetValue<int>("expire_after", default);
@@ -34,6 +39,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Sends update events even if the value hasn't changed. Useful if you want to have meaningful value graphs in history.
         /// </summary>
+        [PublicAPI]
         public bool ForceUpdate
         {
             get => GetValue<bool>("force_update", default);
@@ -43,6 +49,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The icon for the sensor.
         /// </summary>
+        [PublicAPI]
         public string Icon
         {
             get => GetValue<string>("icon", default);
@@ -50,26 +57,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
 
         /// <summary>
-        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the JSON dictionary from messages received on the `json_attributes_topic`.
-        /// </summary>
-        public string JsonAttributesTemplate
-        {
-            get => GetValue<string>("json_attributes_template", default);
-            set => SetValue("json_attributes_template", value);
-        }
-
-        /// <summary>
-        /// The MQTT topic subscribed to receive a JSON dictionary payload and then set as sensor attributes. Implies `force_update` of the current sensor state when a message is received on this topic.
-        /// </summary>
-        public string JsonAttributesTopic
-        {
-            get => GetValue<string>("json_attributes_topic", default);
-            set => SetValue("json_attributes_topic", value);
-        }
-
-        /// <summary>
         /// The name of the MQTT sensor.
         /// </summary>
+        [PublicAPI]
         public string Name
         {
             get => GetValue<string>("name", default);
@@ -79,6 +69,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The maximum QoS level of the state topic.
         /// </summary>
+        [PublicAPI]
         public int Qos
         {
             get => GetValue<int>("qos", default);
@@ -88,6 +79,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic subscribed to receive sensor values.
         /// </summary>
+        [PublicAPI]
         public string StateTopic
         {
             get => GetValue<string>("state_topic", default);
@@ -97,6 +89,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines the units of measurement of the sensor, if any.
         /// </summary>
+        [PublicAPI]
         public string UnitOfMeasurement
         {
             get => GetValue<string>("unit_of_measurement", default);
@@ -106,6 +99,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the value.
         /// </summary>
+        [PublicAPI]
         public string ValueTemplate
         {
             get => GetValue<string>("value_template", default);

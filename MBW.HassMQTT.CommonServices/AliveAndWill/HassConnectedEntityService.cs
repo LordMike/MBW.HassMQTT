@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
+using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Helpers;
+using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Services;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.Hosting;
@@ -28,7 +30,6 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
         public string ProblemMessage => _config.ProblemMessage;
 
         public string StateTopic { get; }
-        private readonly string _attributesTopic;
 
         public HassConnectedEntityService(IOptions<HassConnectedEntityServiceConfig> options,
             IMqttClient mqttClient,
@@ -42,35 +43,32 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
             _hassMqttManager = hassMqttManager;
 
             StateTopic = topicBuilder.GetServiceTopic(_config.DeviceId, _config.EntityId);
-            _attributesTopic = topicBuilder.GetAttributesTopic(_config.DeviceId, _config.EntityId);
         }
 
         private void CreateSystemEntities()
         {
-            MqttBinarySensor sensor = _hassMqttManager.ConfigureDiscovery<MqttBinarySensor>(_config.DeviceId, _config.EntityId);
+            IDiscoveryDocumentBuilder<MqttBinarySensor> builder = _hassMqttManager.ConfigureSensor<MqttBinarySensor>(_config.DeviceId, _config.EntityId)
+                .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes);
 
-            sensor.Device.Name = _config.DiscoveryDeviceName;
-            sensor.Device.Identifiers = new[] { _config.DeviceId };
+            builder.Discovery.Device.Name = _config.DiscoveryDeviceName;
+            builder.Discovery.Device.Identifiers = new[] { _config.DeviceId };
 
             Assembly entryAssembly = Assembly.GetEntryAssembly();
             if (entryAssembly != null)
-                sensor.Device.SwVersion = entryAssembly.GetName().Version.ToString(3);
+                builder.Discovery.Device.SwVersion = entryAssembly.GetName().Version.ToString(3);
 
-            sensor.Name = _config.DiscoveryEntityName;
-            sensor.DeviceClass = HassDeviceClass.Problem;
+            builder.Discovery.Name = _config.DiscoveryEntityName;
+            builder.Discovery.DeviceClass = HassDeviceClass.Problem;
 
-            sensor.PayloadOn = ProblemMessage;
-            sensor.PayloadOff = OkMessage;
-
-            sensor.StateTopic = StateTopic;
-            sensor.JsonAttributesTopic = _attributesTopic;
+            builder.Discovery.PayloadOn = ProblemMessage;
+            builder.Discovery.PayloadOff = OkMessage;
         }
 
         public void SetAttribute(string name, object value)
         {
-            MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(_config.DeviceId, _config.EntityId);
+            ISensorContainer sensor = _hassMqttManager.GetSensor(_config.DeviceId, _config.EntityId);
 
-            attributes.SetAttribute(name, value);
+            sensor.SetAttribute(name, value);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -78,7 +76,8 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
             CreateSystemEntities();
 
             // Push starting values
-            MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(_config.DeviceId, _config.EntityId);
+            ISensorContainer sensor = _hassMqttManager.GetSensor(_config.DeviceId, _config.EntityId);
+            MqttAttributesTopic attributes = sensor.GetAttributesSender();
 
             Assembly entryAssembly = Assembly.GetEntryAssembly();
             if (entryAssembly != null)

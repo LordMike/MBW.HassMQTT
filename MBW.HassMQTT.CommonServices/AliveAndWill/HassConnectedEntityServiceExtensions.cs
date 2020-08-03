@@ -10,12 +10,18 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
 {
     public static class HassConnectedEntityServiceExtensions
     {
-        public static IServiceCollection AddHassConnectedEntityServiceExtensions(this IServiceCollection services, Action<HassConnectedEntityServiceConfig> configuration = null)
+        public static IServiceCollection AddHassConnectedEntityServiceExtensions(this IServiceCollection services, string systemName, Action<HassConnectedEntityServiceConfig> configuration = null)
         {
             services
                 .AddSingleton<AvailabilityDecoratorService>()
                 .AddSingleton<HassConnectedEntityService>()
-                .AddHostedService(x => x.GetRequiredService<HassConnectedEntityService>());
+                .AddHostedService(x => x.GetRequiredService<HassConnectedEntityService>())
+                .Configure<HassConnectedEntityServiceConfig>(x =>
+                {
+                    x.DeviceId = systemName;
+                    x.DiscoveryDeviceName = systemName;
+                    x.DiscoveryEntityName = $"{systemName} Status";
+                });
 
             if (configuration != null)
                 services.PostConfigure(configuration);

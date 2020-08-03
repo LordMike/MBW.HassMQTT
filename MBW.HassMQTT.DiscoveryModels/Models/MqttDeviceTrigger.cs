@@ -1,5 +1,7 @@
 ﻿using System;
+using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
@@ -10,7 +12,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     [DeviceType(HassDeviceType.DeviceTrigger)]
     public class MqttDeviceTrigger : MqttSensorDiscoveryBase
     {
-        public MqttDeviceTrigger(string topic, string uniqueId) : base(topic, uniqueId)
+        public MqttDeviceTrigger(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
             // This is an odd one, it doesn't behave like other components. 
 
@@ -20,6 +22,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The type of automation, must be 'trigger'.
         /// </summary>
+        [PublicAPI]
         public string AutomationType
         {
             get => GetValue<string>("automation_type", default);
@@ -29,6 +32,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Optional payload to match the payload being sent over the topic.
         /// </summary>
+        [PublicAPI]
         public string Payload
         {
             get => GetValue<string>("payload", default);
@@ -38,6 +42,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The maximum QoS level to be used when receiving messages.
         /// </summary>
+        [PublicAPI]
         public int Qos
         {
             get => GetValue<int>("qos", default);
@@ -47,6 +52,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic subscribed to receive trigger events.
         /// </summary>
+        [PublicAPI]
         public string Topic
         {
             get => GetValue<string>("topic", default);
@@ -56,6 +62,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The type of the trigger, e.g. `button_short_press`. Entries supported by the frontend: `button_short_press`, `button_short_release`, `button_long_press`, `button_long_release`, `button_double_press`, `button_triple_press`, `button_quadruple_press`, `button_quintuple_press`. If set to an unsupported value, will render as `subtype type`, e.g. `First button spammed` with `type` set to `spammed` and `subtype` set to `button_1`
         /// </summary>
+        [PublicAPI]
         public string Type
         {
             get => GetValue<string>("type", default);
@@ -65,6 +72,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The subtype of the trigger, e.g. `button_1`. Entries supported by the frontend: `turn_on`, `turn_off`, `button_1`, `button_2`, `button_3`, `button_4`, `button_5`, `button_6`. If set to an unsupported value, will render as `subtype type`, e.g. `left_button pressed` with `type` set to `button_short_press` and `subtype` set to `left_button`
         /// </summary>
+        [PublicAPI]
         public string Subtype
         {
             get => GetValue<string>("subtype", default);
