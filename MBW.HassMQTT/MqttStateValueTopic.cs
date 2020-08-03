@@ -44,6 +44,11 @@ namespace MBW.HassMQTT
             }
         }
 
+        public void SetDirty()
+        {
+            Dirty = true;
+        }
+
         public object GetSerializedValue(bool resetDirty)
         {
             if (resetDirty)

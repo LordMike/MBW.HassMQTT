@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -58,9 +58,8 @@ namespace MBW.HassMQTT.DiscoveryModels
             return _discover.GetOrDefault(name, @default);
         }
 
-        private void SetDirty()
+        public void SetDirty()
         {
-            // To avoid 200x lambdas
             Dirty = true;
         }
 

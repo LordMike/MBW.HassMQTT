@@ -125,6 +125,15 @@ namespace MBW.HassMQTT
             if (log)
                 _logger.LogDebug("Pushed {Value} to {Topic}", sentValue, container.PublishTopic);
         }
+        
+        public void MarkAllValuesDirty()
+        {
+            foreach (MqttStateValueTopic value in _values.Values)
+                value.SetDirty();
+            
+            foreach (MqttAttributesTopic value in _attributes.Values)
+                value.SetDirty();
+        }
 
         public async Task FlushAll(CancellationToken token = default)
         {
