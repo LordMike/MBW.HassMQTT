@@ -77,5 +77,13 @@ namespace MBW.HassMQTT.Extensions
             sensor.GetValueSender(topicKind).Value = value;
             return sensor;
         }
+
+        public static ISensorContainer GetSensor(this HassMqttManager manager, string deviceId, string entityId)
+        {
+            if (manager.TryGetSensor(deviceId, entityId, out var sensor))
+                return sensor;
+
+            throw new InvalidOperationException($"Unable to find sensor {deviceId}/{entityId} - is it configured?");
+        }
     }
 }

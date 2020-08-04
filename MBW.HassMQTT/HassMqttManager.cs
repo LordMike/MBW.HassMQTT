@@ -70,14 +70,14 @@ namespace MBW.HassMQTT
             return (IDiscoveryDocumentBuilder<TEntity>)builder;
         }
 
-        public ISensorContainer GetSensor(string deviceId, string entityId)
+        public bool TryGetSensor(string deviceId, string entityId, out ISensorContainer sensor)
         {
             string uniqueId = $"{deviceId}_{entityId}";
 
-            if (_discoveryDocuments.TryGetValue(uniqueId, out IDiscoveryDocumentBuilder builder))
-                return builder as ISensorContainer;
+            _discoveryDocuments.TryGetValue(uniqueId, out IDiscoveryDocumentBuilder builder);
+            sensor = builder as ISensorContainer;
 
-            throw new InvalidOperationException($"Unable to find sensor {deviceId}/{entityId} - is it configured?");
+            return sensor != null;
         }
 
         public MqttAttributesTopic GetAttributesSender(string topic)
@@ -125,12 +125,12 @@ namespace MBW.HassMQTT
             if (log)
                 _logger.LogDebug("Pushed {Value} to {Topic}", sentValue, container.PublishTopic);
         }
-        
+
         public void MarkAllValuesDirty()
         {
             foreach (MqttStateValueTopic value in _values.Values)
                 value.SetDirty();
-            
+
             foreach (MqttAttributesTopic value in _attributes.Values)
                 value.SetDirty();
         }
