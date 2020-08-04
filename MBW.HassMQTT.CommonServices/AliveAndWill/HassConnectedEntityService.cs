@@ -42,7 +42,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
             _mqttEvents = mqttEvents;
             _hassMqttManager = hassMqttManager;
 
-            StateTopic = topicBuilder.GetServiceTopic(_config.DeviceId, _config.EntityId);
+            StateTopic = topicBuilder.GetServiceTopic(_config.DeviceId, _config.EntityId, "state");
         }
 
         private void CreateSystemEntities()

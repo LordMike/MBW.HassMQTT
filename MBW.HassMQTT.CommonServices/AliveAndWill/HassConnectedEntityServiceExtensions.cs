@@ -39,7 +39,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
 
             return builder.WithWillMessage(new MqttApplicationMessage
             {
-                Topic = topicBuilder.GetServiceTopic(config.DeviceId, config.EntityId),
+                Topic = topicBuilder.GetServiceTopic(config.DeviceId, config.EntityId, "state"),
                 Payload = Encoding.UTF8.GetBytes(config.ProblemMessage),
                 Retain = true
             });
