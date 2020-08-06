@@ -9,6 +9,12 @@
     <PackageOutputPath>$(SolutionDir)/build</PackageOutputPath>
   </PropertyGroup>
 
+  <!-- Docs -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
   <!-- Nuget -->
   <PropertyGroup>
     <Authors>LordMike</Authors>
