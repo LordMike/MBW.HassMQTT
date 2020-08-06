@@ -37,7 +37,7 @@ namespace MBW.HassMQTT.Services
 
         private async Task OnMessage(MqttApplicationMessageReceivedEventArgs arg)
         {
-            _logger.LogTrace("Handling message on {topic} with {bytes} bytes", arg.ApplicationMessage.Topic, arg.ApplicationMessage.Payload.Length);
+            _logger.LogTrace("Handling message on {topic} with {bytes} bytes", arg.ApplicationMessage.Topic, arg.ApplicationMessage.Payload?.Length);
 
             foreach (IMqttMessageReceiver mqttMessageReceiver in _receivers)
             {
