@@ -23,7 +23,9 @@ jobs:
     - uses: actions/upload-artifact@v2-preview
       with:
         name: Nupkg
-        path: build/*.nupkg
+        path: |
+          build/*.nupkg
+          build/*.snupkg
     - name: push
       run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k $NUGET_KEY build/
       env:
