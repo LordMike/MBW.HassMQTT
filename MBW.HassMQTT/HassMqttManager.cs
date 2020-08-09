@@ -101,14 +101,21 @@ namespace MBW.HassMQTT
             object value = container.GetSerializedValue(resetDirty);
             bool log = _logger.IsEnabled(LogLevel.Debug);
 
-            object sentValue = default;
+            object sentValue;
             if (value is string str)
             {
                 sentValue = str;
                 await _mqttClient.SendValueAsync(container.PublishTopic, str, token);
             }
+            else if (value == null)
+            {
+                sentValue = "<null>";
+                await _mqttClient.SendValueAsync(container.PublishTopic, string.Empty, token);
+            }
             else
             {
+                sentValue = null;
+
                 JToken converted = JToken.FromObject(value);
                 await _mqttClient.SendJsonAsync(container.PublishTopic, converted, token);
 
@@ -143,18 +150,24 @@ namespace MBW.HassMQTT
 
                 foreach (IDiscoveryDocumentBuilder value in _discoveryDocuments.Values.Where(s => s.DiscoveryUntyped.Dirty))
                 {
+                    _logger.LogDebug("Sending discovery document for {uniqueId}", value.DiscoveryUntyped.UniqueId);
+
                     await SendValue(value.DiscoveryUntyped, true, token);
                     discoveryDocs++;
                 }
 
                 foreach (MqttStateValueTopic value in _values.Values.Where(s => s.Dirty))
                 {
+                    _logger.LogDebug("Sending state value for {topic}", value.PublishTopic);
+
                     await SendValue(value, true, token);
                     values++;
                 }
 
                 foreach (MqttAttributesTopic value in _attributes.Values.Where(s => s.Dirty))
                 {
+                    _logger.LogDebug("Sending attributes for {topic}", value.PublishTopic);
+
                     await SendValue(value, true, token);
                     attributes++;
                 }
