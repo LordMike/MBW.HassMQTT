@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 
@@ -37,6 +38,15 @@ namespace MBW.HassMQTT
                 return;
 
             _attributes[name] = value;
+            Dirty = true;
+        }
+
+        public void Clear()
+        {
+            if (!_attributes.Any())
+                return;
+
+            _attributes.Clear();
             Dirty = true;
         }
 
