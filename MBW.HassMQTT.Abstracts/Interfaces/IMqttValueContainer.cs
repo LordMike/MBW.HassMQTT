@@ -5,7 +5,7 @@
         string PublishTopic { get; }
         bool Dirty { get; }
 
-        void SetDirty();
+        void SetDirty(bool dirty = true);
 
         object GetSerializedValue(bool resetDirty);
     }

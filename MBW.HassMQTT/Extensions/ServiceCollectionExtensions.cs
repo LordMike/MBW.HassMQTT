@@ -42,5 +42,15 @@ namespace MBW.HassMQTT.Extensions
 
             return services.AddSingleton<IMqttMessageReceiver>(x => x.GetRequiredService<TReceiver>());
         }
+
+        public static IServiceCollection AddHassMqttManager(this IServiceCollection services, Action<HassMqttManagerConfiguration> configure = null)
+        {
+            services.AddSingleton<HassMqttManager>();
+
+            if (configure != null)
+                services.Configure(configure);
+
+            return services;
+        }
     }
 }

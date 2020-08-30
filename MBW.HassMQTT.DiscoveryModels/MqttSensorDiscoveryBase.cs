@@ -24,7 +24,7 @@ namespace MBW.HassMQTT.DiscoveryModels
         public string UniqueId
         {
             get => _discover.GetOrDefault<string>("unique_id", null);
-            set => _discover.SetIfChanged("unique_id", value, SetDirty);
+            set => _discover.SetIfChanged("unique_id", value, () => SetDirty());
         }
 
         public MqttSensorDiscoveryBase(string discoveryTopic, string uniqueId)
@@ -33,7 +33,7 @@ namespace MBW.HassMQTT.DiscoveryModels
             _discover = new JObject();
 
             JObject deviceDoc = new JObject();
-            Device = new MqttDeviceDocument(deviceDoc, SetDirty);
+            Device = new MqttDeviceDocument(deviceDoc, () => SetDirty());
 
             _discover["device"] = deviceDoc;
 
@@ -50,7 +50,7 @@ namespace MBW.HassMQTT.DiscoveryModels
 
         protected void SetValue<T>(string name, T value)
         {
-            _discover.SetIfChanged(name, value, SetDirty);
+            _discover.SetIfChanged(name, value, () => SetDirty());
         }
 
         protected T GetValue<T>(string name, T @default)
@@ -58,9 +58,9 @@ namespace MBW.HassMQTT.DiscoveryModels
             return _discover.GetOrDefault(name, @default);
         }
 
-        public void SetDirty()
+        public void SetDirty(bool dirty = true)
         {
-            Dirty = true;
+            Dirty = dirty;
         }
 
         public void SetTopic(HassTopicKind topicKind, string topic)
