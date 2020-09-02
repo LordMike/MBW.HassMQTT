@@ -98,7 +98,7 @@ namespace MBW.HassMQTT
 
         private async Task SendValue(IMqttValueContainer container, bool resetDirty, CancellationToken token)
         {
-            object value = container.GetSerializedValue(resetDirty);
+            object value = container.GetSerializedValue(false);
             bool log = _logger.IsEnabled(LogLevel.Debug);
 
             object sentValue;
@@ -122,6 +122,10 @@ namespace MBW.HassMQTT
                 if (log)
                     sentValue = converted.ToString(Formatting.None);
             }
+
+            // Set to not-dirty _after_ sending the value
+            if (resetDirty)
+                container.SetDirty(false);
 
             if (log)
                 _logger.LogDebug("Pushed {Value} to {Topic}", sentValue, container.PublishTopic);
