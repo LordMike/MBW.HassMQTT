@@ -12,6 +12,8 @@ using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MQTTnet.Client;
+using MQTTnet.Client.Connecting;
+using MQTTnet.Client.Disconnecting;
 
 namespace MBW.HassMQTT.CommonServices.AliveAndWill
 {
@@ -19,7 +21,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
     /// Service that uses the LWT (Last will testament) of MQTT to notify HASS what the status of this application is.
     /// This is useful to give end users and idea of the uptime of the service, and to notify will stop receiving updates.
     /// </summary>
-    public class HassConnectedEntityService : BackgroundService
+    public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
     {
         private readonly HassConnectedEntityServiceConfig _config;
         private readonly IMqttClient _mqttClient;
@@ -62,7 +64,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
                 {
                     discovery.Name = _config.DiscoveryEntityName;
                     discovery.DeviceClass = HassDeviceClass.Problem;
-            
+
                     discovery.PayloadOn = ProblemMessage;
                     discovery.PayloadOff = OkMessage;
                 });
@@ -73,6 +75,23 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
             ISensorContainer sensor = _hassMqttManager.GetSensor(_config.DeviceId, _config.EntityId);
 
             sensor.SetAttribute(name, value);
+        }
+
+        async Task IMqttEventReceiver.OnConnect(MqttClientConnectedEventArgs args, CancellationToken token)
+        {
+            // Hook to on connect
+            // Connected: Push "ok" message
+            // Testament (When disconnected): Leave "problem" message
+            if (token.IsCancellationRequested)
+                return;
+
+            await _mqttClient.SendValueAsync(StateTopic, OkMessage, token);
+        }
+
+        Task IMqttEventReceiver.OnDisconnect(MqttClientDisconnectedEventArgs args, CancellationToken token)
+        {
+            // Do nothing
+            return Task.CompletedTask;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -88,21 +107,6 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
                 attributes.SetAttribute("version", entryAssembly.GetName().Version.ToString(3));
 
             attributes.SetAttribute("started", DateTime.UtcNow);
-
-            // Hook to on connect
-            // Connected: Push "ok" message
-            // Testament (When disconnected): Leave "problem" message
-
-            _mqttEvents.OnConnect += async (args, token) =>
-            {
-                if (stoppingToken.IsCancellationRequested)
-                    return;
-
-                await _mqttClient.SendValueAsync(StateTopic, OkMessage, token);
-            };
-
-            // Send initial Ok message
-            await _mqttClient.SendValueAsync(StateTopic, OkMessage, stoppingToken);
         }
     }
 }

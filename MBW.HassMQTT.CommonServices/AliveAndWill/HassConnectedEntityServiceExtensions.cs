@@ -18,6 +18,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
             services
                 .AddSingleton<AvailabilityDecoratorService>()
                 .AddSingleton<HassConnectedEntityService>()
+                .AddSingleton<IMqttEventReceiver>(x => x.GetRequiredService<HassConnectedEntityService>())
                 .AddHostedService(x => x.GetRequiredService<HassConnectedEntityService>())
                 .Configure<HassConnectedEntityServiceConfig>(x =>
                 {
