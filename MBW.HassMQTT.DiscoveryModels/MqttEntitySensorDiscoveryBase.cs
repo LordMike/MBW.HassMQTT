@@ -4,7 +4,7 @@ namespace MBW.HassMQTT.DiscoveryModels
 {
     /// <summary>
     /// All MQTT entity discovery types should inherit from this.
-    /// Examples that won't inherit from it: device_trigger
+    /// Examples that won't inherit from it: device_trigger, tag
     /// https://www.home-assistant.io/docs/mqtt/discovery/
     /// </summary>
     public abstract class MqttEntitySensorDiscoveryBase : MqttSensorDiscoveryBase, IHasAttributesTopic, IHasAvailabilityTopic

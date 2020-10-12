@@ -40,6 +40,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         Switch,
 
         [EnumMember(Value = "vacuum")]
-        Vacuum
+        Vacuum,
+
+        [EnumMember(Value = "tag")]
+        TagScanner
     }
 }
