@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace MBW.HassMQTT.DiscoveryModels.Helpers
 {
@@ -33,7 +34,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Helpers
                 case DateTime asDateTime:
                     return asDateTime.Equals((DateTime)b);
                 default:
-                    throw new Exception($"Attempted to compare {a.GetType()}, which is unsupported");
+                    return Comparer.DefaultInvariant.Compare(a, b) == 0;
             }
         }
 
