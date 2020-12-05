@@ -123,7 +123,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
             get => GetValue<string>("payload_disarm", default);
             set => SetValue("payload_disarm", value);
         }
-
+        
         /// <summary>
         /// The maximum QoS level of the state topic.
         /// </summary>
@@ -132,6 +132,16 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         {
             get => GetValue<int>("qos", default);
             set => SetValue("qos", value);
+        }
+
+        /// <summary>
+        /// If the published message should have the retain flag on or not.
+        /// </summary>
+        [PublicAPI]
+        public bool Retain
+        {
+            get => GetValue<bool>("retain", default);
+            set => SetValue("retain", value);
         }
 
         /// <summary>
