@@ -15,7 +15,7 @@ using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -26,7 +26,7 @@ namespace MBW.HassMQTT
         private readonly ManualResetEventSlim _lockObject = new ManualResetEventSlim(true);
         private readonly IServiceProvider _serviceProvider;
         private readonly HassMqttManagerConfiguration _config;
-        private readonly IMqttClient _mqttClient;
+        private readonly IManagedMqttClient _mqttClient;
         private readonly ILogger<HassMqttManager> _logger;
         private readonly ConcurrentDictionary<string, IDiscoveryDocumentBuilder> _discoveryDocuments;
         private readonly ConcurrentDictionary<string, MqttStateValueTopic> _values;
@@ -34,7 +34,7 @@ namespace MBW.HassMQTT
 
         internal HassMqttTopicBuilder TopicBuilder { get; }
 
-        public HassMqttManager(IServiceProvider serviceProvider, IOptions<HassMqttManagerConfiguration> config, IMqttClient mqttClient, HassMqttTopicBuilder topicBuilder, ILogger<HassMqttManager> logger)
+        public HassMqttManager(IServiceProvider serviceProvider, IOptions<HassMqttManagerConfiguration> config, IManagedMqttClient mqttClient, HassMqttTopicBuilder topicBuilder, ILogger<HassMqttManager> logger)
         {
             _serviceProvider = serviceProvider;
             _config = config.Value;

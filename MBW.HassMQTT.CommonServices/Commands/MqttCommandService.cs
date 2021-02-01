@@ -8,14 +8,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MQTTnet;
-using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 
 namespace MBW.HassMQTT.CommonServices.Commands
 {
     internal class MqttCommandService : IHostedService, IMqttMessageReceiver
     {
         private readonly ILogger<MqttCommandService> _logger;
-        private readonly IMqttClient _mqttClient;
+        private readonly IManagedMqttClient _mqttClient;
         private readonly string _topicPrefix;
 
         private readonly List<(string[] filter, IMqttCommandHandler handler)> _handlers = new List<(string[] filter, IMqttCommandHandler handler)>();
@@ -23,7 +23,7 @@ namespace MBW.HassMQTT.CommonServices.Commands
         public MqttCommandService(
             ILogger<MqttCommandService> logger,
             IOptions<HassConfiguration> hassConfig,
-            IMqttClient mqttClient,
+            IManagedMqttClient mqttClient,
             IEnumerable<IMqttCommandHandler> handlers)
         {
             _logger = logger;

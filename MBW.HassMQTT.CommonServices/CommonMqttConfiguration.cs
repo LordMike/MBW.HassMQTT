@@ -14,7 +14,7 @@ namespace MBW.HassMQTT.CommonServices
 
         public string ClientId { get; set; } = "HASSMQTT-unset";
 
-        public TimeSpan ReconnectInterval { get; set; } = TimeSpan.FromSeconds(30);
+        public TimeSpan ReconnectInterval { get; set; } = TimeSpan.FromSeconds(5);
 
         public TimeSpan? KeepAlivePeriod { get; set; }
     }

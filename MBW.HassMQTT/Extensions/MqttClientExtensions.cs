@@ -2,13 +2,13 @@
 using System.Threading;
 using MBW.HassMQTT.Services;
 using Microsoft.Extensions.DependencyInjection;
-using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 
 namespace MBW.HassMQTT.Extensions
 {
     public static class MqttClientExtensions
     {
-        public static IMqttClient ConfigureMqttEvents(this IMqttClient mqttClient, IServiceProvider serviceProvider, CancellationToken cancellationToken)
+        public static IManagedMqttClient ConfigureMqttEvents(this IManagedMqttClient mqttClient, IServiceProvider serviceProvider, CancellationToken cancellationToken)
         {
             MqttEvents mqttEvents = serviceProvider.GetService<MqttEvents>();
 

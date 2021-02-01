@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 
 namespace MBW.HassMQTT.Services
 {
     internal class MqttMessageDistributor : IHostedService
     {
         private readonly ILogger<MqttMessageDistributor> _logger;
-        private readonly IMqttClient _mqttClient;
+        private readonly IManagedMqttClient _mqttClient;
         private readonly List<IMqttMessageReceiver> _receivers;
 
-        public MqttMessageDistributor(ILogger<MqttMessageDistributor> logger, IMqttClient mqttClient, IEnumerable<IMqttMessageReceiver> receivers)
+        public MqttMessageDistributor(ILogger<MqttMessageDistributor> logger, IManagedMqttClient mqttClient, IEnumerable<IMqttMessageReceiver> receivers)
         {
             _logger = logger;
             _mqttClient = mqttClient;

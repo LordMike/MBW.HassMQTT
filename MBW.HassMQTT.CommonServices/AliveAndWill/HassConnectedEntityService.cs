@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,9 +11,9 @@ using MBW.HassMQTT.Services;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
+using MQTTnet.Extensions.ManagedClient;
 
 namespace MBW.HassMQTT.CommonServices.AliveAndWill
 {
@@ -24,7 +24,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
     public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
     {
         private readonly HassConnectedEntityServiceConfig _config;
-        private readonly IMqttClient _mqttClient;
+        private readonly IManagedMqttClient _mqttClient;
         private readonly MqttEvents _mqttEvents;
         private readonly HassMqttManager _hassMqttManager;
 
@@ -34,7 +34,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
         public string StateTopic { get; }
 
         public HassConnectedEntityService(IOptions<HassConnectedEntityServiceConfig> options,
-            IMqttClient mqttClient,
+            IManagedMqttClient mqttClient,
             MqttEvents mqttEvents,
             HassMqttManager hassMqttManager,
             HassMqttTopicBuilder topicBuilder)

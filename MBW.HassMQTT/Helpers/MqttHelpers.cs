@@ -3,7 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MQTTnet;
-using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -27,7 +27,7 @@ namespace MBW.HassMQTT.Helpers
             return ms.ToArray();
         }
 
-        public static Task SendJsonAsync(this IMqttClient mqttClient, string topic, JToken doc, CancellationToken token = default)
+        public static Task SendJsonAsync(this IManagedMqttClient mqttClient, string topic, JToken doc, CancellationToken token = default)
         {
             return mqttClient.PublishAsync(new MqttApplicationMessage
             {
@@ -38,7 +38,7 @@ namespace MBW.HassMQTT.Helpers
             }, token);
         }
 
-        public static Task SendValueAsync(this IMqttClient mqttClient, string topic, string value, CancellationToken token = default)
+        public static Task SendValueAsync(this IManagedMqttClient mqttClient, string topic, string value, CancellationToken token = default)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(value);
 
