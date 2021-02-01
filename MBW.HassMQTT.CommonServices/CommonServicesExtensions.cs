@@ -82,7 +82,7 @@ namespace MBW.HassMQTT.CommonServices
             services.AddHassMqttManager(hassMqttManagerConfiguration);
 
             // Add connecter
-            services.AddHostedService<MqttClientLifetimeService>();
+            services.AddMqttLifetimeService();
 
             return services;
         }

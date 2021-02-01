@@ -24,6 +24,11 @@ namespace MBW.HassMQTT.Extensions
             });
         }
 
+        public static IServiceCollection AddMqttLifetimeService(this IServiceCollection services)
+        {
+            return services.AddHostedService<MqttClientLifetimeService>();
+        }
+
         public static IServiceCollection AddMqttEvents(this IServiceCollection services)
         {
             return services.AddSingleton<MqttEvents>();
