@@ -11,6 +11,7 @@ using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Helpers;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Internal;
+using MBW.HassMQTT.Serialization;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -116,7 +117,7 @@ namespace MBW.HassMQTT
             {
                 sentValue = null;
 
-                JToken converted = JToken.FromObject(value);
+                JToken converted = JToken.FromObject(value, CustomJsonSerializer.Serializer);
                 await _mqttClient.SendJsonAsync(container.PublishTopic, converted, token);
 
                 if (log)

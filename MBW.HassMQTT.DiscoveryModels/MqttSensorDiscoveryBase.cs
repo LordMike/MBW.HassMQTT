@@ -1,9 +1,12 @@
 using System;
+using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using MBW.HassMQTT.Abstracts.Interfaces;
+using MBW.HassMQTT.DiscoveryModels.Device;
 using MBW.HassMQTT.DiscoveryModels.Enum;
-using MBW.HassMQTT.DiscoveryModels.Helpers;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.DiscoveryModels
 {
@@ -11,33 +14,44 @@ namespace MBW.HassMQTT.DiscoveryModels
     /// All MQTT discovery types are documented here:
     /// https://www.home-assistant.io/docs/mqtt/discovery/
     /// </summary>
-    public abstract class MqttSensorDiscoveryBase : IMqttValueContainer
+    public abstract class MqttSensorDiscoveryBase : IMqttValueContainer, INotifyPropertyChanged
     {
-        private readonly JObject _discover;
+        public event PropertyChangedEventHandler PropertyChanged;
 
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+            if (nameof(Dirty) != propertyName)
+                Dirty = true;
+        }
+
+        /// <inheritdoc />
+        [JsonIgnore]
         public bool Dirty { get; private set; }
 
+        /// <inheritdoc />
+        [JsonIgnore]
         public string PublishTopic { get; }
 
-        public MqttDeviceDocument Device { get; }
+        [JsonProperty("device")]
+        public MqttDeviceDocument Device { get; set; }
 
-        public string UniqueId
-        {
-            get => _discover.GetOrDefault<string>("unique_id", null);
-            set => _discover.SetIfChanged("unique_id", value, () => SetDirty());
-        }
+        [JsonProperty("unique_id")]
+        public string UniqueId { get; set; }
 
         public MqttSensorDiscoveryBase(string discoveryTopic, string uniqueId)
         {
             PublishTopic = discoveryTopic;
-            _discover = new JObject();
-
-            JObject deviceDoc = new JObject();
-            Device = new MqttDeviceDocument(deviceDoc, () => SetDirty());
-
-            _discover["device"] = deviceDoc;
-
             UniqueId = uniqueId;
+
+            Device = new MqttDeviceDocument(this);
+        }
+
+        public void SetDirty(bool dirty = true)
+        {
+            Dirty = dirty;
         }
 
         public object GetSerializedValue(bool resetDirty)
@@ -45,22 +59,7 @@ namespace MBW.HassMQTT.DiscoveryModels
             if (resetDirty)
                 Dirty = false;
 
-            return _discover;
-        }
-
-        protected void SetValue<T>(string name, T value)
-        {
-            _discover.SetIfChanged(name, value, () => SetDirty());
-        }
-
-        protected T GetValue<T>(string name, T @default)
-        {
-            return _discover.GetOrDefault(name, @default);
-        }
-
-        public void SetDirty(bool dirty = true)
-        {
-            Dirty = dirty;
+            return this;
         }
 
         public void SetTopic(HassTopicKind topicKind, string topic)

@@ -10,6 +10,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [Obsolete("Needs to be re-implemented")]
     [DeviceType(HassDeviceType.DeviceTrigger)]
+    [PublicAPI]
     public class MqttDeviceTrigger : MqttSensorDiscoveryBase
     {
         public MqttDeviceTrigger(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
@@ -22,61 +23,31 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The type of automation, must be 'trigger'.
         /// </summary>
-        [PublicAPI]
-        public string AutomationType
-        {
-            get => GetValue<string>("automation_type", default);
-            set => SetValue("automation_type", value);
-        }
+        public string AutomationType { get; set; }
 
         /// <summary>
         /// Optional payload to match the payload being sent over the topic.
         /// </summary>
-        [PublicAPI]
-        public string Payload
-        {
-            get => GetValue<string>("payload", default);
-            set => SetValue("payload", value);
-        }
+        public string Payload { get; set; }
 
         /// <summary>
         /// The maximum QoS level to be used when receiving messages.
         /// </summary>
-        [PublicAPI]
-        public int Qos
-        {
-            get => GetValue<int>("qos", default);
-            set => SetValue("qos", value);
-        }
+        public MqttQosLevel Qos { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive trigger events.
         /// </summary>
-        [PublicAPI]
-        public string Topic
-        {
-            get => GetValue<string>("topic", default);
-            set => SetValue("topic", value);
-        }
+        public string Topic { get; set; }
 
         /// <summary>
         /// The type of the trigger, e.g. `button_short_press`. Entries supported by the frontend: `button_short_press`, `button_short_release`, `button_long_press`, `button_long_release`, `button_double_press`, `button_triple_press`, `button_quadruple_press`, `button_quintuple_press`. If set to an unsupported value, will render as `subtype type`, e.g. `First button spammed` with `type` set to `spammed` and `subtype` set to `button_1`
         /// </summary>
-        [PublicAPI]
-        public string Type
-        {
-            get => GetValue<string>("type", default);
-            set => SetValue("type", value);
-        }
+        public string Type { get; set; }
 
         /// <summary>
         /// The subtype of the trigger, e.g. `button_1`. Entries supported by the frontend: `turn_on`, `turn_off`, `button_1`, `button_2`, `button_3`, `button_4`, `button_5`, `button_6`. If set to an unsupported value, will render as `subtype type`, e.g. `left_button pressed` with `type` set to `button_short_press` and `subtype` set to `left_button`
         /// </summary>
-        [PublicAPI]
-        public string Subtype
-        {
-            get => GetValue<string>("subtype", default);
-            set => SetValue("subtype", value);
-        }
+        public string Subtype { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using EnumsNET;
 using MBW.HassMQTT.DiscoveryModels;
+using MBW.HassMQTT.DiscoveryModels.Device;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.Interfaces;
