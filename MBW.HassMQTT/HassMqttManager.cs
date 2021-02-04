@@ -47,9 +47,9 @@ namespace MBW.HassMQTT
             _attributes = new ConcurrentDictionary<string, MqttAttributesTopic>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId) where TEntity : MqttSensorDiscoveryBase
+        public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId, string uniqueId = null) where TEntity : MqttSensorDiscoveryBase
         {
-            string uniqueId = $"{deviceId}_{entityId}".ToLower();
+            uniqueId ??= $"{deviceId}_{entityId}".ToLower();
 
             IDiscoveryDocumentBuilder builder = _discoveryDocuments.GetOrAdd(uniqueId, s =>
             {

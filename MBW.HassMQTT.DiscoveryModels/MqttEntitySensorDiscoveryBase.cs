@@ -18,18 +18,14 @@ namespace MBW.HassMQTT.DiscoveryModels
         }
 
         /// <inheritdoc />
-        [JsonProperty("json_attributes_template")]
         public string JsonAttributesTemplate { get; set; }
 
         /// <inheritdoc />
-        [JsonProperty("json_attributes_topic")]
         public string JsonAttributesTopic { get; set; }
 
-        [JsonProperty("availability")]
         public IList<AvailabilityModel> Availability { get; set; }
 
         /// <inheritdoc />
-        [JsonProperty("availability_mode")]
         public AvailabilityMode? AvailabilityMode { get; set; }
     }
 }

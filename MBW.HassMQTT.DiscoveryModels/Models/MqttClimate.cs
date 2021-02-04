@@ -86,9 +86,19 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string[] FanModes { get; set; }
 
         /// <summary>
+        /// A template to render the value sent to the `fan_mode_command_topic` with.
+        /// </summary>
+        public string FanModeCommandTemplate { get; set; }
+        
+        /// <summary>
         /// The MQTT topic to publish commands to change the hold mode.
         /// </summary>
         public string HoldCommandTopic { get; set; }
+
+        /// <summary>
+        /// A template to render the value sent to the `hold_command_topic` with.
+        /// </summary>
+        public string HoldCommandTemplate { get; set; }
 
         /// <summary>
         /// A template to render the value received on the `hold_state_topic` with.
@@ -124,6 +134,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to change the HVAC operation mode.
         /// </summary>
         public string ModeCommandTopic { get; set; }
+        
+        /// <summary>
+        /// A template to render the value sent to the `mode_command_topic` with.
+        /// </summary>
+        public string ModeCommandTemplate { get; set; }
 
         /// <summary>
         /// A template to render the value received on the `mode_state_topic` with.
@@ -184,6 +199,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to change the swing mode.
         /// </summary>
         public string SwingModeCommandTopic { get; set; }
+        
+        /// <summary>
+        /// A template to render the value sent to the `swing_mode_command_topic` with.
+        /// </summary>
+        public string SwingModeCommandTemplate { get; set; }
 
         /// <summary>
         /// A template to render the value received on the `swing_mode_state_topic` with.
@@ -204,11 +224,21 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to change the target temperature.
         /// </summary>
         public string TemperatureCommandTopic { get; set; }
+        
+        /// <summary>
+        /// A template to render the value sent to the `temperature_command_topic` with.
+        /// </summary>
+        public string TemperatureCommandTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to change the high target temperature.
         /// </summary>
         public string TemperatureHighCommandTopic { get; set; }
+        
+        /// <summary>
+        /// A template to render the value sent to the `temperature_high_command_topic` with.
+        /// </summary>
+        public string TemperatureHighCommandTemplate { get; set; }
 
         /// <summary>
         /// A template to render the value received on the `temperature_high_state_topic` with.
@@ -224,6 +254,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to change the target low temperature.
         /// </summary>
         public string TemperatureLowCommandTopic { get; set; }
+        
+        /// <summary>
+        /// A template to render the value sent to the `temperature_low_command_topic` with.
+        /// </summary>
+        public string TemperatureLowCommandTemplate { get; set; }
 
         /// <summary>
         /// A template to render the value received on the `temperature_low_state_topic` with.

@@ -46,6 +46,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         TagScanner,
 
         [EnumMember(Value = "scene")]
-        Scene
+        Scene,
+
+        [EnumMember(Value = "number")]
+        Number
     }
 }

@@ -35,11 +35,9 @@ namespace MBW.HassMQTT.DiscoveryModels
         [JsonIgnore]
         public string PublishTopic { get; }
 
-        [JsonProperty("device")]
-        public MqttDeviceDocument Device { get; set; }
+        public MqttDeviceDocument Device { get; }
 
-        [JsonProperty("unique_id")]
-        public string UniqueId { get; set; }
+        public string UniqueId { get; }
 
         public MqttSensorDiscoveryBase(string discoveryTopic, string uniqueId)
         {

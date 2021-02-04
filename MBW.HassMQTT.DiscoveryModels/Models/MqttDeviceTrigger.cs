@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
@@ -8,16 +7,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// <summary>
     /// https://www.home-assistant.io/integrations/device_trigger.mqtt/
     /// </summary>
-    [Obsolete("Needs to be re-implemented")]
     [DeviceType(HassDeviceType.DeviceTrigger)]
     [PublicAPI]
     public class MqttDeviceTrigger : MqttSensorDiscoveryBase
     {
         public MqttDeviceTrigger(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
-            // This is an odd one, it doesn't behave like other components. 
-
-            throw new NotImplementedException();
         }
 
         /// <summary>
