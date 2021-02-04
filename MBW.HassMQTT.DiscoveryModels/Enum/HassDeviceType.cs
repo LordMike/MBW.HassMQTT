@@ -49,6 +49,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         Scene,
 
         [EnumMember(Value = "number")]
-        Number
+        Number,
+
+        [EnumMember(Value = "device_tracker")]
+        DeviceTracker
     }
 }
