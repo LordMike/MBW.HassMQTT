@@ -16,14 +16,24 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
         
         /// <summary>
-        /// Name
+        /// The name of the MQTT device_tracker.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
+        /// The icon for the device tracker.
+        /// </summary>
+        public string Icon { get; set; }
+        
+        /// <summary>
         /// State topic
         /// </summary>
         public string StateTopic { get; set; }
+
+        /// <summary>
+        /// Defines a template that returns a device tracker state.
+        /// </summary>
+        public string ValueTemplate { get; set; }
 
         /// <summary>
         /// The QoS level of the topic.
