@@ -59,9 +59,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Number which represents open position.
         /// </summary>
         public int PositionOpen { get; set; }
+        
+        /// <summary>
+        /// Defines a template that can be used to extract the payload for the `position_topic` topic.
+        /// </summary>
+        public string PositionTemplate { get; set; }
 
         /// <summary>
-        /// The MQTT topic subscribed to receive cover position messages. If `position_topic` is set `state_topic` is ignored.
+        /// The MQTT topic subscribed to receive cover position messages.
         /// </summary>
         public string PositionTopic { get; set; }
 
@@ -104,9 +109,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The payload that represents the opening state.
         /// </summary>
         public string StateOpening { get; set; }
+        
+        /// <summary>
+        /// The payload that represents the stopped state (for covers that do not report `open`/`closed` state).
+        /// </summary>
+        public string StateStopped { get; set; }
 
         /// <summary>
-        /// The MQTT topic subscribed to receive cover state messages. Use only if not using `position_topic`. State topic can only read open/close state. Cannot read position state. If `position_topic` is set `state_topic` is ignored.
+        /// The MQTT topic subscribed to receive cover state messages. State topic can only read (`open`, `opening`, `closed`, `closing` or `stopped`) state.
         /// </summary>
         public string StateTopic { get; set; }
 
@@ -114,16 +124,16 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The value that will be sent on a `close_cover_tilt` command.
         /// </summary>
         public int TiltClosedValue { get; set; }
+        
+        /// <summary>
+        /// Defines a [template](/topics/templating/) that can be used to extract the payload for the `tilt_command_topic` topic.
+        /// </summary>
+        public string TiltCommandTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to control the cover tilt.
         /// </summary>
         public string TiltCommandTopic { get; set; }
-
-        /// <summary>
-        /// Flag that determines if open/close are flipped; higher values toward closed and lower values toward open.
-        /// </summary>
-        public bool TiltInvertState { get; set; }
 
         /// <summary>
         /// The maximum tilt value
@@ -156,7 +166,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string TiltStatusTopic { get; set; }
 
         /// <summary>
-        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the payload.
+        /// Defines a template that can be used to extract the payload for the `state_topic` topic.
         /// </summary>
         public string ValueTemplate { get; set; }
     }
