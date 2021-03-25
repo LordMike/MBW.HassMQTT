@@ -5,7 +5,6 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{120041D7-3CC3-44EC-92DA-FBBB6970DCF2}"
 	ProjectSection(SolutionItems) = preProject
-		.gitignore = .gitignore
 		Directory.Build.props = Directory.Build.props
 		README.md = README.md
 	EndProjectSection
@@ -17,6 +16,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBW.HassMQTT.Abstracts", "MBW.HassMQTT.Abstracts\MBW.HassMQTT.Abstracts.csproj", "{E9C5BE1F-93D3-4A76-A174-FE3E99718209}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBW.HassMQTT.CommonServices", "MBW.HassMQTT.CommonServices\MBW.HassMQTT.CommonServices.csproj", "{A2D211E9-0770-4A46-868C-40239A7A5F4A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Imports", "_Imports", "{97FF5073-E307-4E9D-A437-3021A246F467}"
+	ProjectSection(SolutionItems) = preProject
+		_Imports\Local.targets = _Imports\Local.targets
+		_Imports\Test.targets = _Imports\Test.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +84,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97FF5073-E307-4E9D-A437-3021A246F467} = {120041D7-3CC3-44EC-92DA-FBBB6970DCF2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D9E1751-0BE8-4E7E-8F42-FDC69239F41D}
