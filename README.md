@@ -1,4 +1,4 @@
-# MBW.HassMQTT
+# MBW.HassMQTT [![Generic Build](https://github.com/LordMike/MBW.HassMQTT/actions/workflows/dotnet.yml/badge.svg)](https://github.com/LordMike/MBW.HassMQTT/actions/workflows/dotnet.yml) [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT)](https://www.nuget.org/packages/MBW.HassMQTT)
 
 Code to help me build integrations for Home Assistants MQTT integration. Contains models, common service and helper utilities.
 
