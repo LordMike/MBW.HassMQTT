@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
@@ -10,11 +11,34 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
     {
         private readonly MqttSensorDiscoveryBase _discoveryDoc;
         public event PropertyChangedEventHandler PropertyChanged;
-        
+
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged(string propertyName, object before, object after)
         {
-            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (propertyName == nameof(Identifiers))
+            {
+                // Extra check as arrays are special
+                if (before is string[] arrBefore && after is string[] arrAfter &&
+                    arrBefore.Length == arrAfter.Length &&
+                    arrBefore.SequenceEqual(arrAfter, StringComparer.Ordinal))
+                {
+                    // These arrays are identical
+                    return;
+                }
+            }
+
+            if (propertyName == nameof(Connections))
+            {
+                // Extra check as arrays are special
+                if (before is IList<ValueTuple<string, string>> arrBefore && after is IList<ValueTuple<string, string>> arrAfter &&
+                    arrBefore.Count == arrAfter.Count &&
+                    arrBefore.SequenceEqual(arrAfter, StringtupleComparer.Instance))
+                {
+                    // These arrays are identical
+                    return;
+                }
+            }
+
             _discoveryDoc.SetDirty();
         }
 
