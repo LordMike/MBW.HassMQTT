@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using Newtonsoft.Json;
@@ -23,6 +24,7 @@ namespace MBW.HassMQTT.DiscoveryModels
         /// <inheritdoc />
         public string JsonAttributesTopic { get; set; }
 
+        /// <inheritdoc />
         public IList<AvailabilityModel> Availability { get; set; }
 
         /// <inheritdoc />

@@ -1,5 +1,5 @@
 ﻿using MBW.HassMQTT.DiscoveryModels;
-using MBW.HassMQTT.DiscoveryModels.Availability;
+using MBW.HassMQTT.DiscoveryModels.Extensions;
 
 namespace MBW.HassMQTT.CommonServices.AliveAndWill
 {
@@ -14,12 +14,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
 
         public void ApplyAvailabilityInformation(MqttEntitySensorDiscoveryBase discovery)
         {
-            discovery.Availability.Add(new AvailabilityModel
-            {
-                Topic = _connectedEntityService.StateTopic,
-                PayloadAvailable = _connectedEntityService.OkMessage,
-                PayloadNotAvailable = _connectedEntityService.ProblemMessage
-            });
+            discovery.ConfigureAvailability(_connectedEntityService.StateTopic, _connectedEntityService.OkMessage, _connectedEntityService.ProblemMessage);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MBW.HassMQTT.DiscoveryModels.Availability
 {
@@ -7,6 +8,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Availability
         /// <summary>
         /// A list of MQTT topics subscribed to receive availability (online/offline) updates. Must not be used together with availability_topic.
         /// </summary>
+        [Obsolete("Use ConfigureAvailability extension method instead of this directly - direct use can lead to bugs")]
         IList<AvailabilityModel> Availability { get; set; }
 
         /// <summary>
