@@ -6,6 +6,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/tag.mqtt/
+    ///
+    /// The mqtt tag scanner platform uses an MQTT message payload to generate tag scanned events.
     /// </summary>
     [DeviceType(HassDeviceType.TagScanner)]
     [PublicAPI]

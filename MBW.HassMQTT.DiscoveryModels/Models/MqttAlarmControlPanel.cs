@@ -1,15 +1,37 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/alarm_control_panel.mqtt/
+    ///
+    /// The mqtt alarm panel platform enables the possibility to control MQTT capable alarm panels. The Alarm icon
+    /// will change state after receiving a new state from state_topic. If these messages are published with RETAIN flag,
+    /// the MQTT alarm panel will receive an instant state update after subscription and will start with the correct state.
+    /// Otherwise, the initial state will be unknown.
+    /// 
+    /// The integration will accept the following states from your Alarm Panel (in lower case):
+    /// - disarmed
+    /// - armed_home
+    /// - armed_away
+    /// - armed_night
+    /// - armed_custom_bypass
+    /// - pending
+    /// - triggered
+    /// - arming
+    /// - disarming
+    /// 
+    /// The integration can control your Alarm Panel by publishing to the command_topic when a user interacts with the
+    /// Home Assistant frontend.
     /// </summary>
     [DeviceType(HassDeviceType.AlarmControlPanel)]
     [PublicAPI]
-    public class MqttAlarmControlPanel : MqttEntitySensorDiscoveryBase
+    public class MqttAlarmControlPanel : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttAlarmControlPanel(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -71,16 +93,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string PayloadDisarm { get; set; }
 
         /// <summary>
-        /// The maximum QoS level of the state topic.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
-        /// If the published message should have the retain flag on or not.
-        /// </summary>
-        public bool Retain { get; set; }
-
-        /// <summary>
         /// The MQTT topic subscribed to receive state updates.
         /// </summary>
         public string StateTopic { get; set; }
@@ -89,5 +101,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the value.
         /// </summary>
         public string ValueTemplate { get; set; }
+
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
+        public bool Retain { get; set; }
     }
 }

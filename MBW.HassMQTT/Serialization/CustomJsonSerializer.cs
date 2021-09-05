@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
@@ -21,6 +21,7 @@ namespace MBW.HassMQTT.Serialization
 
             settings.Converters.Add(new QosLevelConverter());
             settings.Converters.Add(new StringEnumConverter(namingStrategy));
+            settings.Converters.Add(new ConnectionInfoConverter());
 
             Serializer = JsonSerializer.Create(settings);
         }

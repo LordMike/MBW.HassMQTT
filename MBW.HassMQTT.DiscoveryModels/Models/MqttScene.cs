@@ -2,37 +2,28 @@
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/scene.mqtt/
+    ///
+    /// The mqtt scene platform lets you control your MQTT enabled scenes.
     /// </summary>
     [DeviceType(HassDeviceType.Scene)]
     [PublicAPI]
-    public class MqttScene : MqttSensorDiscoveryBase, IHasAvailabilityTopic
+    public class MqttScene : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttScene(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
-            Availability = new List<AvailabilityModel>();
         }
-
-        /// <inheritdoc />
-        public IList<AvailabilityModel> Availability { get; set; }
-
-        /// <inheritdoc />
-        public AvailabilityMode? AvailabilityMode { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to change the switch state.
         /// </summary>
         public string CommandTopic { get; set; }
-
-        /// <summary>
-        /// Icon for the switch.
-        /// </summary>
-        public string Icon { get; set; }
 
         /// <summary>
         /// The name to use when displaying this switch.
@@ -45,14 +36,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// </summary>
         public string PayloadOn { get; set; }
 
-        /// <summary>
-        /// The maximum QoS level to be used when receiving messages.
-        /// </summary>
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
         public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
-        /// If the published message should have the retain flag on or not.
-        /// </summary>
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
         public bool Retain { get; set; }
     }
 }

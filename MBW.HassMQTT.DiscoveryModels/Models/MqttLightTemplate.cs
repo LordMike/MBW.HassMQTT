@@ -1,15 +1,38 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/light.mqtt/#template-schema
+    ///
+    /// The mqtt light platform with template schema lets you control a MQTT-enabled light that receive
+    /// commands on a command topic and optionally sends status update on a state topic. It is format-agnostic
+    /// so you can use any data format you want (i.e., string, JSON), just configure it with templating.
+    /// 
+    /// This schema supports on/off, brightness, RGB colors, XY colors, color temperature, transitions,
+    /// short/long flashing and effects.
     /// </summary>
+    /// <remarks>
+    /// In an ideal scenario, the MQTT device will have a state topic to publish state changes. If these
+    /// messages are published with the RETAIN flag, the MQTT light will receive an instant state update
+    /// after subscription and will start with the correct state. Otherwise, the initial state of the light
+    /// will be off.
+    /// 
+    /// When a state topic is not available, the light will work in optimistic mode.In this mode, the light
+    /// will immediately change state after every command.Otherwise, the light will wait for state confirmation
+    /// from the device (message from state_topic).
+    /// 
+    /// Optimistic mode can be forced, even if state topic is available.Try enabling it if the light is operating
+    /// incorrectly.
+    /// </remarks>
     [DeviceType(HassDeviceType.Light)]
     [PublicAPI]
-    public class MqttLightTemplate : MqttEntitySensorDiscoveryBase
+    public class MqttLightTemplate : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttLightTemplate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -81,11 +104,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string Optimistic { get; set; }
 
         /// <summary>
-        /// The maximum QoS level of the state topic.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract red color from the state payload value.
         /// </summary>
         public string RedTemplate { get; set; }
@@ -109,5 +127,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract white value from the state payload value.
         /// </summary>
         public string WhiteValueTemplate { get; set; }
+
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
+        public bool Retain { get; set; }
     }
 }

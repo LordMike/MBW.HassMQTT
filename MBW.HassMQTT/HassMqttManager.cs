@@ -62,7 +62,7 @@ namespace MBW.HassMQTT
                     EntityId = entityId
                 };
 
-                if (_config.AutoConfigureAttributesTopics && newBuilder.Discovery is IHasAttributesTopic)
+                if (_config.AutoConfigureAttributesTopics && newBuilder.Discovery is IHasJsonAttributes)
                     newBuilder.ConfigureTopics(HassTopicKind.JsonAttributes);
 
                 return newBuilder;
@@ -155,16 +155,18 @@ namespace MBW.HassMQTT
 
                 foreach (IDiscoveryDocumentBuilder value in _discoveryDocuments.Values.Where(s => s.DiscoveryUntyped.Dirty))
                 {
+                    string uniqueId = (value.DiscoveryUntyped as IHasUniqueId)?.UniqueId ?? value.ToString();
+
                     if (_config.SendDiscoveryDocuments)
                     {
-                        _logger.LogDebug("Sending discovery document for {uniqueId}", value.DiscoveryUntyped.UniqueId);
+                        _logger.LogDebug("Sending discovery document for {identifier}", uniqueId);
 
                         await SendValue(value.DiscoveryUntyped, true, token);
                         discoveryDocs++;
                     }
                     else
                     {
-                        _logger.LogDebug("Not sending discovery for {uniqueId}, due to configuration", value.DiscoveryUntyped.UniqueId);
+                        _logger.LogDebug("Not sending discovery for {identifier}, due to configuration", uniqueId);
                         value.DiscoveryUntyped.SetDirty(false);
                     }
                 }

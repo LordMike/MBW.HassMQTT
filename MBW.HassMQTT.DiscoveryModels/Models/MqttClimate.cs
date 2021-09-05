@@ -1,15 +1,20 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/climate.mqtt/
+    ///
+    /// The mqtt climate platform lets you control your MQTT enabled HVAC devices.
     /// </summary>
     [DeviceType(HassDeviceType.Climate)]
     [PublicAPI]
-    public class MqttClimate : MqttEntitySensorDiscoveryBase
+    public class MqttClimate : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttClimate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -181,16 +186,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public float Precision { get; set; }
 
         /// <summary>
-        /// The maximum QoS level to be used when receiving and publishing messages.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
-        /// Defines if published messages should have the retain flag set.
-        /// </summary>
-        public bool Retain { get; set; }
-
-        /// <summary>
         /// Set to `false` to suppress sending of all MQTT messages when the current mode is `Off`.
         /// </summary>
         public bool SendIfOff { get; set; }
@@ -294,5 +289,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Default template to render the payloads on *all* `*_state_topic`s with.
         /// </summary>
         public string ValueTemplate { get; set; }
+
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public bool Retain { get; set; }
     }
 }

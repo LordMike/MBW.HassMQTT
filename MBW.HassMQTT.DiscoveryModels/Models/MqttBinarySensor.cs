@@ -1,15 +1,38 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/binary_sensor.mqtt/
+    ///
+    /// The mqtt binary sensor platform uses an MQTT message received to set the binary sensor’s state to on or off.
+    /// 
+    /// The state will be updated only after a new message is published on state_topic matching payload_on or payload_off.
+    /// If these messages are published with the retain flag set, the binary sensor will receive an instant state update
+    /// after subscription and Home Assistant will display the correct state on startup.Otherwise, the initial state
+    /// displayed in Home Assistant will be unknown.
+    /// 
+    /// Stateless devices such as buttons, remote controls etc are better represented by MQTT device triggers than by
+    /// binary sensors.
     /// </summary>
+    /// <remarks>
+    /// The mqtt binary sensor platform optionally supports a list of availability topics to receive online and offline
+    /// messages (birth and LWT messages) from the MQTT device. During normal operation, if the MQTT sensor device goes
+    /// offline (i.e., publishes payload_not_available to an availability topic), Home Assistant will display the binary
+    /// sensor as unavailable. If these messages are published with the retain flag set, the binary sensor will receive
+    /// an instant update after subscription and Home Assistant will display the correct availability state of the binary
+    /// sensor when Home Assistant starts up. If the retain flag is not set, Home Assistant will display the binary sensor
+    /// as unavailable when Home Assistant starts up. If no availability topic is defined, Home Assistant will consider
+    /// the MQTT device to be available and will display its state.
+    /// </remarks>
     [DeviceType(HassDeviceType.BinarySensor)]
     [PublicAPI]
-    public class MqttBinarySensor : MqttEntitySensorDiscoveryBase
+    public class MqttBinarySensor : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
     {
         public MqttBinarySensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -51,11 +74,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string PayloadOn { get; set; }
 
         /// <summary>
-        /// The maximum QoS level to be used when receiving messages.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
         /// The MQTT topic subscribed to receive sensor's state.
         /// </summary>
         public string StateTopic { get; set; }
@@ -64,5 +82,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) that returns a string to be compared to `payload_on`/`payload_off`. Available variables: `entity_id`. Remove this option when 'payload_on' and 'payload_off' are sufficient to match your payloads (i.e no pre-processing of original message is required).
         /// </summary>
         public string ValueTemplate { get; set; }
+
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
     }
 }

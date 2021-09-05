@@ -11,8 +11,7 @@ namespace MBW.HassMQTT.Serialization
             writer.WriteValue((byte)value);
         }
 
-        public override MqttQosLevel ReadJson(JsonReader reader, Type objectType, MqttQosLevel existingValue, bool hasExistingValue,
-            JsonSerializer serializer)
+        public override MqttQosLevel ReadJson(JsonReader reader, Type objectType, MqttQosLevel existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             int? value = reader.ReadAsInt32();
             if (value.HasValue)

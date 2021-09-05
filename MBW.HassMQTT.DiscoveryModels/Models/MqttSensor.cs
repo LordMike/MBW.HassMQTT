@@ -1,15 +1,22 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/sensor.mqtt/
+    ///
+    /// This mqtt sensor platform uses the MQTT message payload as the sensor value. If messages in this state_topic
+    /// are published with RETAIN flag, the sensor will receive an instant update with last known value. Otherwise,
+    /// the initial state will be undefined.
     /// </summary>
     [DeviceType(HassDeviceType.Sensor)]
     [PublicAPI]
-    public class MqttSensor : MqttEntitySensorDiscoveryBase
+    public class MqttSensor : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
     {
         public MqttSensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -31,19 +38,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool ForceUpdate { get; set; }
 
         /// <summary>
-        /// The icon for the sensor.
-        /// </summary>
-        public string Icon { get; set; }
-
-        /// <summary>
         /// The name of the MQTT sensor.
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// The maximum QoS level of the state topic.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive sensor values.
@@ -59,5 +56,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the value.
         /// </summary>
         public string ValueTemplate { get; set; }
+
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public string UniqueId { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
     }
 }

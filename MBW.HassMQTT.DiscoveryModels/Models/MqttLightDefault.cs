@@ -1,15 +1,38 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/light.mqtt/#default-schema
+    ///
+    /// The mqtt light platform with default schema lets you control your MQTT enabled lights.
+    /// It supports setting brightness, color temperature, effects, on/off, RGB colors, XY colors and white.
     /// </summary>
+    /// <remarks>
+    /// In an ideal scenario, the MQTT device will have a state topic to publish state changes. If these messages
+    /// are published with a RETAIN flag, the MQTT light will receive an instant state update after subscription
+    /// and will start with the correct state. Otherwise, the initial state of the switch will be false / off.
+    /// 
+    /// When a state topic is not available, the light will work in optimistic mode.In this mode, the light will
+    /// immediately change state after every command.Otherwise, the light will wait for state confirmation from
+    /// the device (message from state_topic).
+    /// 
+    /// Optimistic mode can be forced, even if the state_topic is available.Try to enable it, if experiencing incorrect
+    /// light operation.
+    /// 
+    /// Home Assistant internally assumes that a light’s state corresponds to a defined color_mode.The state of MQTT lights
+    /// with default schema and support for both color and color temperature will set the color_mode according to the
+    /// last received valid color or color temperature.Optionally, a color_mode_state_topic can be configured for explicit
+    /// control of the color_mode
+    /// </remarks>
     [DeviceType(HassDeviceType.Light)]
     [PublicAPI]
-    public class MqttLightDefault : MqttEntitySensorDiscoveryBase
+    public class MqttLightDefault : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttLightDefault(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -131,16 +154,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string PayloadOn { get; set; }
 
         /// <summary>
-        /// The maximum QoS level of the state topic.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
-        /// If the published message should have the retain flag on or not.
-        /// </summary>
-        public bool Retain { get; set; }
-
-        /// <summary>
         /// Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgb_command_topic`. Available variables: `red`, `green` and `blue`.
         /// </summary>
         public string RgbCommandTemplate { get; set; }
@@ -209,5 +222,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the XY value.
         /// </summary>
         public string XyValueTemplate { get; set; }
+
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
+        public bool Retain { get; set; }
     }
 }

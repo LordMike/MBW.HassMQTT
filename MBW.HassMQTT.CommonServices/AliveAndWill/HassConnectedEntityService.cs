@@ -58,7 +58,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
                         device.SwVersion = entryAssembly.GetName().Version.ToString(3);
 
                     device.Name = _config.DiscoveryDeviceName;
-                    device.Identifiers = new[] { _config.DeviceId };
+                    device.Identifiers.Add(_config.DeviceId);
                 })
                 .ConfigureDiscovery(discovery =>
                 {

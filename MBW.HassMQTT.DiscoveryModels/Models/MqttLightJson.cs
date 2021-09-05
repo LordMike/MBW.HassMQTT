@@ -1,15 +1,38 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/light.mqtt/#json-schema
+    ///
+    /// The mqtt light platform with JSON schema lets you control a MQTT-enabled light that can receive JSON messages.
+    /// 
+    /// This schema supports on/off, brightness, RGB colors, XY colors, color temperature, transitions and short/long
+    /// flashing.The messages sent to/from the lights look similar to this, omitting fields when they aren’t needed.
+    /// The color_mode will not be present in messages sent to the light. It is optional in messages received from the
+    /// light, but can be used to disambiguate the current mode in the light. In the example below, color_mode is set
+    /// to rgb and color_temp, color.c, color.w, color.x, color.y, color.h, color.s will all be ignored by Home Assistant.
     /// </summary>
+    /// <remarks>
+    /// In an ideal scenario, the MQTT device will have a state topic to publish state changes. If these messages are
+    /// published with the RETAIN flag, the MQTT light will receive an instant state update after subscription and will
+    /// start with the correct state. Otherwise, the initial state of the light will be off.
+    /// 
+    /// When a state topic is not available, the light will work in optimistic mode.In this mode, the light will
+    /// immediately change state after every command.Otherwise, the light will wait for state confirmation from the
+    /// device (message from state_topic).
+    /// 
+    /// Optimistic mode can be forced, even if state topic is available.Try enabling it if the light is operating
+    /// incorrectly.
+    /// </remarks>
     [DeviceType(HassDeviceType.Light)]
     [PublicAPI]
-    public class MqttLightJson : MqttEntitySensorDiscoveryBase
+    public class MqttLightJson : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttLightJson(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -81,16 +104,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool Optimistic { get; set; }
 
         /// <summary>
-        /// The maximum QoS level of the state topic.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
-        /// If the published message should have the retain flag on or not.
-        /// </summary>
-        public bool Retain { get; set; }
-
-        /// <summary>
         /// Flag that defines if the light supports RGB colors.
         /// </summary>
         public bool Rgb { get; set; }
@@ -114,5 +127,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Flag that defines if the light supports XY colors.
         /// </summary>
         public bool Xy { get; set; }
+
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
+        public bool Retain { get; set; }
     }
 }

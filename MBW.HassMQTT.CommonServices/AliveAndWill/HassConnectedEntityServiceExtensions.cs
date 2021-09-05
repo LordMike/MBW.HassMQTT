@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using MBW.HassMQTT.DiscoveryModels;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Topics;
@@ -46,7 +47,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
             });
         }
 
-        public static IDiscoveryDocumentBuilder<TEntity> ConfigureAliveService<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : MqttEntitySensorDiscoveryBase
+        public static IDiscoveryDocumentBuilder<TEntity> ConfigureAliveService<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : MqttSensorDiscoveryBase, IHasAvailability
         {
             AvailabilityDecoratorService decorator = builder.HassMqttManager.GetService<AvailabilityDecoratorService>();
 

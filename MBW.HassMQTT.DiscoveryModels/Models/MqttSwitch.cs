@@ -1,15 +1,32 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/switch.mqtt
+    ///
+    /// The mqtt switch platform lets you control your MQTT enabled switches.
     /// </summary>
+    /// <remarks>
+    /// In an ideal scenario, the MQTT device will have a state_topic to publish state changes. If these messages
+    /// are published with a RETAIN flag, the MQTT switch will receive an instant state update after subscription,
+    /// and will start with the correct state. Otherwise, the initial state of the switch will be false / off.
+    /// 
+    /// When a state_topic is not available, the switch will work in optimistic mode.In this mode, the switch will
+    /// immediately change state after every command.Otherwise, the switch will wait for state confirmation from the
+    /// device (message from state_topic).
+    /// 
+    /// Optimistic mode can be forced, even if the state_topic is available.Try to enable it, if experiencing incorrect
+    /// switch operation.
+    /// </remarks>
     [DeviceType(HassDeviceType.Switch)]
     [PublicAPI]
-    public class MqttSwitch : MqttEntitySensorDiscoveryBase
+    public class MqttSwitch : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttSwitch(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -19,11 +36,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to change the switch state.
         /// </summary>
         public string CommandTopic { get; set; }
-
-        /// <summary>
-        /// Icon for the switch.
-        /// </summary>
-        public string Icon { get; set; }
 
         /// <summary>
         /// The name to use when displaying this switch.
@@ -46,16 +58,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string PayloadOn { get; set; }
 
         /// <summary>
-        /// The maximum QoS level of the state topic. Default is 0 and will also be used to publishing messages.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
-        /// If the published message should have the retain flag on or not.
-        /// </summary>
-        public bool Retain { get; set; }
-
-        /// <summary>
         /// The payload that represents the `off` state. Used when value that represents `off` state in the `state_topic` is different from value that should be sent to the `command_topic` to turn the device `off`.
         /// </summary>
         public string StateOff { get; set; }
@@ -74,5 +76,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract device's state from the `state_topic`. To determine the switches's state result of this template will be compared to `state_on` and `state_off`.
         /// </summary>
         public string ValueTemplate { get; set; }
+
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
+        public bool Retain { get; set; }
     }
 }

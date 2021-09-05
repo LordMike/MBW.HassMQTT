@@ -1,15 +1,53 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
     /// <summary>
     /// https://www.home-assistant.io/integrations/cover.mqtt/
+    ///
+    /// The mqtt cover platform allows you to control an MQTT cover (such as blinds, a roller shutter or a garage door).
     /// </summary>
+    /// <remarks>
+    /// A cover entity can be in states (open, opening, closed or closing).
+    /// 
+    /// If a state_topic is configured, the entity’s state will be updated only after an MQTT message is received
+    /// on state_topic matching state_open, state_opening, state_closed or state_closing.For covers that only report
+    /// 3 states(opening, closing, stopped), a state_stopped state can be configured to indicate that the device is
+    /// not moving.When this payload is received on the state_topic, and a position_topic is not configured, the cover
+    /// will be set to state closed if its state was closing and to state open otherwise.If a position_topic is set,
+    /// the cover’s position will be used to set the state to either open or closed state.
+    /// 
+    /// If the cover reports its position, a position_topic can be configured for receiving the position.If no state_topic
+    /// is configured, the cover’s state will be set to either open or closed when a position is received.
+    /// 
+    /// If the cover reports its tilt position, a tilt_status_topic can be configured for receiving the tilt position.
+    /// If position topic and state topic are both defined, the device state (open, opening, closed or closing) will be
+    /// set by the state topic and the cover position will be set by the position topic.
+    /// 
+    /// If neither a state topic nor a position topic are defined, the cover will work in optimistic mode. In this mode,
+    /// the cover will immediately change state (open or closed) after every command sent by Home Assistant.If a state
+    /// topic/position topic is defined, the cover will wait for a message on state_topic or position_topic.
+    /// 
+    /// Optimistic mode can be forced, even if a state_topic / position_topic is defined.Try to enable it if experiencing
+    /// incorrect cover operation (Google Assistant gauge may need optimistic mode as it often send request to your Home
+    /// Assistant immediately after send set_cover_position in which case MQTT could be too slow).
+    /// 
+    /// The mqtt cover platform optionally supports a list of availability topics to receive online and offline
+    /// messages (birth and LWT messages) from the MQTT cover device.During normal operation, if the MQTT cover device
+    /// goes offline(i.e., publishes a matching payload_not_available to any availability topic), Home Assistant will
+    /// display the cover as “unavailable”. If these messages are published with the retain flag set, the cover will
+    /// receive an instant update after subscription and Home Assistant will display correct availability state of the
+    /// cover when Home Assistant starts up.If the retain flag is not set, Home Assistant will display the cover as
+    /// "unavailable" when Home Assistant starts up.
+    /// </remarks>
     [DeviceType(HassDeviceType.Cover)]
     [PublicAPI]
-    public class MqttCover : MqttEntitySensorDiscoveryBase
+    public class MqttCover : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttCover(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -69,16 +107,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic subscribed to receive cover position messages.
         /// </summary>
         public string PositionTopic { get; set; }
-
-        /// <summary>
-        /// The maximum QoS level to be used when receiving and publishing messages.
-        /// </summary>
-        public MqttQosLevel Qos { get; set; }
-
-        /// <summary>
-        /// Defines if published messages should have the retain flag set.
-        /// </summary>
-        public bool Retain { get; set; }
 
         /// <summary>
         /// Defines a [template](/topics/templating/) to define the position to be sent to the `set_position_topic` topic. Incoming position value is available for use in the template `{{position}}`. If no template is defined, the position (0-100) will be calculated according to `position_open` and `position_closed` values.
@@ -169,5 +197,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Defines a template that can be used to extract the payload for the `state_topic` topic.
         /// </summary>
         public string ValueTemplate { get; set; }
+
+        public string UniqueId { get; set; }
+        public IList<AvailabilityModel> Availability { get; set; }
+        public AvailabilityMode? AvailabilityMode { get; set; }
+        public MqttQosLevel Qos { get; set; }
+        public string JsonAttributesTemplate { get; set; }
+        public string JsonAttributesTopic { get; set; }
+        public string Icon { get; set; }
+        public bool? EnabledByDefault { get; set; }
+        public bool Retain { get; set; }
     }
 }

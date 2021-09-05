@@ -42,7 +42,7 @@ namespace MBW.HassMQTT.Extensions
         /// </summary>
         public static MqttAttributesTopic GetAttributesSender(this ISensorContainer builder)
         {
-            if (!(builder.Discovery is IHasAttributesTopic asAttributesTopic))
+            if (!(builder.Discovery is IHasJsonAttributes asAttributesTopic))
                 throw new InvalidOperationException($"Attempted to get attributes sender for an invalid type, {builder.Discovery.GetType().Name}");
 
             string topic = asAttributesTopic.JsonAttributesTopic;

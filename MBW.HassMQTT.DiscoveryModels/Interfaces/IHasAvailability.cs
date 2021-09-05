@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using MBW.HassMQTT.DiscoveryModels.Availability;
 
-namespace MBW.HassMQTT.DiscoveryModels.Availability
+namespace MBW.HassMQTT.DiscoveryModels.Interfaces
 {
-    public interface IHasAvailabilityTopic
+    public interface IHasAvailability
     {
         /// <summary>
         /// A list of MQTT topics subscribed to receive availability (online/offline) updates. Must not be used together with availability_topic.
