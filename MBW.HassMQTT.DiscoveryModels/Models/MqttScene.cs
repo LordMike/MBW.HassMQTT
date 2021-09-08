@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -15,7 +16,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Scene)]
     [PublicAPI]
-    public class MqttScene : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttScene(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -44,5 +45,10 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttSceneValidator : MqttSensorDiscoveryBaseValidator<MqttScene>
+        {
+            public MqttSceneValidator() { }
+        }
     }
 }

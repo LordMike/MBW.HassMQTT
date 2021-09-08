@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -17,12 +18,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.DeviceTracker)]
     [PublicAPI]
-    public class MqttDeviceTracker : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon
+    public class MqttDeviceTracker : MqttSensorDiscoveryBase<MqttDeviceTracker, MqttDeviceTracker.MqttDeviceTrackerValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon
     {
         public MqttDeviceTracker(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
-        
+
         /// <summary>
         /// The name of the MQTT device_tracker.
         /// </summary>
@@ -60,5 +61,13 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? JsonAttributesTemplate { get; set; }
         public string? JsonAttributesTopic { get; set; }
         public string? Icon { get; set; }
+
+        public class MqttDeviceTrackerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTracker>
+        {
+            public MqttDeviceTrackerValidator()
+            {
+                TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
+            }
+        }
     }
 }

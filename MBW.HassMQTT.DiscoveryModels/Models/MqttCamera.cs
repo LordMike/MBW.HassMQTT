@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -19,7 +20,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Camera)]
     [PublicAPI]
-    public class MqttCamera : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
+    public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCameraValidator>, IHasUniqueId, IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
     {
         public MqttCamera(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -42,5 +43,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? JsonAttributesTopic { get; set; }
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
+
+        public class MqttCameraValidator : MqttSensorDiscoveryBaseValidator<MqttCamera>
+        {
+            public MqttCameraValidator()
+            {
+            }
+        }
     }
 }

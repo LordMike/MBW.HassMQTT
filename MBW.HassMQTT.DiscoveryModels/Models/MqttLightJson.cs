@@ -1,5 +1,7 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -33,7 +35,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Light)]
     [PublicAPI]
-    public class MqttLightJson : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJson.MqttLightJsonValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttLightJson(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -132,5 +134,40 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttLightJsonValidator : MqttSensorDiscoveryBaseValidator<MqttLightJson>
+        {
+            public MqttLightJsonValidator()
+            {
+                // TODO: Make enums
+                HashSet<string> validColors = new HashSet<string>(StringComparer.Ordinal)
+                {
+                    "onoff", "brightness", "color_temp", "hs", "xy", "rgb", "rgbw", "rgbww"
+                };
+
+                RuleFor(s => s.SupportedColorModes)
+                    .NotEmpty()
+                    .ForEach(x => x.Must(validColors.Contains).WithMessage("{PropertyName} must be one of " + string.Join(", ", validColors)))
+                    .When(s => s.ColorMode.GetValueOrDefault(false));
+
+                RuleFor(s => s.FlashTimeShort)
+                    .GreaterThanOrEqualTo(1);
+
+                RuleFor(s => s.FlashTimeLong)
+                    .GreaterThanOrEqualTo(1);
+
+                RuleFor(s => s.BrightnessScale)
+                    .GreaterThanOrEqualTo(1);
+
+                RuleFor(s => s.EffectList)
+                    .NotEmpty()
+                    .When(s => s.EffectList != null);
+
+                RuleFor(s => s.Schema).Equal("json");
+
+                // TODO: Find defaults
+                //MinMax(s => s.MinMireds, s => s.MaxMireds, 1, 100);
+            }
+        }
     }
 }

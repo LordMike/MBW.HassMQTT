@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentValidation;
+using FluentValidation.Results;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -47,7 +49,7 @@ namespace MBW.HassMQTT
             _attributes = new ConcurrentDictionary<string, MqttAttributesTopic>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId, string uniqueId = null) where TEntity : MqttSensorDiscoveryBase
+        public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId, string uniqueId = null) where TEntity : IHassDiscoveryDocument
         {
             uniqueId ??= $"{deviceId}_{entityId}".ToLower();
 
@@ -159,6 +161,15 @@ namespace MBW.HassMQTT
 
                     if (_config.SendDiscoveryDocuments)
                     {
+                        if (_config.ValidateDiscoveryDocuments)
+                        {
+                            ValidationContext<IHassDiscoveryDocument> validationContext = new ValidationContext<IHassDiscoveryDocument>(value.DiscoveryUntyped);
+                            ValidationResult validation = await value.DiscoveryUntyped.Validator.ValidateAsync(validationContext, token);
+
+                            if (!validation.IsValid)
+                                throw new ValidationException(validation.Errors);
+                        }
+
                         _logger.LogDebug("Sending discovery document for {identifier}", uniqueId);
 
                         await SendValue(value.DiscoveryUntyped, true, token);

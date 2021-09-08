@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -28,7 +29,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Fan)]
     [PublicAPI]
-    public class MqttFan : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttFan(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -178,5 +179,22 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttFanValidator : MqttSensorDiscoveryBaseValidator<MqttFan>
+        {
+            public MqttFanValidator()
+            {
+                TopicAndTemplate(s => s.CommandTopic, s => s.CommandTemplate);
+                TopicAndTemplate(s => s.OscillationCommandTopic, s => s.OscillationCommandTemplate);
+                TopicAndTemplate(s => s.OscillationStateTopic, s => s.OscillationValueTemplate);
+                TopicAndTemplate(s => s.PercentageCommandTopic, s => s.PercentageCommandTemplate);
+                TopicAndTemplate(s => s.PercentageStateTopic, s => s.PercentageValueTemplate);
+                TopicAndTemplate(s => s.PresetModeCommandTopic, s => s.PresetModeCommandTemplate);
+                TopicAndTemplate(s => s.PresetModeStateTopic, s => s.PresetModeValueTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.StateValueTemplate);
+
+                MinMax(s => s.SpeedRangeMin, s => s.SpeedRangeMax, 1, 100);
+            }
+        }
     }
 }

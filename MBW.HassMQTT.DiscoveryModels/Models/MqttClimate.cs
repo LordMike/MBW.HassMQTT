@@ -1,5 +1,7 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -15,7 +17,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Climate)]
     [PublicAPI]
-    public class MqttClimate : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.MqttClimateValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttClimate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -302,5 +304,37 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? EnabledByDefault { get; set; }
         public MqttQosLevel? Qos { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttClimateValidator : MqttSensorDiscoveryBaseValidator<MqttClimate>
+        {
+            public MqttClimateValidator()
+            {
+                TopicAndTemplate(s => s.ActionTopic, s => s.ActionTemplate);
+                TopicAndTemplate(s => s.AuxStateTopic, s => s.AuxStateTemplate);
+                TopicAndTemplate(s => s.AwayModeStateTopic, s => s.AwayModeStateTemplate);
+                TopicAndTemplate(s => s.CurrentTemperatureTopic, s => s.CurrentTemperatureTemplate);
+                TopicAndTemplate(s => s.FanModeCommandTopic, s => s.FanModeCommandTemplate);
+                TopicAndTemplate(s => s.FanModeStateTopic, s => s.FanModeStateTemplate);
+                TopicAndTemplate(s => s.HoldCommandTopic, s => s.HoldCommandTemplate);
+                TopicAndTemplate(s => s.HoldStateTopic, s => s.HoldStateTemplate);
+                TopicAndTemplate(s => s.ModeCommandTopic, s => s.ModeCommandTemplate);
+                TopicAndTemplate(s => s.ModeStateTopic, s => s.ModeStateTemplate);
+                TopicAndTemplate(s => s.SwingModeCommandTopic, s => s.SwingModeCommandTemplate);
+                TopicAndTemplate(s => s.SwingModeStateTopic, s => s.SwingModeStateTemplate);
+                TopicAndTemplate(s => s.TemperatureCommandTopic, s => s.TemperatureCommandTemplate);
+                TopicAndTemplate(s => s.TemperatureHighCommandTopic, s => s.TemperatureHighCommandTemplate);
+                TopicAndTemplate(s => s.TemperatureHighStateTopic, s => s.TemperatureHighStateTemplate);
+                TopicAndTemplate(s => s.TemperatureLowCommandTopic, s => s.TemperatureLowCommandTemplate);
+                TopicAndTemplate(s => s.TemperatureLowStateTopic, s => s.TemperatureLowStateTemplate);
+                TopicAndTemplate(s => s.TemperatureStateTopic, s => s.TemperatureStateTemplate);
+
+                MinMax(s => s.MinTemp, s => s.MaxTemp, -30, 60, (s => s.Initial, 21));
+
+                RuleFor(s => s.Precision)
+                    .Must(s => Math.Abs(s.Value - 0.1f) < float.Epsilon ||
+                               Math.Abs(s.Value - 0.5f) < float.Epsilon ||
+                               Math.Abs(s.Value - 1f) < float.Epsilon);
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -33,7 +34,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Light)]
     [PublicAPI]
-    public class MqttLightDefault : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLightDefault.MqttLightDefaultValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttLightDefault(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -234,5 +235,24 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttLightDefaultValidator : MqttSensorDiscoveryBaseValidator<MqttLightDefault>
+        {
+            public MqttLightDefaultValidator()
+            {
+                TopicAndTemplate(s => s.BrightnessStateTopic, s => s.BrightnessValueTemplate);
+                TopicAndTemplate(s => s.ColorModeStateTopic, s => s.ColorModeValueTemplate);
+                TopicAndTemplate(s => s.ColorTempCommandTopic, s => s.ColorTempCommandTemplate);
+                TopicAndTemplate(s => s.ColorTempStateTopic, s => s.ColorTempValueTemplate);
+                TopicAndTemplate(s => s.EffectStateTopic, s => s.EffectValueTemplate);
+                TopicAndTemplate(s => s.HsStateTopic, s => s.HsValueTemplate);
+                TopicAndTemplate(s => s.RgbCommandTopic, s => s.RgbCommandTemplate);
+                TopicAndTemplate(s => s.RgbStateTopic, s => s.RgbValueTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.StateValueTemplate);
+                TopicAndTemplate(s => s.XyStateTopic, s => s.XyValueTemplate);
+
+                RuleFor(s => s.Schema).Equal("default");
+            }
+        }
     }
 }

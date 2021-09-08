@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
@@ -12,7 +13,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.TagScanner)]
     [PublicAPI]
-    public class MqttTagScanner : MqttSensorDiscoveryBase
+    public class MqttTagScanner : MqttSensorDiscoveryBase<MqttTagScanner, MqttTagScanner.MqttTagScannerValidator>
     {
         public MqttTagScanner(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -27,5 +28,13 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) that returns a tag ID.
         /// </summary>
         public string? ValueTemplate { get; set; }
+
+        public class MqttTagScannerValidator : MqttSensorDiscoveryBaseValidator<MqttTagScanner>
+        {
+            public MqttTagScannerValidator()
+            {
+                TopicAndTemplate(s => s.Topic, s => s.ValueTemplate);
+            }
+        }
     }
 }

@@ -1,5 +1,7 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -19,7 +21,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Vacuum)]
     [PublicAPI]
-    public class MqttVacuumLegacy : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttVacuumLegacy : MqttSensorDiscoveryBase<MqttVacuumLegacy, MqttVacuumLegacy.MqttVacuumLegacyValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttVacuumLegacy(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -175,5 +177,36 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttVacuumLegacyValidator : MqttSensorDiscoveryBaseValidator<MqttVacuumLegacy>
+        {
+            public MqttVacuumLegacyValidator()
+            {
+                TopicAndTemplate(s => s.BatteryLevelTopic, s => s.BatteryLevelTemplate);
+                TopicAndTemplate(s => s.ChargingTopic, s => s.ChargingTemplate);
+                TopicAndTemplate(s => s.CleaningTopic, s => s.CleaningTemplate);
+                TopicAndTemplate(s => s.DockedTopic, s => s.DockedTemplate);
+                TopicAndTemplate(s => s.ErrorTopic, s => s.ErrorTemplate);
+                TopicAndTemplate(s => s.FanSpeedTopic, s => s.FanSpeedTemplate);
+
+                // TODO: Make enum
+                HashSet<string> possibleFeatures = new HashSet<string>(StringComparer.Ordinal)
+                {
+                    "turn_on", "turn_off", "pause", "stop", "return_home", "battery", "status", "locate", "clean_spot",
+                    "fan_speed", "send_command"
+                };
+
+                RuleFor(s => s.SupportedFeatures)
+                    .NotEmpty()
+                    .ForEach(x => x.Must(possibleFeatures.Contains).WithMessage("{PropertyName} must be one of " + string.Join(", ", possibleFeatures)))
+                    .When(s => s.SupportedFeatures != null);
+
+                RuleFor(s => s.Schema).Equal("legacy").When(s => s != null);
+
+                RuleFor(s => s.FanSpeedList)
+                    .NotEmpty()
+                    .When(s => s.FanSpeedList != null);
+            }
+        }
     }
 }

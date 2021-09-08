@@ -1,5 +1,6 @@
 ﻿#nullable enable
 
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
@@ -22,7 +23,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.DeviceTrigger)]
     [PublicAPI]
-    public class MqttDeviceTrigger : MqttSensorDiscoveryBase, IHasQos
+    public class MqttDeviceTrigger : MqttSensorDiscoveryBase<MqttDeviceTrigger, MqttDeviceTrigger.MqttDeviceTriggerValidator>, IHasQos
     {
         public MqttDeviceTrigger(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -78,5 +79,13 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string Subtype { get; set; }
 
         public MqttQosLevel? Qos { get; set; }
+
+        public class MqttDeviceTriggerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTrigger>
+        {
+            public MqttDeviceTriggerValidator()
+            {
+                RuleFor(s => s.AutomationType).Equal("trigger");
+            }
+        }
     }
 }

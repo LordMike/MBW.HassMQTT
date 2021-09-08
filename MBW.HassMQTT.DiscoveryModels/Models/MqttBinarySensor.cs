@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -33,7 +34,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.BinarySensor)]
     [PublicAPI]
-    public class MqttBinarySensor : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
+    public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBinarySensor.MqttBinarySensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
     {
         public MqttBinarySensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -93,5 +94,17 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? JsonAttributesTopic { get; set; }
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
+
+        public class MqttBinarySensorValidator : MqttSensorDiscoveryBaseValidator<MqttBinarySensor>
+        {
+            public MqttBinarySensorValidator()
+            {
+                TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
+
+                RuleFor(s => s.ExpireAfter).GreaterThanOrEqualTo(0);
+
+                RuleFor(s => s.DeviceClass).IsInEnum();
+            }
+        }
     }
 }

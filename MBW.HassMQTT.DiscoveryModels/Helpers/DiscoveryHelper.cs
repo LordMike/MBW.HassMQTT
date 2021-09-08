@@ -1,12 +1,13 @@
 ﻿using System;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Helpers
 {
     public static class DiscoveryHelper
     {
-        public static HassDeviceType GetDeviceType<T>() where T : MqttSensorDiscoveryBase
+        public static HassDeviceType GetDeviceType<T>() where T : IHassDiscoveryDocument
         {
             Attribute attribute = Attribute.GetCustomAttribute(typeof(T), typeof(DeviceTypeAttribute));
 

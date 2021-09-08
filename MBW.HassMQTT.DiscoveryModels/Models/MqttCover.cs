@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -49,7 +50,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Cover)]
     [PublicAPI]
-    public class MqttCover : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttCover(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -99,7 +100,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// Number which represents open position.
         /// </summary>
         public int? PositionOpen { get; set; }
-        
+
         /// <summary>
         /// Defines a template that can be used to extract the payload for the `position_topic` topic.
         /// </summary>
@@ -139,7 +140,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The payload that represents the opening state.
         /// </summary>
         public string? StateOpening { get; set; }
-        
+
         /// <summary>
         /// The payload that represents the stopped state (for covers that do not report `open`/`closed` state).
         /// </summary>
@@ -154,7 +155,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The value that will be sent on a `close_cover_tilt` command.
         /// </summary>
         public int? TiltClosedValue { get; set; }
-        
+
         /// <summary>
         /// Defines a [template](/topics/templating/) that can be used to extract the payload for the `tilt_command_topic` topic.
         /// </summary>
@@ -209,5 +210,24 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttCoverValidator : MqttSensorDiscoveryBaseValidator<MqttCover>
+        {
+            public MqttCoverValidator()
+            {
+                TopicAndTemplate(s => s.PositionTopic, s => s.PositionTemplate);
+                TopicAndTemplate(s => s.SetpositionTopic, s => s.SetPositionTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
+                TopicAndTemplate(s => s.TiltCommandTopic, s => s.TiltCommandTemplate);
+                TopicAndTemplate(s => s.TiltStatusTopic, s => s.TiltStatusTemplate);
+
+                RuleFor(s => s.SetpositionTopic).NotNull().Unless(s => s.PositionTopic == null);
+                RuleFor(s => s.PositionTopic).NotNull().Unless(s => s.SetpositionTopic == null);
+
+                MinMax(s => s.TiltMin, s => s.TiltMax, 0, 100,
+                    (s => s.TiltOpenedValue, 0),
+                    (s => s.TiltClosedValue, 100));
+            }
+        }
     }
 }

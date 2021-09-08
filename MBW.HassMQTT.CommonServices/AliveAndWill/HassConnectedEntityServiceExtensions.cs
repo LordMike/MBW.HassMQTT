@@ -47,14 +47,14 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
             });
         }
 
-        public static IDiscoveryDocumentBuilder<TEntity> ConfigureAliveService<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : MqttSensorDiscoveryBase, IHasAvailability
+        public static IDiscoveryDocumentBuilder<TEntity> ConfigureAliveService<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : IHassDiscoveryDocument, IHasAvailability
         {
             AvailabilityDecoratorService decorator = builder.HassMqttManager.GetService<AvailabilityDecoratorService>();
 
             if (decorator == null)
                 throw new InvalidOperationException($"Unable to locate the Alive services. Did you forget to configure services.{nameof(AddHassConnectedEntityService)}?");
 
-            return builder.ConfigureDiscovery(decorator.ApplyAvailabilityInformation);
+            return builder.ConfigureDiscovery(discovery => decorator.ApplyAvailabilityInformation(discovery));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -28,7 +29,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Humidifier)]
     [PublicAPI]
-    public class MqttHumidifier : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidifier.MqttHumidifierValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttHumidifier(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -47,7 +48,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The device class of the MQTT device. Must be either humidifier or dehumidifier.
         /// </summary>
-        public string? DeviceClass { get; set; }
+        public HumidifierDeviceClass? DeviceClass { get; set; }
 
         /// <summary>
         /// The minimum target humidity percentage that can be set.
@@ -156,5 +157,23 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttHumidifierValidator : MqttSensorDiscoveryBaseValidator<MqttHumidifier>
+        {
+            public MqttHumidifierValidator()
+            {
+                TopicAndTemplate(s => s.CommandTopic, s => s.CommandTemplate);
+                TopicAndTemplate(s => s.TargetHumidityCommandTopic, s => s.TargetHumidityCommandTemplate);
+                TopicAndTemplate(s => s.TargetHumidityStateTopic, s => s.TargetHumidityStateTemplate);
+                TopicAndTemplate(s => s.ModeCommandTopic, s => s.ModeCommandTemplate);
+                TopicAndTemplate(s => s.ModeStateTopic, s => s.ModeStateTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.StateValueTemplate);
+
+                RuleFor(s => s.DeviceClass)
+                    .IsInEnum()
+                    .Must(s => s.Value != HumidifierDeviceClass.Unknown)
+                    .When(s => s.DeviceClass.HasValue);
+            }
+        }
     }
 }

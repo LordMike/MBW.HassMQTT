@@ -1,9 +1,10 @@
 ﻿using MBW.HassMQTT.DiscoveryModels;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.Interfaces;
 
 namespace MBW.HassMQTT.Internal
 {
-    internal class DiscoveryDocumentBuilder<TEntity> : IDiscoveryDocumentBuilder<TEntity>, ISensorContainer where TEntity : MqttSensorDiscoveryBase
+    internal class DiscoveryDocumentBuilder<TEntity> : IDiscoveryDocumentBuilder<TEntity>, ISensorContainer where TEntity : IHassDiscoveryDocument
     {
         private HassMqttManager _hassMqttManager;
 
@@ -14,8 +15,8 @@ namespace MBW.HassMQTT.Internal
         HassMqttManager ISensorContainer.HassMqttManager => _hassMqttManager;
         HassMqttManager IDiscoveryDocumentBuilder.HassMqttManager => _hassMqttManager;
 
-        MqttSensorDiscoveryBase ISensorContainer.Discovery => Discovery;
-        MqttSensorDiscoveryBase IDiscoveryDocumentBuilder.DiscoveryUntyped => Discovery;
+        IHassDiscoveryDocument ISensorContainer.Discovery => Discovery;
+        IHassDiscoveryDocument IDiscoveryDocumentBuilder.DiscoveryUntyped => Discovery;
 
         public TEntity Discovery { get; internal set; }
 

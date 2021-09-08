@@ -1,13 +1,14 @@
 ﻿using EnumsNET;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.Topics;
 
 namespace MBW.HassMQTT.Extensions
 {
     public static class HassMqttTopicBuilderExtensions
     {
-        public static string GetDiscoveryTopic<TEntity>(this HassMqttTopicBuilder topicBuilder, string deviceId, string entityId) where TEntity : MqttSensorDiscoveryBase
+        public static string GetDiscoveryTopic<TEntity>(this HassMqttTopicBuilder topicBuilder, string deviceId, string entityId) where TEntity : IHassDiscoveryDocument
         {
             // homeassistant/<sensor>/<my_device>/<my_entity>/config
             return topicBuilder.GetDiscoveryTopic(DiscoveryHelper.GetDeviceType<TEntity>().AsString(EnumFormat.EnumMemberValue), deviceId, entityId, "config");

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -33,7 +34,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Light)]
     [PublicAPI]
-    public class MqttLightTemplate : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttLightTemplate : MqttSensorDiscoveryBase<MqttLightTemplate, MqttLightTemplate.MqttLightTemplateValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttLightTemplate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -133,5 +134,28 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttLightTemplateValidator : MqttSensorDiscoveryBaseValidator<MqttLightTemplate>
+        {
+            public MqttLightTemplateValidator()
+            {
+                TopicAndTemplate(s => s.StateTopic, s => s.BlueTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.BrightnessTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.ColorTempTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.CommandOffTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.CommandOnTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.EffectTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.GreenTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.RedTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.StateTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.BlueTemplate);
+                TopicAndTemplate(s => s.StateTopic, s => s.BlueTemplate);
+
+                RuleFor(s => s.Schema).Equal("template");
+
+                // TODO: Find defaults
+                //MinMax(s => s.MinMireds, s => s.MaxMireds, 1, 100);
+            }
+        }
     }
 }

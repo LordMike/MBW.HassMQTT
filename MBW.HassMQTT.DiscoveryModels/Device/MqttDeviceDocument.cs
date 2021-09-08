@@ -4,6 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
@@ -12,6 +13,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
     public class MqttDeviceDocument : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public static MqttDeviceDocumentValidator Validator { get; } = new MqttDeviceDocumentValidator();
 
         [NotifyPropertyChangedInvocator]
         [UsedImplicitly]
@@ -78,12 +81,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
         /// A list of connections of the device to the outside world as a list of tuples [connection_type, connection_identifier].
         /// For example the MAC address of a network interface: "connections": [["mac", "02:5b:26:a8:dc:12"]].
         /// </summary>
-        public ObservableCollection<ConnectionInfo> Connections { get; set; }
+        public ObservableCollection<ConnectionInfo> Connections { get; }
 
         /// <summary>
         /// A list of IDs that uniquely identify the device. For example a serial number.
         /// </summary>
-        public ObservableCollection<string> Identifiers { get; set; }
+        public ObservableCollection<string> Identifiers { get; }
 
         /// <summary>
         /// The manufacturer of the device.
@@ -117,5 +120,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
         /// This is used to show device topology in Home Assistant.
         /// </summary>
         public string? ViaDevice { get; set; }
+
+        public class MqttDeviceDocumentValidator : AbstractValidator<MqttDeviceDocument>
+        {
+            public MqttDeviceDocumentValidator()
+            {
+                RuleForEach(s => s.Identifiers).NotNull().WithMessage("{PropertyName} must not contain null values");
+                RuleForEach(s => s.Connections).SetValidator(ConnectionInfo.Validator);
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -17,12 +18,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Number)]
     [PublicAPI]
-    public class MqttNumber : MqttSensorDiscoveryBase, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNumberValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
     {
         public MqttNumber(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
-        
+
         /// <summary>
         /// The MQTT topic to publish commands to change the number.
         /// </summary>
@@ -65,8 +66,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// </summary>
         public string? ValueTemplate { get; set; }
 
-
-
         public string? UniqueId { get; set; }
         public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
@@ -76,5 +75,18 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? EnabledByDefault { get; set; }
         public string? Icon { get; set; }
         public bool? Retain { get; set; }
+
+        public class MqttNumberValidator : MqttSensorDiscoveryBaseValidator<MqttNumber>
+        {
+            public MqttNumberValidator()
+            {
+                TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
+
+                RuleFor(s => s.Step)
+                    .GreaterThanOrEqualTo(0.001f);
+
+                MinMax(s => s.Min, s => s.Max, 1f, 100f);
+            }
+        }
     }
 }
