@@ -7,6 +7,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Interfaces
         /// <summary>
         /// The maximum QoS level of the state topic.
         /// </summary>
-        MqttQosLevel Qos { get; set; }
+        MqttQosLevel? Qos { get; set; }
     }
 }

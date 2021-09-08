@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -25,7 +26,22 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The name of the MQTT device_tracker.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// The payload value that represents the ‘home’ state for the device.
+        /// </summary>
+        public string? PayloadHome { get; set; }
+
+        /// <summary>
+        /// The payload value that represents the ‘not_home’ state for the device.
+        /// </summary>
+        public string? PayloadNotHome { get; set; }
+
+        /// <summary>
+        /// Attribute of a device tracker that affects state when being used to track a person. Valid options are gps, router, bluetooth, or bluetooth_le.
+        /// </summary>
+        public DeviceTrackerSourceType? SourceType { get; set; }
 
         /// <summary>
         /// State topic
@@ -35,29 +51,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a template that returns a device tracker state.
         /// </summary>
-        public string ValueTemplate { get; set; }
+        public string? ValueTemplate { get; set; }
 
-        /// <summary>
-        /// The payload value that represents the ‘home’ state for the device.
-        /// </summary>
-        public string PayloadHome { get; set; }
-
-        /// <summary>
-        /// The payload value that represents the ‘not_home’ state for the device.
-        /// </summary>
-        public string PayloadNotHome { get; set; }
-
-        /// <summary>
-        /// Attribute of a device tracker that affects state when being used to track a person. Valid options are gps, router, bluetooth, or bluetooth_le.
-        /// </summary>
-        public DeviceTrackerSourceType? SourceType { get; set; }
-
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
     }
 }

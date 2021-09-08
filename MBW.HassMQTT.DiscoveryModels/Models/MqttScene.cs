@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -23,25 +24,25 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish commands to change the switch state.
         /// </summary>
-        public string CommandTopic { get; set; }
+        public string? CommandTopic { get; set; }
 
         /// <summary>
         /// The name to use when displaying this switch.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// The payload that represents on state.
         /// If specified, will be used for both comparing to the value in the state_topic (see value_template and state_on for details) and sending as on command to the command_topic.
         /// </summary>
-        public string PayloadOn { get; set; }
+        public string? PayloadOn { get; set; }
 
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }

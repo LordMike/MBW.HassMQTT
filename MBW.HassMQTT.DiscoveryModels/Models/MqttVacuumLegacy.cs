@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -27,141 +28,152 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/topics/templating/) to define the battery level of the vacuum. This is required if `battery_level_topic` is set.
         /// </summary>
-        public string BatteryLevelTemplate { get; set; }
+        public string? BatteryLevelTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive battery level values from the vacuum.
         /// </summary>
-        public string BatteryLevelTopic { get; set; }
+        public string? BatteryLevelTopic { get; set; }
 
         /// <summary>
         /// Defines a [template](/topics/templating/) to define the charging state of the vacuum. This is required if `charging_topic` is set.
         /// </summary>
-        public string ChargingTemplate { get; set; }
+        public string? ChargingTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive charging state values from the vacuum.
         /// </summary>
-        public string ChargingTopic { get; set; }
+        public string? ChargingTopic { get; set; }
 
         /// <summary>
         /// Defines a [template](/topics/templating/) to define the cleaning state of the vacuum. This is required if `cleaning_topic` is set.
         /// </summary>
-        public string CleaningTemplate { get; set; }
+        public string? CleaningTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive cleaning state values from the vacuum.
         /// </summary>
-        public string CleaningTopic { get; set; }
+        public string? CleaningTopic { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to control the vacuum.
         /// </summary>
-        public string CommandTopic { get; set; }
+        public string? CommandTopic { get; set; }
 
         /// <summary>
         /// Defines a [template](/topics/templating/) to define the docked state of the vacuum. This is required if `docked_topic` is set.
         /// </summary>
-        public string DockedTemplate { get; set; }
+        public string? DockedTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive docked state values from the vacuum.
         /// </summary>
-        public string DockedTopic { get; set; }
+        public string? DockedTopic { get; set; }
 
         /// <summary>
         /// Defines a [template](/topics/templating/) to define potential error messages emitted by the vacuum. This is required if `error_topic` is set.
         /// </summary>
-        public string ErrorTemplate { get; set; }
+        public string? ErrorTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive error messages from the vacuum.
         /// </summary>
-        public string ErrorTopic { get; set; }
+        public string? ErrorTopic { get; set; }
 
         /// <summary>
         /// List of possible fan speeds for the vacuum.
         /// </summary>
-        public string[] FanSpeedList { get; set; }
+        public IList<string>? FanSpeedList { get; set; }
 
         /// <summary>
         /// Defines a [template](/topics/templating/) to define the fan speed of the vacuum. This is required if `fan_speed_topic` is set.
         /// </summary>
-        public string FanSpeedTemplate { get; set; }
+        public string? FanSpeedTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive fan speed values from the vacuum.
         /// </summary>
-        public string FanSpeedTopic { get; set; }
+        public string? FanSpeedTopic { get; set; }
 
         /// <summary>
         /// The name of the vacuum.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to begin a spot cleaning cycle.
         /// </summary>
-        public string PayloadCleanSpot { get; set; }
+        public string? PayloadCleanSpot { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to locate the vacuum (typically plays a song).
         /// </summary>
-        public string PayloadLocate { get; set; }
+        public string? PayloadLocate { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to tell the vacuum to return to base.
         /// </summary>
-        public string PayloadReturnToBase { get; set; }
+        public string? PayloadReturnToBase { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to start or pause the vacuum.
         /// </summary>
-        public string PayloadStartPause { get; set; }
+        public string? PayloadStartPause { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to stop the vacuum.
         /// </summary>
-        public string PayloadStop { get; set; }
+        public string? PayloadStop { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to turn the vacuum off.
         /// </summary>
-        public string PayloadTurnOff { get; set; }
+        public string? PayloadTurnOff { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to begin the cleaning cycle.
         /// </summary>
-        public string PayloadTurnOn { get; set; }
+        public string? PayloadTurnOn { get; set; }
 
         /// <summary>
         /// The schema to use. Must be `legacy` or omitted to select the legacy schema.
         /// </summary>
-        public string Schema { get; set; }
+        public string? Schema { get; set; } = "legacy";
 
         /// <summary>
         /// The MQTT topic to publish custom commands to the vacuum.
         /// </summary>
-        public string SendCommandTopic { get; set; }
+        public string? SendCommandTopic { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to control the vacuum's fan speed.
         /// </summary>
-        public string SetFanSpeedTopic { get; set; }
+        public string? SetFanSpeedTopic { get; set; }
 
         /// <summary>
-        /// List of features that the vacuum supports (possible values are `turn_on`, `turn_off`, `pause`, `stop`, `return_home`, `battery`, `status`, `locate`, `clean_spot`, `fan_speed`, `send_command`).
+        /// List of features that the vacuum supports, possible values are:
+        /// - turn_on
+        /// - turn_off
+        /// - pause
+        /// - stop
+        /// - return_home
+        /// - battery
+        /// - status
+        /// - locate
+        /// - clean_spot
+        /// - fan_speed
+        /// - send_command
         /// </summary>
-        public string[] SupportedFeatures { get; set; }
+        public IList<string>? SupportedFeatures { get; set; }
 
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }

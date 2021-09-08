@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -34,6 +35,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
 
         /// <summary>
+        /// Defines a template to generate the payload to send to command_topic.
+        /// </summary>
+        public string? CommandTemplate { get; set; }
+
+        /// <summary>
         /// The MQTT topic to publish commands to change the fan state.
         /// </summary>
         public string CommandTopic { get; set; }
@@ -41,17 +47,22 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The name of the fan.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Flag that defines if lock works in optimistic mode
         /// </summary>
-        public bool Optimistic { get; set; }
+        public bool? Optimistic { get; set; }
+
+        /// <summary>
+        /// Defines a template to generate the payload to send to oscillation_command_topic.
+        /// </summary>
+        public string? OscillationCommandTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to change the oscillation state.
         /// </summary>
-        public string OscillationCommandTopic { get; set; }
+        public string? OscillationCommandTopic { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive oscillation state updates.
@@ -61,81 +72,111 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the oscillation.
         /// </summary>
-        public string OscillationValueTemplate { get; set; }
-
-        /// <summary>
-        /// The payload that represents the fan's high speed.
-        /// </summary>
-        public string PayloadHighSpeed { get; set; }
-
-        /// <summary>
-        /// The payload that represents the fan's low speed.
-        /// </summary>
-        public string PayloadLowSpeed { get; set; }
-
-        /// <summary>
-        /// The payload that represents the fan's medium speed.
-        /// </summary>
-        public string PayloadMediumSpeed { get; set; }
+        public string? OscillationValueTemplate { get; set; }
 
         /// <summary>
         /// The payload that represents the stop state.
         /// </summary>
-        public string PayloadOff { get; set; }
+        public string? PayloadOff { get; set; }
 
         /// <summary>
         /// The payload that represents the running state.
         /// </summary>
-        public string PayloadOn { get; set; }
+        public string? PayloadOn { get; set; }
 
         /// <summary>
         /// The payload that represents the oscillation off state.
         /// </summary>
-        public string PayloadOscillationOff { get; set; }
+        public string? PayloadOscillationOff { get; set; }
 
         /// <summary>
         /// The payload that represents the oscillation on state.
         /// </summary>
-        public string PayloadOscillationOn { get; set; }
+        public string? PayloadOscillationOn { get; set; }
 
         /// <summary>
-        /// The MQTT topic to publish commands to change speed state.
+        /// A special payload that resets the percentage state attribute to None when received at the percentage_state_topic.
         /// </summary>
-        public string SpeedCommandTopic { get; set; }
+        public string? PayloadResetPercentage { get; set; }
 
         /// <summary>
-        /// The MQTT topic subscribed to receive speed state updates.
+        /// A special payload that resets the preset_mode state attribute to None when received at the preset_mode_state_topic.
         /// </summary>
-        public string SpeedStateTopic { get; set; }
+        public string? PayloadResetPresetMode { get; set; }
 
         /// <summary>
-        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the speed payload.
+        /// Defines a template to generate the payload to send to percentage_command_topic.
         /// </summary>
-        public string SpeedValueTemplate { get; set; }
+        public string? PercentageCommandTemplate { get; set; }
 
         /// <summary>
-        /// List of speeds this fan is capable of running at. Valid entries are `off`, `low`, `medium` and `high`.
+        /// The MQTT topic to publish commands to change the fan speed state based on a percentage.
         /// </summary>
-        public string[] Speeds { get; set; }
+        public string? PercentageCommandTopic { get; set; }
+
+        /// <summary>
+        /// The MQTT topic subscribed to receive fan speed based on percentage.
+        /// </summary>
+        public string? PercentageStateTopic { get; set; }
+
+        /// <summary>
+        /// Defines a template to extract the percentage value from the payload received on percentage_state_topic.
+        /// </summary>
+        public string? PercentageValueTemplate { get; set; }
+
+        /// <summary>
+        /// Defines a template to generate the payload to send to preset_mode_command_topic.
+        /// </summary>
+        public string? PresetModeCommandTemplate { get; set; }
+
+        /// <summary>
+        /// The MQTT topic to publish commands to change the preset mode.
+        /// </summary>
+        public string? PresetModeCommandTopic { get; set; }
+
+        /// <summary>
+        /// The MQTT topic subscribed to receive fan speed based on presets.
+        /// </summary>
+        public string? PresetModeStateTopic { get; set; }
+
+        /// <summary>
+        /// Defines a template to extract the preset_mode value from the payload received on preset_mode_state_topic.
+        /// </summary>
+        public string? PresetModeValueTemplate { get; set; }
+
+        /// <summary>
+        /// List of preset modes this fan is capable of running at. Common examples include auto, smart, whoosh, eco and breeze.
+        /// </summary>
+        public IList<string>? PresetModes { get; set; }
+
+        /// <summary>
+        /// The maximum of numeric output range (representing 100 %). The number of speeds within the speed_range / 100 will determine the percentage_step.
+        /// </summary>
+        public int? SpeedRangeMax { get; set; }
+
+        /// <summary>
+        /// The minimum of numeric output range (off not included, so speed_range_min - 1 represents 0 %). The number of speeds within the speed_range / 100 will determine the percentage_step.
+        /// </summary>
+        public int? SpeedRangeMin { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive state updates.
         /// </summary>
-        public string StateTopic { get; set; }
+        public string? StateTopic { get; set; }
 
         /// <summary>
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the state.
         /// </summary>
-        public string StateValueTemplate { get; set; }
+        public string? StateValueTemplate { get; set; }
 
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }

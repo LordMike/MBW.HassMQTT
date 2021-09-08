@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -27,81 +28,91 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish commands to control the vacuum.
         /// </summary>
-        public string CommandTopic { get; set; }
+        public string? CommandTopic { get; set; }
 
         /// <summary>
         /// List of possible fan speeds for the vacuum.
         /// </summary>
-        public string[] FanSpeedList { get; set; }
+        public IList<string>? FanSpeedList { get; set; }
 
         /// <summary>
         /// The name of the vacuum.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to begin a spot cleaning cycle.
         /// </summary>
-        public string PayloadCleanSpot { get; set; }
+        public string? PayloadCleanSpot { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to locate the vacuum (typically plays a song).
         /// </summary>
-        public string PayloadLocate { get; set; }
+        public string? PayloadLocate { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to pause the vacuum.
         /// </summary>
-        public string PayloadPause { get; set; }
+        public string? PayloadPause { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to tell the vacuum to return to base.
         /// </summary>
-        public string PayloadReturnToBase { get; set; }
+        public string? PayloadReturnToBase { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to begin the cleaning cycle.
         /// </summary>
-        public string PayloadStart { get; set; }
+        public string? PayloadStart { get; set; }
 
         /// <summary>
         /// The payload to send to the `command_topic` to stop cleaning.
         /// </summary>
-        public string PayloadStop { get; set; }
+        public string? PayloadStop { get; set; }
 
         /// <summary>
         /// The schema to use. Must be `state` to select the state schema.
         /// </summary>
-        public string Schema { get; set; }
+        public string? Schema { get; set; } = "state";
 
         /// <summary>
         /// The MQTT topic to publish custom commands to the vacuum.
         /// </summary>
-        public string SendCommandTopic { get; set; }
+        public string? SendCommandTopic { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to control the vacuum's fan speed.
         /// </summary>
-        public string SetFanSpeedTopic { get; set; }
+        public string? SetFanSpeedTopic { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive state messages from the vacuum. Messages received on the `state_topic` must be a valid JSON dictionary, with a mandatory `state` key and optionally `battery_level` and `fan_speed` keys as shown in the [example](#state-mqtt-protocol).
         /// </summary>
-        public string StateTopic { get; set; }
+        public string? StateTopic { get; set; }
 
         /// <summary>
-        /// List of features that the vacuum supports (possible values are `start`, `stop`, `pause`, `return_home`, `battery`, `status`, `locate`, `clean_spot`, `fan_speed`, `send_command`).
+        /// List of features that the vacuum supports, possible values are:
+        /// - start
+        /// - stop
+        /// - pause
+        /// - return_home
+        /// - battery
+        /// - status
+        /// - locate
+        /// - clean_spot
+        /// - fan_speed
+        /// - send_command
         /// </summary>
-        public string[] SupportedFeatures { get; set; }
+        public IList<string>? SupportedFeatures { get; set; }
 
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }

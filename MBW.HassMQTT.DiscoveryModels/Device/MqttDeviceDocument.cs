@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -86,27 +88,27 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
         /// <summary>
         /// The manufacturer of the device.
         /// </summary>
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
         /// <summary>
         /// The model of the device.
         /// </summary>
-        public string Model { get; set; }
+        public string? Model { get; set; }
 
         /// <summary>
         /// The name of the device.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Suggest an area if the device isn’t in one yet.
         /// </summary>
-        public string SuggestedArea { get; set; }
+        public string? SuggestedArea { get; set; }
 
         /// <summary>
         /// The firmware version of the device.
         /// </summary>
-        public string SwVersion { get; set; }
+        public string? SwVersion { get; set; }
 
         /// <summary>
         /// Identifier of a device that routes messages between this device and Home Assistant.
@@ -114,6 +116,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
         ///
         /// This is used to show device topology in Home Assistant.
         /// </summary>
-        public string ViaDevice { get; set; }
+        public string? ViaDevice { get; set; }
     }
 }

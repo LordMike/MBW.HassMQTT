@@ -1,7 +1,9 @@
-﻿namespace MBW.HassMQTT.DiscoveryModels.Interfaces
+﻿#nullable enable
+
+namespace MBW.HassMQTT.DiscoveryModels.Interfaces
 {
     public interface IHasUniqueId
     {
-        public string UniqueId { get; set; }
+        public string? UniqueId { get; set; }
     }
 }

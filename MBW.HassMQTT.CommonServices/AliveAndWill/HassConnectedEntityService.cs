@@ -63,7 +63,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill
                 .ConfigureDiscovery(discovery =>
                 {
                     discovery.Name = _config.DiscoveryEntityName;
-                    discovery.DeviceClass = HassDeviceClass.Problem;
+                    discovery.DeviceClass = HassBinarySensorDeviceClass.Problem;
 
                     discovery.PayloadOn = ProblemMessage;
                     discovery.PayloadOff = OkMessage;

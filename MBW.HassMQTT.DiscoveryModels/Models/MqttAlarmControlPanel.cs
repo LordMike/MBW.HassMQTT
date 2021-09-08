@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -40,22 +41,22 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// If defined, specifies a code to enable or disable the alarm in the frontend.
         /// </summary>
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         /// <summary>
         /// If true the code is required to arm the alarm. If false the code is not validated.
         /// </summary>
-        public bool CodeArmRequired { get; set; }
+        public bool? CodeArmRequired { get; set; }
 
         /// <summary>
         /// If true the code is required to disarm the alarm. If false the code is not validated.
         /// </summary>
-        public bool CodeDisarmRequired { get; set; }
+        public bool? CodeDisarmRequired { get; set; }
 
         /// <summary>
         /// The [template](/docs/configuration/templating/#processing-incoming-data) used for the command payload. Available variables: `action` and `code`.
         /// </summary>
-        public string CommandTemplate { get; set; }
+        public string? CommandTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to change the alarm state.
@@ -65,32 +66,32 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The name of the alarm.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// The payload to set armed-away mode on your Alarm Panel.
         /// </summary>
-        public string PayloadArmAway { get; set; }
+        public string? PayloadArmAway { get; set; }
 
         /// <summary>
         /// The payload to set armed-home mode on your Alarm Panel.
         /// </summary>
-        public string PayloadArmHome { get; set; }
+        public string? PayloadArmHome { get; set; }
 
         /// <summary>
         /// The payload to set armed-night mode on your Alarm Panel.
         /// </summary>
-        public string PayloadArmNight { get; set; }
+        public string? PayloadArmNight { get; set; }
 
         /// <summary>
         /// The payload to set armed-custom-bypass mode on your Alarm Panel.
         /// </summary>
-        public string PayloadArmCustomBypass { get; set; }
+        public string? PayloadArmCustomBypass { get; set; }
 
         /// <summary>
         /// The payload to disarm your Alarm Panel.
         /// </summary>
-        public string PayloadDisarm { get; set; }
+        public string? PayloadDisarm { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive state updates.
@@ -100,16 +101,16 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the value.
         /// </summary>
-        public string ValueTemplate { get; set; }
+        public string? ValueTemplate { get; set; }
 
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }

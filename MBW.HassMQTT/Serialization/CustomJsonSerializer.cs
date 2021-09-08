@@ -1,17 +1,17 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace MBW.HassMQTT.Serialization
 {
-    internal static class CustomJsonSerializer
+    public static class CustomJsonSerializer
     {
         public static JsonSerializer Serializer { get; }
 
         static CustomJsonSerializer()
         {
             SnakeCaseNamingStrategy namingStrategy = new SnakeCaseNamingStrategy();
-
+            
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -41,17 +42,17 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract blue color from the state payload value.
         /// </summary>
-        public string BlueTemplate { get; set; }
+        public string? BlueTemplate { get; set; }
 
         /// <summary>
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract brightness from the state payload value.
         /// </summary>
-        public string BrightnessTemplate { get; set; }
+        public string? BrightnessTemplate { get; set; }
 
         /// <summary>
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract color temperature from the state payload value.
         /// </summary>
-        public string ColorTempTemplate { get; set; }
+        public string? ColorTempTemplate { get; set; }
 
         /// <summary>
         /// The [template](/docs/configuration/templating/#processing-incoming-data) for *off* state changes. Available variables: `state` and `transition`.
@@ -71,71 +72,66 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// List of possible effects.
         /// </summary>
-        public string[] EffectList { get; set; }
+        public IList<string>? EffectList { get; set; }
 
         /// <summary>
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract effect from the state payload value.
         /// </summary>
-        public string EffectTemplate { get; set; }
+        public string? EffectTemplate { get; set; }
 
         /// <summary>
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract green color from the state payload value.
         /// </summary>
-        public string GreenTemplate { get; set; }
+        public string? GreenTemplate { get; set; }
 
         /// <summary>
         /// The maximum color temperature in mireds.
         /// </summary>
-        public int MaxMireds { get; set; }
+        public int? MaxMireds { get; set; }
 
         /// <summary>
         /// The minimum color temperature in mireds.
         /// </summary>
-        public int MinMireds { get; set; }
+        public int? MinMireds { get; set; }
 
         /// <summary>
         /// The name of the light.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Flag that defines if the light works in optimistic mode.
         /// </summary>
-        public string Optimistic { get; set; }
+        public bool? Optimistic { get; set; }
 
         /// <summary>
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract red color from the state payload value.
         /// </summary>
-        public string RedTemplate { get; set; }
+        public string? RedTemplate { get; set; }
 
         /// <summary>
         /// The schema to use. Must be `template` to select the template schema.
         /// </summary>
-        public string Schema { get; set; }
+        public string? Schema { get; set; } = "template";
 
         /// <summary>
         /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract state from the state payload value.
         /// </summary>
-        public string StateTemplate { get; set; }
+        public string? StateTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive state updates.
         /// </summary>
-        public string StateTopic { get; set; }
+        public string? StateTopic { get; set; }
 
-        /// <summary>
-        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract white value from the state payload value.
-        /// </summary>
-        public string WhiteValueTemplate { get; set; }
-
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -56,156 +58,156 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish commands to control the cover.
         /// </summary>
-        public string CommandTopic { get; set; }
+        public string? CommandTopic { get; set; }
 
         /// <summary>
         /// Sets the [class of the device](/integrations/cover/), changing the device state and icon that is displayed on the frontend.
         /// </summary>
-        public string DeviceClass { get; set; }
+        public string? DeviceClass { get; set; }
 
         /// <summary>
         /// The name of the cover.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Flag that defines if switch works in optimistic mode.
         /// </summary>
-        public string Optimistic { get; set; }
+        public bool? Optimistic { get; set; }
 
         /// <summary>
         /// The command payload that closes the cover.
         /// </summary>
-        public string PayloadClose { get; set; }
+        public string? PayloadClose { get; set; }
 
         /// <summary>
         /// The command payload that opens the cover.
         /// </summary>
-        public string PayloadOpen { get; set; }
+        public string? PayloadOpen { get; set; }
 
         /// <summary>
         /// The command payload that stops the cover.
         /// </summary>
-        public string PayloadStop { get; set; }
+        public string? PayloadStop { get; set; }
 
         /// <summary>
         /// Number which represents closed position.
         /// </summary>
-        public int PositionClosed { get; set; }
+        public int? PositionClosed { get; set; }
 
         /// <summary>
         /// Number which represents open position.
         /// </summary>
-        public int PositionOpen { get; set; }
+        public int? PositionOpen { get; set; }
         
         /// <summary>
         /// Defines a template that can be used to extract the payload for the `position_topic` topic.
         /// </summary>
-        public string PositionTemplate { get; set; }
+        public string? PositionTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive cover position messages.
         /// </summary>
-        public string PositionTopic { get; set; }
+        public string? PositionTopic { get; set; }
 
         /// <summary>
         /// Defines a [template](/topics/templating/) to define the position to be sent to the `set_position_topic` topic. Incoming position value is available for use in the template `{{position}}`. If no template is defined, the position (0-100) will be calculated according to `position_open` and `position_closed` values.
         /// </summary>
-        public string SetPositionTemplate { get; set; }
+        public string? SetPositionTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish position commands to. You need to set position_topic as well if you want to use position topic. Use template if position topic wants different values than within range `position_closed` - `position_open`. If template is not defined and `position_closed != 100` and `position_open != 0` then proper position value is calculated from percentage position.
         /// </summary>
-        public string SetpositionTopic { get; set; }
+        public string? SetpositionTopic { get; set; }
 
         /// <summary>
         /// The payload that represents the closed state.
         /// </summary>
-        public string StateClosed { get; set; }
+        public string? StateClosed { get; set; }
 
         /// <summary>
         /// The payload that represents the closing state.
         /// </summary>
-        public string StateClosing { get; set; }
+        public string? StateClosing { get; set; }
 
         /// <summary>
         /// The payload that represents the open state.
         /// </summary>
-        public string StateOpen { get; set; }
+        public string? StateOpen { get; set; }
 
         /// <summary>
         /// The payload that represents the opening state.
         /// </summary>
-        public string StateOpening { get; set; }
+        public string? StateOpening { get; set; }
         
         /// <summary>
         /// The payload that represents the stopped state (for covers that do not report `open`/`closed` state).
         /// </summary>
-        public string StateStopped { get; set; }
+        public string? StateStopped { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive cover state messages. State topic can only read (`open`, `opening`, `closed`, `closing` or `stopped`) state.
         /// </summary>
-        public string StateTopic { get; set; }
+        public string? StateTopic { get; set; }
 
         /// <summary>
         /// The value that will be sent on a `close_cover_tilt` command.
         /// </summary>
-        public int TiltClosedValue { get; set; }
+        public int? TiltClosedValue { get; set; }
         
         /// <summary>
         /// Defines a [template](/topics/templating/) that can be used to extract the payload for the `tilt_command_topic` topic.
         /// </summary>
-        public string TiltCommandTemplate { get; set; }
+        public string? TiltCommandTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to control the cover tilt.
         /// </summary>
-        public string TiltCommandTopic { get; set; }
+        public string? TiltCommandTopic { get; set; }
 
         /// <summary>
         /// The maximum tilt value
         /// </summary>
-        public int TiltMax { get; set; }
+        public int? TiltMax { get; set; }
 
         /// <summary>
         /// The minimum tilt value.
         /// </summary>
-        public int TiltMin { get; set; }
+        public int? TiltMin { get; set; }
 
         /// <summary>
         /// The value that will be sent on an `open_cover_tilt` command.
         /// </summary>
-        public int TiltOpenedValue { get; set; }
+        public int? TiltOpenedValue { get; set; }
 
         /// <summary>
         /// Flag that determines if tilt works in optimistic mode.
         /// </summary>
-        public bool TiltOptimistic { get; set; }
+        public bool? TiltOptimistic { get; set; }
 
         /// <summary>
         /// Defines a [template](/topics/templating/) that can be used to extract the payload for the `tilt_status_topic` topic. 
         /// </summary>
-        public string TiltStatusTemplate { get; set; }
+        public string? TiltStatusTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive tilt status update values.
         /// </summary>
-        public string TiltStatusTopic { get; set; }
+        public string? TiltStatusTopic { get; set; }
 
         /// <summary>
         /// Defines a template that can be used to extract the payload for the `state_topic` topic.
         /// </summary>
-        public string ValueTemplate { get; set; }
+        public string? ValueTemplate { get; set; }
 
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 
@@ -10,7 +12,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Interfaces
         /// A list of MQTT topics subscribed to receive availability (online/offline) updates. Must not be used together with availability_topic.
         /// </summary>
         [Obsolete("Use ConfigureAvailability extension method instead of this directly - direct use can lead to bugs")]
-        IList<AvailabilityModel> Availability { get; set; }
+        IList<AvailabilityModel>? Availability { get; set; }
 
         /// <summary>
         /// When `availability` is configured, this controls the conditions needed to set the entity to `available`.

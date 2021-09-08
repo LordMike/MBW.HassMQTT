@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -49,7 +50,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The name of the Select.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Flag that defines if the select works in optimistic mode.
@@ -60,26 +61,26 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// List of options that can be selected.
         /// </summary>
-        public List<string> Options { get; set; }
+        public IList<string> Options { get; set; } = new List<string>();
 
         /// <summary>
         /// The MQTT topic subscribed to receive update of the selected option.
         /// </summary>
-        public string StateTopic { get; set; }
+        public string? StateTopic { get; set; }
 
         /// <summary>
         /// Defines a template to extract the value.
         /// </summary>
-        public string ValueTemplate { get; set; }
+        public string? ValueTemplate { get; set; }
 
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }

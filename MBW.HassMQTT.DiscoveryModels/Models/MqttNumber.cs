@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -25,33 +26,55 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish commands to change the number.
         /// </summary>
-        public string CommandTopic { get; set; }
+        public string? CommandTopic { get; set; }
+
+        /// <summary>
+        /// Minimum value.
+        /// </summary>
+        public float? Min { get; set; }
+
+        /// <summary>
+        /// Maximum value.
+        /// </summary>
+        public float? Max { get; set; }
 
         /// <summary>
         /// The name of the Number.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Flag that defines if number works in optimistic mode.
         /// 
         /// Default: true if no state_topic defined, else false.
         /// </summary>
-        public bool Optimistic { get; set; }
+        public bool? Optimistic { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive number values.
         /// </summary>
-        public string StateTopic { get; set; }
+        public string? StateTopic { get; set; }
 
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        /// <summary>
+        /// Step value. Smallest value 0.001.
+        /// </summary>
+        public float? Step { get; set; }
+
+        /// <summary>
+        /// Defines a template to extract the value.
+        /// </summary>
+        public string? ValueTemplate { get; set; }
+
+
+
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public string Icon { get; set; }
-        public bool Retain { get; set; }
+        public string? Icon { get; set; }
+        public bool? Retain { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿#nullable enable
+using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
@@ -25,6 +26,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) that returns a tag ID.
         /// </summary>
-        public string ValueTemplate { get; set; }
+        public string? ValueTemplate { get; set; }
     }
 }

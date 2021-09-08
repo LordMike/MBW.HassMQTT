@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -41,17 +42,17 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light supports brightness.
         /// </summary>
-        public bool Brightness { get; set; }
+        public bool? Brightness { get; set; }
 
         /// <summary>
         /// Defines the maximum brightness value (i.e., 100%) of the MQTT device.
         /// </summary>
-        public int BrightnessScale { get; set; }
+        public int? BrightnessScale { get; set; }
 
         /// <summary>
-        /// Flag that defines if the light supports color temperature.
+        /// Flag that defines if the light supports color modes.
         /// </summary>
-        public bool ColorTemp { get; set; }
+        public bool? ColorMode { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to change the light’s state.
@@ -61,81 +62,75 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// Flag that defines if the light supports effects.
         /// </summary>
-        public bool Effect { get; set; }
+        public bool? Effect { get; set; }
 
         /// <summary>
         /// The list of effects the light supports.
         /// </summary>
-        public string[] EffectList { get; set; }
+        public IList<string>? EffectList { get; set; }
 
         /// <summary>
         /// The duration, in seconds, of a “long” flash.
         /// </summary>
-        public int FlashTimeLong { get; set; }
+        public int? FlashTimeLong { get; set; }
 
         /// <summary>
         /// The duration, in seconds, of a “short” flash.
         /// </summary>
-        public int FlashTimeShort { get; set; }
-
-        /// <summary>
-        /// Flag that defines if the light supports HS colors.
-        /// </summary>
-        public bool Hs { get; set; }
+        public int? FlashTimeShort { get; set; }
 
         /// <summary>
         /// The maximum color temperature in mireds.
         /// </summary>
-        public int MaxMireds { get; set; }
+        public int? MaxMireds { get; set; }
 
         /// <summary>
         /// The minimum color temperature in mireds.
         /// </summary>
-        public int MinMireds { get; set; }
+        public int? MinMireds { get; set; }
 
         /// <summary>
         /// The name of the light.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Flag that defines if the light works in optimistic mode.
         /// </summary>
-        public bool Optimistic { get; set; }
-
-        /// <summary>
-        /// Flag that defines if the light supports RGB colors.
-        /// </summary>
-        public bool Rgb { get; set; }
+        public bool? Optimistic { get; set; }
 
         /// <summary>
         /// The schema to use. Must be `json` to select the JSON schema.
         /// </summary>
-        public string Schema { get; set; }
+        public string? Schema { get; set; } = "json";
 
         /// <summary>
         /// The MQTT topic subscribed to receive state updates.
         /// </summary>
-        public string StateTopic { get; set; }
+        public string? StateTopic { get; set; }
 
         /// <summary>
-        /// Flag that defines if the light supports white values.
+        /// A list of color modes supported by the list. This is required if color_mode is True.
+        /// Possible color modes are:
+        /// - onoff
+        /// - brightness
+        /// - color_temp
+        /// - hs
+        /// - xy
+        /// - rgb
+        /// - rgbw
+        /// - rgbww
         /// </summary>
-        public bool WhiteValue { get; set; }
+        public IList<string>? SupportedColorModes { get; set; }
 
-        /// <summary>
-        /// Flag that defines if the light supports XY colors.
-        /// </summary>
-        public bool Xy { get; set; }
-
-        public string UniqueId { get; set; }
-        public IList<AvailabilityModel> Availability { get; set; }
+        public string? UniqueId { get; set; }
+        public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
-        public MqttQosLevel Qos { get; set; }
-        public string JsonAttributesTemplate { get; set; }
-        public string JsonAttributesTopic { get; set; }
-        public string Icon { get; set; }
+        public MqttQosLevel? Qos { get; set; }
+        public string? JsonAttributesTemplate { get; set; }
+        public string? JsonAttributesTopic { get; set; }
+        public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
-        public bool Retain { get; set; }
+        public bool? Retain { get; set; }
     }
 }
