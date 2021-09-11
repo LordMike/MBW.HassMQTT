@@ -162,8 +162,6 @@ namespace MBW.HassMQTT.DiscoveryModels
                         //IRuleBuilderOptions<TInner, System.Enum?>? rule = RuleFor(propExpression)
                         //    .IsInEnum();
                     }
-
-                    Console.WriteLine();
                 }
 
                 // Templates
