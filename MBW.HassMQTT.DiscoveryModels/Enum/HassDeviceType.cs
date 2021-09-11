@@ -18,7 +18,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         [EnumMember(Value = "cover")]
         Cover,
 
-        [EnumMember(Value = "device_trigger")]
+        [EnumMember(Value = "device_automation")]
         DeviceTrigger,
 
         [EnumMember(Value = "fan")]
@@ -52,6 +52,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         Number,
 
         [EnumMember(Value = "device_tracker")]
-        DeviceTracker
+        DeviceTracker,
+
+        [EnumMember(Value = "select")]
+        Select,
+
+        [EnumMember(Value = "humidifier")]
+        Humidifier
     }
 }

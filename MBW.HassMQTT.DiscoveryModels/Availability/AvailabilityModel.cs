@@ -1,27 +1,35 @@
-﻿using Newtonsoft.Json;
+﻿#nullable enable
+using FluentValidation;
 
 namespace MBW.HassMQTT.DiscoveryModels.Availability
 {
     public class AvailabilityModel
     {
+        public static AvailabilityModelValidator Validator { get; } = new AvailabilityModelValidator();
+
         /// <summary>
         /// An MQTT topic subscribed to receive availability (online/offline) updates.
         /// </summary>
-        [JsonProperty("topic")]
         public string Topic { get; set; }
 
         /// <summary>
         /// The payload that represents the available state.
         /// </summary>
         /// <remarks>Default is 'online'</remarks>
-        [JsonProperty("payload_available")]
-        public string PayloadAvailable { get; set; }
+        public string? PayloadAvailable { get; set; }
 
         /// <summary>
         /// The payload that represents the unavailable state.
         /// </summary>
         /// <remarks>Default is 'offline'</remarks>
-        [JsonProperty("payload_not_available")]
-        public string PayloadNotAvailable { get; set; }
+        public string? PayloadNotAvailable { get; set; }
+
+        public class AvailabilityModelValidator : AbstractValidator<AvailabilityModel>
+        {
+            public AvailabilityModelValidator()
+            {
+                RuleFor(s => s.Topic).NotEmpty();
+            }
+        }
     }
 }

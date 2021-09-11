@@ -1,4 +1,4 @@
-﻿using MBW.HassMQTT.DiscoveryModels;
+﻿using MBW.HassMQTT.DiscoveryModels.Interfaces;
 
 namespace MBW.HassMQTT.Interfaces
 {
@@ -8,10 +8,10 @@ namespace MBW.HassMQTT.Interfaces
         string EntityId { get; }
         internal HassMqttManager HassMqttManager { get; }
 
-        internal MqttSensorDiscoveryBase DiscoveryUntyped { get; }
+        internal IHassDiscoveryDocument DiscoveryUntyped { get; }
     }
     
-    public interface IDiscoveryDocumentBuilder<TEntity> : IDiscoveryDocumentBuilder where TEntity : MqttSensorDiscoveryBase
+    public interface IDiscoveryDocumentBuilder<TEntity> : IDiscoveryDocumentBuilder where TEntity : IHassDiscoveryDocument
     {
         TEntity Discovery { get; }
     }

@@ -1,83 +1,117 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable enable
+
+using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using FluentValidation;
 using JetBrains.Annotations;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Device
 {
     public class MqttDeviceDocument : INotifyPropertyChanged
     {
-        private readonly MqttSensorDiscoveryBase _discoveryDoc;
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public static MqttDeviceDocumentValidator Validator { get; } = new MqttDeviceDocumentValidator();
+
         [NotifyPropertyChangedInvocator]
+        [UsedImplicitly]
         protected virtual void OnPropertyChanged(string propertyName, object before, object after)
         {
             if (propertyName == nameof(Identifiers))
             {
-                // Extra check as arrays are special
-                if (before is string[] arrBefore && after is string[] arrAfter &&
-                    arrBefore.Length == arrAfter.Length &&
-                    arrBefore.SequenceEqual(arrAfter, StringComparer.Ordinal))
+                if (before is string strBefore && after is string strAfter &&
+                    string.Equals(strBefore, strAfter, StringComparison.Ordinal))
                 {
-                    // These arrays are identical
                     return;
                 }
             }
 
             if (propertyName == nameof(Connections))
             {
-                // Extra check as arrays are special
-                if (before is IList<ValueTuple<string, string>> arrBefore && after is IList<ValueTuple<string, string>> arrAfter &&
-                    arrBefore.Count == arrAfter.Count &&
-                    arrBefore.SequenceEqual(arrAfter, StringtupleComparer.Instance))
+                if (before is ConnectionInfo valBefore && after is ConnectionInfo valAfter &&
+                    string.Equals(valBefore.Type, valAfter.Type, StringComparison.Ordinal) &&
+                    string.Equals(valBefore.Value, valAfter.Value, StringComparison.Ordinal))
                 {
-                    // These arrays are identical
                     return;
                 }
             }
 
-            _discoveryDoc.SetDirty();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        internal MqttDeviceDocument(MqttSensorDiscoveryBase discoveryDoc)
+        internal MqttDeviceDocument()
         {
-            _discoveryDoc = discoveryDoc;
-            Connections = new List<(string, string)>();
+            Connections = new ObservableCollection<ConnectionInfo>();
+            Identifiers = new ObservableCollection<string>();
+
+            Connections.CollectionChanged += (sender, args) =>
+            {
+                object oldValue = null;
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Move:
+                    case NotifyCollectionChangedAction.Remove:
+                    case NotifyCollectionChangedAction.Replace:
+                        oldValue = args.OldItems[0];
+                        break;
+                }
+
+                OnPropertyChanged(nameof(Connections), oldValue, args.NewItems[0]);
+            };
+            Identifiers.CollectionChanged += (sender, args) =>
+            {
+                object oldValue = null;
+                switch (args.Action)
+                {
+                    case NotifyCollectionChangedAction.Move:
+                    case NotifyCollectionChangedAction.Remove:
+                    case NotifyCollectionChangedAction.Replace:
+                        oldValue = args.OldItems[0];
+                        break;
+                }
+
+                OnPropertyChanged(nameof(Identifiers), oldValue, args.NewItems[0]);
+            };
         }
 
         /// <summary>
         /// A list of connections of the device to the outside world as a list of tuples [connection_type, connection_identifier].
         /// For example the MAC address of a network interface: "connections": [["mac", "02:5b:26:a8:dc:12"]].
         /// </summary>
-        public IList<ValueTuple<string, string>> Connections { get; set; }
+        public ObservableCollection<ConnectionInfo> Connections { get; }
 
         /// <summary>
         /// A list of IDs that uniquely identify the device. For example a serial number.
         /// </summary>
-        public string[] Identifiers { get; set; }
+        public ObservableCollection<string> Identifiers { get; }
 
         /// <summary>
         /// The manufacturer of the device.
         /// </summary>
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
         /// <summary>
         /// The model of the device.
         /// </summary>
-        public string Model { get; set; }
+        public string? Model { get; set; }
 
         /// <summary>
         /// The name of the device.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
+
+        /// <summary>
+        /// Suggest an area if the device isn’t in one yet.
+        /// </summary>
+        public string? SuggestedArea { get; set; }
 
         /// <summary>
         /// The firmware version of the device.
         /// </summary>
-        public string SwVersion { get; set; }
+        public string? SwVersion { get; set; }
 
         /// <summary>
         /// Identifier of a device that routes messages between this device and Home Assistant.
@@ -85,6 +119,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
         ///
         /// This is used to show device topology in Home Assistant.
         /// </summary>
-        public string ViaDevice { get; set; }
+        public string? ViaDevice { get; set; }
+
+        public class MqttDeviceDocumentValidator : AbstractValidator<MqttDeviceDocument>
+        {
+            public MqttDeviceDocumentValidator()
+            {
+                RuleForEach(s => s.Identifiers).NotNull().WithMessage("{PropertyName} must not contain null values");
+                RuleForEach(s => s.Connections).SetValidator(ConnectionInfo.Validator);
+            }
+        }
     }
 }

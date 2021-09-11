@@ -4,15 +4,14 @@ using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.Serialization
 {
-    internal class QosLevelConverter : JsonConverter<MqttQosLevel>
+    internal class QosLevelConverter : JsonConverter<MqttQosLevel?>
     {
-        public override void WriteJson(JsonWriter writer, MqttQosLevel value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, MqttQosLevel? value, JsonSerializer serializer)
         {
-            writer.WriteValue((byte)value);
+            writer.WriteValue((byte)value.GetValueOrDefault());
         }
 
-        public override MqttQosLevel ReadJson(JsonReader reader, Type objectType, MqttQosLevel existingValue, bool hasExistingValue,
-            JsonSerializer serializer)
+        public override MqttQosLevel? ReadJson(JsonReader reader, Type objectType, MqttQosLevel? existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             int? value = reader.ReadAsInt32();
             if (value.HasValue)

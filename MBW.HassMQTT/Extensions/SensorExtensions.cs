@@ -10,11 +10,11 @@ namespace MBW.HassMQTT.Extensions
 {
     public static class SensorExtensions
     {
-        public delegate void DiscoveryConfigure<TEntity>(TEntity discovery) where TEntity : MqttSensorDiscoveryBase;
+        public delegate void DiscoveryConfigure<TEntity>(TEntity discovery) where TEntity : IHassDiscoveryDocument;
 
         public delegate void DeviceConfigure(MqttDeviceDocument device);
 
-        public static IDiscoveryDocumentBuilder<TEntity> ConfigureTopics<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, params HassTopicKind[] topicKinds) where TEntity : MqttSensorDiscoveryBase
+        public static IDiscoveryDocumentBuilder<TEntity> ConfigureTopics<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, params HassTopicKind[] topicKinds) where TEntity : IHassDiscoveryDocument
         {
             foreach (HassTopicKind topicKind in topicKinds)
             {
@@ -25,13 +25,13 @@ namespace MBW.HassMQTT.Extensions
             return builder;
         }
 
-        public static IDiscoveryDocumentBuilder<TEntity> ConfigureDiscovery<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, DiscoveryConfigure<TEntity> configure) where TEntity : MqttSensorDiscoveryBase
+        public static IDiscoveryDocumentBuilder<TEntity> ConfigureDiscovery<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, DiscoveryConfigure<TEntity> configure) where TEntity : IHassDiscoveryDocument
         {
             configure(builder.Discovery);
             return builder;
         }
 
-        public static IDiscoveryDocumentBuilder<TEntity> ConfigureDevice<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, DeviceConfigure configure) where TEntity : MqttSensorDiscoveryBase
+        public static IDiscoveryDocumentBuilder<TEntity> ConfigureDevice<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder, DeviceConfigure configure) where TEntity : IHassDiscoveryDocument
         {
             configure(builder.Discovery.Device);
             return builder;
@@ -42,7 +42,7 @@ namespace MBW.HassMQTT.Extensions
         /// </summary>
         public static MqttAttributesTopic GetAttributesSender(this ISensorContainer builder)
         {
-            if (!(builder.Discovery is IHasAttributesTopic asAttributesTopic))
+            if (!(builder.Discovery is IHasJsonAttributes asAttributesTopic))
                 throw new InvalidOperationException($"Attempted to get attributes sender for an invalid type, {builder.Discovery.GetType().Name}");
 
             string topic = asAttributesTopic.JsonAttributesTopic;

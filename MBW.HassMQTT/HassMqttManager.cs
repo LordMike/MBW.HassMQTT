@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentValidation;
+using FluentValidation.Results;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -47,7 +49,7 @@ namespace MBW.HassMQTT
             _attributes = new ConcurrentDictionary<string, MqttAttributesTopic>(StringComparer.OrdinalIgnoreCase);
         }
 
-        public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId, string uniqueId = null) where TEntity : MqttSensorDiscoveryBase
+        public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId, string uniqueId = null) where TEntity : IHassDiscoveryDocument
         {
             uniqueId ??= $"{deviceId}_{entityId}".ToLower();
 
@@ -62,7 +64,7 @@ namespace MBW.HassMQTT
                     EntityId = entityId
                 };
 
-                if (_config.AutoConfigureAttributesTopics && newBuilder.Discovery is IHasAttributesTopic)
+                if (_config.AutoConfigureAttributesTopics && newBuilder.Discovery is IHasJsonAttributes)
                     newBuilder.ConfigureTopics(HassTopicKind.JsonAttributes);
 
                 return newBuilder;
@@ -155,16 +157,27 @@ namespace MBW.HassMQTT
 
                 foreach (IDiscoveryDocumentBuilder value in _discoveryDocuments.Values.Where(s => s.DiscoveryUntyped.Dirty))
                 {
+                    string uniqueId = (value.DiscoveryUntyped as IHasUniqueId)?.UniqueId ?? value.ToString();
+
                     if (_config.SendDiscoveryDocuments)
                     {
-                        _logger.LogDebug("Sending discovery document for {uniqueId}", value.DiscoveryUntyped.UniqueId);
+                        if (_config.ValidateDiscoveryDocuments)
+                        {
+                            ValidationContext<IHassDiscoveryDocument> validationContext = new ValidationContext<IHassDiscoveryDocument>(value.DiscoveryUntyped);
+                            ValidationResult validation = await value.DiscoveryUntyped.Validator.ValidateAsync(validationContext, token);
+
+                            if (!validation.IsValid)
+                                throw new ValidationException(validation.Errors);
+                        }
+
+                        _logger.LogDebug("Sending discovery document for {identifier}", uniqueId);
 
                         await SendValue(value.DiscoveryUntyped, true, token);
                         discoveryDocs++;
                     }
                     else
                     {
-                        _logger.LogDebug("Not sending discovery for {uniqueId}, due to configuration", value.DiscoveryUntyped.UniqueId);
+                        _logger.LogDebug("Not sending discovery for {identifier}, due to configuration", uniqueId);
                         value.DiscoveryUntyped.SetDirty(false);
                     }
                 }
