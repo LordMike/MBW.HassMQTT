@@ -62,7 +62,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The state_class of the sensor.
         /// See https://developers.home-assistant.io/docs/core/entity/sensor/#available-state-classes
         /// </summary>
-        public string? StateClass { get; set; }
+        public HassStateClass? StateClass { get; set; }
 
         /// <summary>
         /// The MQTT topic subscribed to receive sensor values.
@@ -96,6 +96,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
                 TopicAndTemplate(s => s.LastResetTopic, s => s.LastResetValueTemplate);
 
                 RuleFor(s => s.DeviceClass).IsInEnum();
+                RuleFor(s => s.StateClass).IsInEnum().NotEqual(HassStateClass.Unknown);
 
                 RuleFor(s => s.ExpireAfter)
                     .GreaterThanOrEqualTo(0);
