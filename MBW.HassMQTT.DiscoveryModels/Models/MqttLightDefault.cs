@@ -82,7 +82,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? ColorTempCommandTopic { get; set; }
 
         /// <summary>
-        /// The MQTT topic subscribed to receive color temperature state updates. If the light also supports setting colors, also define a `white_value_state_topic`. 
+        /// The MQTT topic subscribed to receive color temperature state updates.
         /// </summary>
         public string? ColorTempStateTopic { get; set; }
 
