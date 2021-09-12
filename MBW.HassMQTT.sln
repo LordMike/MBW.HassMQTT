@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Imports", "_Imports", "{97
 		_Imports\Local.targets = _Imports\Local.targets
 		_Imports\Test.targets = _Imports\Test.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBW.HassMQTT.SourceGenerators", "MBW.HassMQTT.SourceGenerators\MBW.HassMQTT.SourceGenerators.csproj", "{F144ACC8-5018-4AE8-BCE9-68038F086FC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,18 @@ Global
 		{A2D211E9-0770-4A46-868C-40239A7A5F4A}.Release|x64.Build.0 = Release|Any CPU
 		{A2D211E9-0770-4A46-868C-40239A7A5F4A}.Release|x86.ActiveCfg = Release|Any CPU
 		{A2D211E9-0770-4A46-868C-40239A7A5F4A}.Release|x86.Build.0 = Release|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Debug|x64.Build.0 = Debug|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Debug|x86.Build.0 = Debug|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Release|x64.ActiveCfg = Release|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Release|x64.Build.0 = Release|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Release|x86.ActiveCfg = Release|Any CPU
+		{F144ACC8-5018-4AE8-BCE9-68038F086FC7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
