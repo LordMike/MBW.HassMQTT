@@ -22,6 +22,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// - armed_home
     /// - armed_away
     /// - armed_night
+    /// - armed_vacation
     /// - armed_custom_bypass
     /// - pending
     /// - triggered
@@ -83,6 +84,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The payload to set armed-night mode on your Alarm Panel.
         /// </summary>
         public string? PayloadArmNight { get; set; }
+
+        /// <summary>
+        /// The payload to set armed-vacation mode on your Alarm Panel.
+        /// </summary>
+        public string? PayloadArmVacation { get; set; }
 
         /// <summary>
         /// The payload to set armed-custom-bypass mode on your Alarm Panel.
