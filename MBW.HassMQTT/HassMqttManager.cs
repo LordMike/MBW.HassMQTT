@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,6 +35,7 @@ namespace MBW.HassMQTT
         private readonly ConcurrentDictionary<string, IDiscoveryDocumentBuilder> _discoveryDocuments;
         private readonly ConcurrentDictionary<string, MqttStateValueTopic> _values;
         private readonly ConcurrentDictionary<string, MqttAttributesTopic> _attributes;
+        private readonly ConcurrentBag<string> _removeTopics;
 
         internal HassMqttTopicBuilder TopicBuilder { get; }
 
@@ -47,6 +49,15 @@ namespace MBW.HassMQTT
             _discoveryDocuments = new ConcurrentDictionary<string, IDiscoveryDocumentBuilder>(StringComparer.OrdinalIgnoreCase);
             _values = new ConcurrentDictionary<string, MqttStateValueTopic>(StringComparer.OrdinalIgnoreCase);
             _attributes = new ConcurrentDictionary<string, MqttAttributesTopic>(StringComparer.OrdinalIgnoreCase);
+            _removeTopics = new ConcurrentBag<string>();
+        }
+
+        /// <summary>
+        /// Sends an empty discovery document on startup, removing a sensor from HASS
+        /// </summary>
+        public void RemoveSensor<TEntity>(string deviceId, string entityId) where TEntity : IHassDiscoveryDocument
+        {
+            _removeTopics.Add(TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId));
         }
 
         public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId, string uniqueId = null) where TEntity : IHassDiscoveryDocument
@@ -101,37 +112,41 @@ namespace MBW.HassMQTT
 
         private async Task SendValue(IMqttValueContainer container, bool resetDirty, CancellationToken token)
         {
-            object value = container.GetSerializedValue(false);
+            await SendValue(container.PublishTopic, container.GetSerializedValue(false), token);
+
+            // Set to not-dirty _after_ sending the value
+            if (resetDirty)
+                container.SetDirty(false);
+        }
+
+        private async Task SendValue(string topic, object value, CancellationToken token)
+        {
             bool log = _logger.IsEnabled(LogLevel.Debug);
 
             object sentValue;
             if (value is string str)
             {
                 sentValue = str;
-                await _mqttClient.SendValueAsync(container.PublishTopic, str, token);
+                await _mqttClient.SendValueAsync(topic, str, token);
             }
             else if (value == null)
             {
                 sentValue = "<null>";
-                await _mqttClient.SendValueAsync(container.PublishTopic, string.Empty, token);
+                await _mqttClient.SendValueAsync(topic, string.Empty, token);
             }
             else
             {
                 sentValue = null;
 
                 JToken converted = JToken.FromObject(value, CustomJsonSerializer.Serializer);
-                await _mqttClient.SendJsonAsync(container.PublishTopic, converted, token);
+                await _mqttClient.SendJsonAsync(topic, converted, token);
 
                 if (log)
                     sentValue = converted.ToString(Formatting.None);
             }
 
-            // Set to not-dirty _after_ sending the value
-            if (resetDirty)
-                container.SetDirty(false);
-
             if (log)
-                _logger.LogDebug("Pushed {Value} to {Topic}", sentValue, container.PublishTopic);
+                _logger.LogDebug("Pushed {Value} to {Topic}", sentValue, topic);
         }
 
         public void MarkAllValuesDirty()
@@ -180,6 +195,12 @@ namespace MBW.HassMQTT
                         _logger.LogDebug("Not sending discovery for {identifier}, due to configuration", uniqueId);
                         value.DiscoveryUntyped.SetDirty(false);
                     }
+                }
+
+                while (_removeTopics.TryTake(out string topic))
+                {
+                    if (_config.SendDiscoveryDocuments)
+                        await SendValue(topic, string.Empty, token);
                 }
 
                 foreach (MqttStateValueTopic value in _values.Values.Where(s => s.Dirty))
