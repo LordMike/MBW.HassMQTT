@@ -41,13 +41,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? ForceUpdate { get; set; }
 
         /// <summary>
-        /// The MQTT topic subscribed to receive timestamps for when an accumulating sensor such as an energy meter was reset.
-        /// If the sensor never resets, set last_reset_topic to same as state_topic and set the last_reset_value_template to a
-        /// constant valid timstamp, for example UNIX epoch 0: 1970-01-01T00:00:00+00:00.
-        /// </summary>
-        public string? LastResetTopic { get; set; }
-
-        /// <summary>
         /// Defines a template to extract the last_reset. Available variables: entity_id. The entity_id can be used to reference the
         /// entity’s attributes.
         /// </summary>
