@@ -89,6 +89,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
         public ObservableCollection<string> Identifiers { get; }
 
         /// <summary>
+        /// A link to the webpage that can manage the configuration of this device. Can be either an HTTP or HTTPS link.
+        /// </summary>
+        public string? ConfigurationUrl { get; set; }
+
+        /// <summary>
         /// The manufacturer of the device.
         /// </summary>
         public string? Manufacturer { get; set; }

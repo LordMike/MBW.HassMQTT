@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System.Collections.Generic;
 using FluentValidation;
 using JetBrains.Annotations;
@@ -18,7 +18,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Sensor)]
     [PublicAPI]
-    public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
+    public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory
     {
         public MqttSensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -80,6 +80,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public MqttQosLevel? Qos { get; set; }
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttSensorValidator : MqttSensorDiscoveryBaseValidator<MqttSensor>
         {

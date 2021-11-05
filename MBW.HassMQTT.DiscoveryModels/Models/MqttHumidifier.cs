@@ -29,7 +29,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Humidifier)]
     [PublicAPI]
-    public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidifier.MqttHumidifierValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidifier.MqttHumidifierValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
     {
         public MqttHumidifier(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -157,6 +157,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttHumidifierValidator : MqttSensorDiscoveryBaseValidator<MqttHumidifier>
         {

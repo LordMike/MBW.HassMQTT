@@ -20,7 +20,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Camera)]
     [PublicAPI]
-    public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCameraValidator>, IHasUniqueId, IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
+    public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCameraValidator>, IHasUniqueId, IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory
     {
         public MqttCamera(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -43,6 +43,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? JsonAttributesTopic { get; set; }
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttCameraValidator : MqttSensorDiscoveryBaseValidator<MqttCamera>
         {

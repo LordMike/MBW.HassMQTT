@@ -20,7 +20,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Vacuum)]
     [PublicAPI]
-    public class MqttVacuumState : MqttSensorDiscoveryBase<MqttVacuumState, MqttVacuumState.MqttVacuumStateValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttVacuumState : MqttSensorDiscoveryBase<MqttVacuumState, MqttVacuumState.MqttVacuumStateValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
     {
         public MqttVacuumState(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -115,6 +115,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttVacuumStateValidator : MqttSensorDiscoveryBaseValidator<MqttVacuumState>
         {

@@ -18,7 +18,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Number)]
     [PublicAPI]
-    public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNumberValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNumberValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
     {
         public MqttNumber(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -75,6 +75,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? EnabledByDefault { get; set; }
         public string? Icon { get; set; }
         public bool? Retain { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttNumberValidator : MqttSensorDiscoveryBaseValidator<MqttNumber>
         {

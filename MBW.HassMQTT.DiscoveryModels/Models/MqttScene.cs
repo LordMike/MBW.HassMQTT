@@ -16,7 +16,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Scene)]
     [PublicAPI]
-    public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
     {
         public MqttScene(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -45,6 +45,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttSceneValidator : MqttSensorDiscoveryBaseValidator<MqttScene>
         {

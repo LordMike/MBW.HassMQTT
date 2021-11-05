@@ -34,7 +34,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.BinarySensor)]
     [PublicAPI]
-    public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBinarySensor.MqttBinarySensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault
+    public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBinarySensor.MqttBinarySensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory
     {
         public MqttBinarySensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -94,6 +94,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? JsonAttributesTopic { get; set; }
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttBinarySensorValidator : MqttSensorDiscoveryBaseValidator<MqttBinarySensor>
         {

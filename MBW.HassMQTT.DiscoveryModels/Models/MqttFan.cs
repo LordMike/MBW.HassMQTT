@@ -29,7 +29,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Fan)]
     [PublicAPI]
-    public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
     {
         public MqttFan(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -179,6 +179,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttFanValidator : MqttSensorDiscoveryBaseValidator<MqttFan>
         {

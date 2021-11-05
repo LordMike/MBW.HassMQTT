@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.Generic;
 using FluentValidation;
 using JetBrains.Annotations;
@@ -34,14 +34,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.AlarmControlPanel)]
     [PublicAPI]
-    public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPanel, MqttAlarmControlPanel.MqttAlarmControlPanelValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain
+    public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPanel, MqttAlarmControlPanel.MqttAlarmControlPanelValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
     {
         public MqttAlarmControlPanel(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
 
         /// <summary>
-        /// If defined, specifies a code to enable or disable the alarm in the frontend.
+        /// If defined, specifies a code to enable or disable the alarm in the frontend. Note that the code is validated locally and blocks sending MQTT messages to the remote device. For remote code validation, the code can be configured to either of the special values `REMOTE_CODE` (numeric code) or `REMOTE_CODE_TEXT` (text code). In this case, local code validation is bypassed but the frontend will still show a numeric or text code dialog. Use `command_template` to send the code to the remote device. Example configurations for remote code validation [can be found here](./#configurations-with-remote-code-validation).
         /// </summary>
         public string? Code { get; set; }
 
@@ -119,6 +119,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
+        public EntityCategory? EntityCategory { get; set; }
 
         public class MqttAlarmControlPanelValidator : MqttSensorDiscoveryBaseValidator<MqttAlarmControlPanel>
         {
