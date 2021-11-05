@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.Generic;
 using FluentValidation;
 using JetBrains.Annotations;
@@ -86,7 +86,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
             public MqttSensorValidator()
             {
                 TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
-                TopicAndTemplate(s => s.LastResetTopic, s => s.LastResetValueTemplate);
 
                 RuleFor(s => s.DeviceClass).IsInEnum();
                 RuleFor(s => s.StateClass).IsInEnum().NotEqual(HassStateClass.Unknown);
