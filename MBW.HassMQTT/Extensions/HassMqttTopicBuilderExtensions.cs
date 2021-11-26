@@ -1,5 +1,4 @@
 ﻿using EnumsNET;
-using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.Topics;

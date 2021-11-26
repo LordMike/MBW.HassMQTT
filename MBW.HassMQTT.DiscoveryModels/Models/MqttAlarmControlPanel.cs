@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Generic;
-using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;

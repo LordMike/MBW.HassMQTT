@@ -1,5 +1,4 @@
-﻿using MBW.HassMQTT.DiscoveryModels;
-using MBW.HassMQTT.DiscoveryModels.Extensions;
+﻿using MBW.HassMQTT.DiscoveryModels.Extensions;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 
 namespace MBW.HassMQTT.CommonServices.AliveAndWill

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Interfaces;

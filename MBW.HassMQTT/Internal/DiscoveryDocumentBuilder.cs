@@ -1,5 +1,4 @@
-﻿using MBW.HassMQTT.DiscoveryModels;
-using MBW.HassMQTT.DiscoveryModels.Interfaces;
+﻿using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.Interfaces;
 
 namespace MBW.HassMQTT.Internal

@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
