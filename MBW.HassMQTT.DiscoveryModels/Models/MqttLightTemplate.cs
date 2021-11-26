@@ -41,17 +41,17 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
 
         /// <summary>
-        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract blue color from the state payload value.
+        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract blue color from the state payload value. Expected result of the template is an integer from 0-255 range.
         /// </summary>
         public string? BlueTemplate { get; set; }
 
         /// <summary>
-        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract brightness from the state payload value.
+        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract brightness from the state payload value. Expected result of the template is an integer from 0-255 range.
         /// </summary>
         public string? BrightnessTemplate { get; set; }
 
         /// <summary>
-        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract color temperature from the state payload value.
+        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract color temperature from the state payload value. Expected result of the template is an integer representing mired units.
         /// </summary>
         public string? ColorTempTemplate { get; set; }
 
@@ -61,7 +61,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string CommandOffTemplate { get; set; }
 
         /// <summary>
-        /// The [template](/docs/configuration/templating/#processing-incoming-data) for *on* state changes. Available variables: `state`, `brightness`, `red`, `green`, `blue`, `white_value`, `flash`, `transition` and `effect`.
+        /// The [template](/docs/configuration/templating/#processing-incoming-data) for *on* state changes. Available variables: `state`, `brightness`, `color_temp`, `red`, `green`, `blue`, `white_value`, `flash`, `transition` and `effect`. Values `red`, `green`, `blue`, `brightness` are provided as integers from range 0-255. Value of `color_temp` is provided as integer representing mired units.
         /// </summary>
         public string CommandOnTemplate { get; set; }
 
@@ -81,7 +81,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? EffectTemplate { get; set; }
 
         /// <summary>
-        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract green color from the state payload value.
+        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract green color from the state payload value. Expected result of the template is an integer from 0-255 range.
         /// </summary>
         public string? GreenTemplate { get; set; }
 
@@ -106,7 +106,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? Optimistic { get; set; }
 
         /// <summary>
-        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract red color from the state payload value.
+        /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract red color from the state payload value. Expected result of the template is an integer from 0-255 range.
         /// </summary>
         public string? RedTemplate { get; set; }
 
