@@ -17,7 +17,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.DeviceTracker)]
     [PublicAPI]
-    public class MqttDeviceTracker : MqttSensorDiscoveryBase<MqttDeviceTracker, MqttDeviceTracker.MqttDeviceTrackerValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon
+    public class MqttDeviceTracker : MqttSensorDiscoveryBase<MqttDeviceTracker, MqttDeviceTracker.MqttDeviceTrackerValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasObjectId
     {
         public MqttDeviceTracker(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -60,6 +60,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? JsonAttributesTemplate { get; set; }
         public string? JsonAttributesTopic { get; set; }
         public string? Icon { get; set; }
+        public string? ObjectId { get; set; }
 
         public class MqttDeviceTrackerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTracker>
         {

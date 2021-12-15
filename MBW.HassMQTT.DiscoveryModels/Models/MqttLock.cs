@@ -24,10 +24,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// 
     /// Optimistic mode can be forced, even if state topic is available.Try to enable it, if experiencing incorrect
     /// lock operation.
+    ///
+    /// It's mandatory for locks to support `lock` and `unlock`. A lock may optionally support `open`, (e.g. to open
+    /// the bolt in addition to the latch), in this case, `payload_open` is required in the configuration. If the lock
+    /// is in optimistic mode, it will change states to `unlocked` when handling the `open` command.
     /// </remarks>
     [DeviceType(HassDeviceType.Lock)]
     [PublicAPI]
-    public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
+    public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
     {
         public MqttLock(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -49,18 +53,27 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? Optimistic { get; set; }
 
         /// <summary>
-        /// The payload that represents enabled/locked state.
+        /// The payload sent to the lock to lock it.
         /// </summary>
+        /// <remarks>Default value: 'LOCK'</remarks>
         public string? PayloadLock { get; set; }
 
         /// <summary>
-        /// The payload that represents disabled/unlocked state.
+        /// The payload sent to the lock to unlock it.
         /// </summary>
+        /// <remarks>Default value: 'UNLOCK'</remarks>
         public string? PayloadUnlock { get; set; }
 
         /// <summary>
-        /// The value that represents the lock to be in locked state
+        /// The payload sent to the lock to open it.
         /// </summary>
+        /// <remarks>Default value: 'OPEN'</remarks>
+        public string? payload_open { get; set; }
+
+        /// <summary>
+        /// The payload sent to by the lock when it's locked.
+        /// </summary>
+        /// <remarks>Default value: 'LOCKED'</remarks>
         public string? StateLocked { get; set; }
 
         /// <summary>
@@ -69,8 +82,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? StateTopic { get; set; }
 
         /// <summary>
-        /// The value that represents the lock to be in unlocked state
+        /// The payload sent to by the lock when it's unlocked.
         /// </summary>
+        /// <remarks>Default value: 'UNLOCKED'</remarks>
         public string? StateUnlocked { get; set; }
 
         /// <summary>
@@ -88,6 +102,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
+        public string? ObjectId { get; set; }
 
         public class MqttLockValidator : MqttSensorDiscoveryBaseValidator<MqttLock>
         {

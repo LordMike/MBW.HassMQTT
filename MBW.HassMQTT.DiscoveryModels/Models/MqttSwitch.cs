@@ -27,7 +27,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Switch)]
     [PublicAPI]
-    public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwitchValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
+    public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwitchValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
     {
         public MqttSwitch(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -37,6 +37,13 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to change the switch state.
         /// </summary>
         public string? CommandTopic { get; set; }
+
+        /// <summary>
+        /// The [type/class](/integrations/switch/#device-class) of the switch to set the icon in the frontend.
+        /// See https://www.home-assistant.io/integrations/switch/#device-class
+        /// </summary>
+        /// <remarks>Default value: 'None'</remarks>
+        public HassSwitchDeviceClass? DeviceClass { get; set; }
 
         /// <summary>
         /// The name to use when displaying this switch.
@@ -88,6 +95,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
+        public string? ObjectId { get; set; }
 
         public class MqttSwitchValidator : MqttSensorDiscoveryBaseValidator<MqttSwitch>
         {

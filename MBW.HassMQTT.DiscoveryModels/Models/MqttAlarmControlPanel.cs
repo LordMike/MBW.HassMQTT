@@ -33,7 +33,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.AlarmControlPanel)]
     [PublicAPI]
-    public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPanel, MqttAlarmControlPanel.MqttAlarmControlPanelValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
+    public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPanel, MqttAlarmControlPanel.MqttAlarmControlPanelValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
     {
         public MqttAlarmControlPanel(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -53,6 +53,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// If true the code is required to disarm the alarm. If false the code is not validated.
         /// </summary>
         public bool? CodeDisarmRequired { get; set; }
+
+        /// <summary>
+        /// If true the code is required to trigger the alarm. If false the code is not validated.
+        /// </summary>
+        /// <remarks>Default is 'true'</remarks>
+        public bool? CodeTriggerRequired { get; set; }
 
         /// <summary>
         /// The [template](/docs/configuration/templating/#processing-incoming-data) used for the command payload. Available variables: `action` and `code`.
@@ -109,6 +115,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// </summary>
         public string? ValueTemplate { get; set; }
 
+        /// <summary>
+        /// The payload to trigger the alarm on your Alarm Panel.
+        /// </summary>
+        /// <remarks>Default value: 'TRIGGER'</remarks>
+        public string? PayloadTrigger { get; set; }
+
         public string? UniqueId { get; set; }
         public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
@@ -119,6 +131,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
+        public string? ObjectId { get; set; }
 
         public class MqttAlarmControlPanelValidator : MqttSensorDiscoveryBaseValidator<MqttAlarmControlPanel>
         {

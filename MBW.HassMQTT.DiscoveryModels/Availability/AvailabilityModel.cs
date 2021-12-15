@@ -24,6 +24,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Availability
         /// <remarks>Default is 'offline'</remarks>
         public string? PayloadNotAvailable { get; set; }
 
+        /// <summary>
+        /// Defines a template to extract device’s availability from the topic. To determine the devices’s availability result of this template will be compared to `payload_available` and `payload_not_available`.
+        /// </summary>
+        public string? ValueTemplate { get; set; }
+
         public class AvailabilityModelValidator : AbstractValidator<AvailabilityModel>
         {
             public AvailabilityModelValidator()

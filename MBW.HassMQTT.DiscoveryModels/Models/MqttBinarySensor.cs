@@ -34,7 +34,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.BinarySensor)]
     [PublicAPI]
-    public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBinarySensor.MqttBinarySensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory
+    public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBinarySensor.MqttBinarySensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasObjectId
     {
         public MqttBinarySensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -86,6 +86,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// </summary>
         public string? ValueTemplate { get; set; }
 
+        /// <summary>
+        /// The encoding of the payload received at `state_topic` and availability topics `availability_topic` and `topic`. Set to `""` to disable decoding.
+        /// </summary>
+        /// <remarks>Default value: 'utf-8'</remarks>
+        public string? Encoding { get; set; }
+
         public string? UniqueId { get; set; }
         public IList<AvailabilityModel>? Availability { get; set; }
         public AvailabilityMode? AvailabilityMode { get; set; }
@@ -95,6 +101,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public EntityCategory? EntityCategory { get; set; }
+        public string? ObjectId { get; set; }
 
         public class MqttBinarySensorValidator : MqttSensorDiscoveryBaseValidator<MqttBinarySensor>
         {

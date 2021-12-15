@@ -18,7 +18,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Sensor)]
     [PublicAPI]
-    public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory
+    public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasObjectId
     {
         public MqttSensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -29,6 +29,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// See https://www.home-assistant.io/integrations/sensor/#device-class
         /// </summary>
         public HassSensorDeviceClass? DeviceClass { get; set; }
+
+        /// <summary>
+        /// The encoding of the payload received at `state_topic` and availability topics `availability_topic` and `topic`. Set to `""` to disable decoding.
+        /// </summary>
+        /// <remarks>Default value: 'utf-8'</remarks>
+        public string? Encoding { get; set; }
 
         /// <summary>
         /// Defines the number of seconds after the value expires if it's not updated.
@@ -81,6 +87,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? EnabledByDefault { get; set; }
         public EntityCategory? EntityCategory { get; set; }
+        public string? ObjectId { get; set; }
 
         public class MqttSensorValidator : MqttSensorDiscoveryBaseValidator<MqttSensor>
         {

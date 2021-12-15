@@ -20,7 +20,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Select)]
     [PublicAPI]
-    public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSelectValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
+    public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSelectValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
     {
         public MqttSelect(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -44,6 +44,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         }
 
         /// <summary>
+        /// Defines a `template` to generate the payload to send to `command_topic`.
+        /// </summary>
+        public string? CommandTemplate { get; set; }
+
+        /// <summary>
         /// The MQTT topic to publish commands to change the selected option.
         /// </summary>
         public string CommandTopic { get; set; }
@@ -60,7 +65,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? Optimistic { get; set; }
 
         /// <summary>
-        /// List of options that can be selected.
+        /// List of options that can be selected. An empty list or a list with a single item is allowed.
         /// </summary>
         public IList<string> Options { get; set; } = new List<string>();
 
@@ -84,11 +89,15 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? EnabledByDefault { get; set; }
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
+        public string? ObjectId { get; set; }
 
         public class MqttSelectValidator : MqttSensorDiscoveryBaseValidator<MqttSelect>
         {
             public MqttSelectValidator()
             {
+                TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
+                TopicAndTemplate(s => s.CommandTopic, s => s.CommandTemplate);
+
                 RuleFor(s => s.Options).NotEmpty();
             }
         }

@@ -18,11 +18,16 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Number)]
     [PublicAPI]
-    public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNumberValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory
+    public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNumberValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
     {
         public MqttNumber(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
         }
+
+        /// <summary>
+        /// Defines a `template` to generate the payload to send to `command_topic`.
+        /// </summary>
+        public string? CommandTemplate { get; set; }
 
         /// <summary>
         /// The MQTT topic to publish commands to change the number.
@@ -76,12 +81,14 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? Icon { get; set; }
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
+        public string? ObjectId { get; set; }
 
         public class MqttNumberValidator : MqttSensorDiscoveryBaseValidator<MqttNumber>
         {
             public MqttNumberValidator()
             {
                 TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
+                TopicAndTemplate(s => s.CommandTopic, s => s.CommandTemplate);
 
                 RuleFor(s => s.Step)
                     .GreaterThanOrEqualTo(0.001f);

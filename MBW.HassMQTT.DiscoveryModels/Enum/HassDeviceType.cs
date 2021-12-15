@@ -58,6 +58,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         Select,
 
         [EnumMember(Value = "humidifier")]
-        Humidifier
+        Humidifier,
+
+        [EnumMember(Value = "button")]
+        Button
     }
 }
