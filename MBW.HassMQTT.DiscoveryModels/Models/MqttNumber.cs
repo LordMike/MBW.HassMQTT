@@ -32,7 +32,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// <summary>
         /// The MQTT topic to publish commands to change the number.
         /// </summary>
-        public string? CommandTopic { get; set; }
+        public string CommandTopic { get; set; }
 
         /// <summary>
         /// Minimum value.
