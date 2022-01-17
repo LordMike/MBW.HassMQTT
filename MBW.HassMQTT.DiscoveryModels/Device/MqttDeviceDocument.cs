@@ -4,6 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
@@ -130,6 +131,10 @@ namespace MBW.HassMQTT.DiscoveryModels.Device
         {
             public MqttDeviceDocumentValidator()
             {
+                // Either Identifiers or Connections must be non-empty
+                RuleFor(s => s.Identifiers).NotEmpty().Unless(s => s.Connections.Any());
+                RuleFor(s => s.Connections).NotEmpty().Unless(s => s.Identifiers.Any());
+
                 RuleForEach(s => s.Identifiers).NotNull().WithMessage("{PropertyName} must not contain null values");
                 RuleForEach(s => s.Connections).SetValidator(ConnectionInfo.Validator);
             }

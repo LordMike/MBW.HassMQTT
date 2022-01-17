@@ -78,12 +78,19 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// </summary>
         public string Subtype { get; set; }
 
+        /// <summary>
+        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the value.
+        /// </summary>
+        public string? ValueTemplate { get; set; }
+
         public MqttQosLevel? Qos { get; set; }
 
         public class MqttDeviceTriggerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTrigger>
         {
             public MqttDeviceTriggerValidator()
             {
+                TopicAndTemplate(s => s.Topic, s => s.ValueTemplate);
+
                 RuleFor(s => s.AutomationType).Equal("trigger");
             }
         }
