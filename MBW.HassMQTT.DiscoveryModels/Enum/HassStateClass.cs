@@ -12,7 +12,7 @@
         /// For sensors with state_class total_increasing, a decreasing value is interpreted as the start of a new meter cycle or
         /// the replacement of the meter. It is important that the integration ensures that the value cannot erroneously decrease
         /// in the case of calculating a value from a sensor with measurement noise present. There is some tolerance, a decrease
-        /// between state changes of < 10% will not trigger a new meter cycle. This state class is useful for gas meters,
+        /// between state changes of &lt; 10% will not trigger a new meter cycle. This state class is useful for gas meters,
         /// electricity meters, water meters etc. The value when the sensor reading decreases will not be used as zero-point
         /// when calculating sum statistics, instead the zero-point will be set to 0.
         /// </summary>

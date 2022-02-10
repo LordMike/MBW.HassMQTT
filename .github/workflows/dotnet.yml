@@ -20,10 +20,10 @@ jobs:
         fetch-depth: 50
     - run: git fetch --tags
 
-    - name: Setup .NET
+    - name: Setup .NET Core 6.0
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
 
     - name: Restore dependencies
       run: dotnet restore

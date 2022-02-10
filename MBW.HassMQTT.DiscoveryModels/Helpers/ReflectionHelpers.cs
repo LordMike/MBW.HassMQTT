@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -11,8 +13,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Helpers
     {
         public static PropertyInfo GetProperty<TType, TProperty>(this Expression<Func<TType, TProperty>> expression)
         {
-            Type type = typeof(TType);
-
             MemberExpression member = expression.Body as MemberExpression;
             if (member == null)
                 throw new ArgumentException($"Expression '{expression}' refers to a method, not a property.");

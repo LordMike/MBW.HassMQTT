@@ -334,9 +334,10 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
                 MinMax(s => s.MinTemp, s => s.MaxTemp, -30, 60, (s => s.Initial, 21));
 
                 RuleFor(s => s.Precision)
-                    .Must(s => Math.Abs(s.Value - 0.1f) < float.Epsilon ||
+                    .Must(s => Math.Abs(s!.Value - 0.1f) < float.Epsilon ||
                                Math.Abs(s.Value - 0.5f) < float.Epsilon ||
-                               Math.Abs(s.Value - 1f) < float.Epsilon);
+                               Math.Abs(s.Value - 1f) < float.Epsilon)
+                    .When(s => s.Precision.HasValue);
             }
         }
     }

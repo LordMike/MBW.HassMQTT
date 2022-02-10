@@ -174,7 +174,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
 
                 RuleFor(s => s.DeviceClass)
                     .IsInEnum()
-                    .Must(s => s.Value != HumidifierDeviceClass.Unknown)
+                    .Must(s => s!.Value != HumidifierDeviceClass.Unknown)
                     .When(s => s.DeviceClass.HasValue);
             }
         }

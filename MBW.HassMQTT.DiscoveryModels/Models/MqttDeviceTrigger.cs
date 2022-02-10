@@ -17,7 +17,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     /// <remarks>
     /// MQTT device triggers are only supported through MQTT discovery, manual setup through configuration.yaml
-    /// is not supported. The discovery topic needs to be: <discovery_prefix>/device_automation/[<node_id>/]<object_id>/config.
+    /// is not supported. The discovery topic needs to be: &lt;discovery_prefix&gt;/device_automation/[&lt;node_id&gt;/]&lt;object_id&gt;/config.
     /// Note that only one trigger may be defined per unique discovery topic. Also note that the combination of type and subtype
     /// should be unique for a device.
     /// </remarks>

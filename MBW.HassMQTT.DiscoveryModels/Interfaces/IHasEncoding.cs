@@ -1,4 +1,6 @@
-﻿namespace MBW.HassMQTT.DiscoveryModels.Interfaces
+﻿#nullable enable
+
+namespace MBW.HassMQTT.DiscoveryModels.Interfaces
 {
     public interface IHasEncoding
     {
