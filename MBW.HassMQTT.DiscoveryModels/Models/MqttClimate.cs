@@ -17,7 +17,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Climate)]
     [PublicAPI]
-    public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.MqttClimateValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
+    public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.MqttClimateValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
     {
         public MqttClimate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -306,6 +306,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
         public string? ObjectId { get; set; }
+        public string? Encoding { get; set; }
 
         public class MqttClimateValidator : MqttSensorDiscoveryBaseValidator<MqttClimate>
         {

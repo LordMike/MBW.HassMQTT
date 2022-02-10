@@ -31,7 +31,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Lock)]
     [PublicAPI]
-    public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
+    public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
     {
         public MqttLock(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -103,6 +103,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
         public string? ObjectId { get; set; }
+        public string? Encoding { get; set; }
 
         public class MqttLockValidator : MqttSensorDiscoveryBaseValidator<MqttLock>
         {

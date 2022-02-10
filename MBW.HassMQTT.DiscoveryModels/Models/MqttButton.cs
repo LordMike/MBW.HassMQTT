@@ -16,7 +16,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </summary>
     [DeviceType(HassDeviceType.Button)]
     [PublicAPI]
-    public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttButtonValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
+    public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttButtonValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
     {
         public MqttButton(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -26,6 +26,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to trigger the button.
         /// </summary>
         public string? CommandTopic { get; set; }
+
+
+        /// <summary>
+        /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to generate the payload to send to `command_topic`.
+        /// </summary>
+        public string? CommandTemplate { get; set; }
 
         /// <summary>
         /// The type/class of the button to set the icon in the frontend.
@@ -57,11 +63,13 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
         public string? ObjectId { get; set; }
+        public string? Encoding { get; set; }
 
         public class MqttButtonValidator : MqttSensorDiscoveryBaseValidator<MqttButton>
         {
             public MqttButtonValidator()
             {
+                TopicAndTemplate(x => x.CommandTopic, x => x.CommandTemplate);
             }
         }
     }

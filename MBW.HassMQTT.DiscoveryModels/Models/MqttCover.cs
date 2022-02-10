@@ -50,7 +50,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Cover)]
     [PublicAPI]
-    public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
+    public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
     {
         public MqttCover(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -212,6 +212,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
         public string? ObjectId { get; set; }
+        public string? Encoding { get; set; }
 
         public class MqttCoverValidator : MqttSensorDiscoveryBaseValidator<MqttCover>
         {

@@ -35,7 +35,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// </remarks>
     [DeviceType(HassDeviceType.Light)]
     [PublicAPI]
-    public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJson.MqttLightJsonValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
+    public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJson.MqttLightJsonValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
     {
         public MqttLightJson(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
         {
@@ -136,6 +136,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public bool? Retain { get; set; }
         public EntityCategory? EntityCategory { get; set; }
         public string? ObjectId { get; set; }
+        public string? Encoding { get; set; }
 
         public class MqttLightJsonValidator : MqttSensorDiscoveryBaseValidator<MqttLightJson>
         {
