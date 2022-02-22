@@ -191,11 +191,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public float? Precision { get; set; }
 
         /// <summary>
-        /// Set to `false` to suppress sending of all MQTT messages when the current mode is `Off`.
-        /// </summary>
-        public bool? SendIfOff { get; set; }
-
-        /// <summary>
         /// A template to render the value sent to the `swing_mode_command_topic` with.
         /// </summary>
         public string? SwingModeCommandTemplate { get; set; }
