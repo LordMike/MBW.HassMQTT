@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v2
     # We do not need to fetch tags, as we're already at a tagged build - it should be available automatically
 
-    - name: Setup .NET Core 6.0
+    - name: Setup .NET Core 5.0
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
@@ -30,7 +30,7 @@ jobs:
       run: ls -alh Build/
     
     - name: Nuget push (github)
-      run: dotnet nuget push --no-symbols 1 --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }} -s "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" Build/*.nupkg
+      run: dotnet nuget push --no-symbols --skip-duplicate -k ${{ secrets.GITHUB_TOKEN }} -s "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" Build/*.nupkg
       
     - name: Nuget push 
       run: dotnet nuget push --skip-duplicate -k ${{secrets.NUGET_KEY}} -s https://api.nuget.org/v3/index.json Build/*.nupkg
