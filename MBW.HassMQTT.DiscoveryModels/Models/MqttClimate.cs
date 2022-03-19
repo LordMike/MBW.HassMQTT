@@ -1,12 +1,12 @@
 ﻿#nullable enable
-using System;
-using System.Collections.Generic;
 using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
+using System;
+using System.Collections.Generic;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models
 {
@@ -51,21 +51,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         public string? AuxStateTopic { get; set; }
 
         /// <summary>
-        /// The MQTT topic to publish commands to change the away mode.
-        /// </summary>
-        public string? AwayModeCommandTopic { get; set; }
-
-        /// <summary>
-        /// A template to render the value received on the `away_mode_state_topic` with.
-        /// </summary>
-        public string? AwayModeStateTemplate { get; set; }
-
-        /// <summary>
-        /// The MQTT topic to subscribe for changes of the HVAC away mode. If this is not set, the away mode works in optimistic mode (see below).
-        /// </summary>
-        public string? AwayModeStateTopic { get; set; }
-
-        /// <summary>
         /// A template with which the value received on `current_temperature_topic` will be rendered.
         /// </summary>
         public string? CurrentTemperatureTemplate { get; set; }
@@ -99,31 +84,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// A list of supported fan modes.
         /// </summary>
         public IList<string>? FanModes { get; set; }
-
-        /// <summary>
-        /// A template to render the value sent to the `hold_command_topic` with.
-        /// </summary>
-        public string? HoldCommandTemplate { get; set; }
-
-        /// <summary>
-        /// The MQTT topic to publish commands to change the hold mode.
-        /// </summary>
-        public string? HoldCommandTopic { get; set; }
-
-        /// <summary>
-        /// A template to render the value received on the `hold_state_topic` with.
-        /// </summary>
-        public string? HoldStateTemplate { get; set; }
-
-        /// <summary>
-        /// The MQTT topic to subscribe for changes of the HVAC hold mode. If this is not set, the hold mode works in optimistic mode (see below).
-        /// </summary>
-        public string? HoldStateTopic { get; set; }
-
-        /// <summary>
-        /// A list of available hold modes.
-        /// </summary>
-        public IList<string>? HoldModes { get; set; }
 
         /// <summary>
         /// Set the initial target temperature.
@@ -189,6 +149,31 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The desired precision for this device. Can be used to match your actual thermostat's precision. Supported values are `0.1`, `0.5` and `1.0`.
         /// </summary>
         public float? Precision { get; set; }
+
+        /// <summary>
+        /// Defines a template to generate the payload to send to `preset_mode_command_topic`.
+        /// </summary>
+        public string? PresetModeCommandTemplate { get; set; }
+
+        /// <summary>
+        /// The MQTT topic to publish commands to change the preset mode.
+        /// </summary>
+        public string? PresetModeCommandTopic { get; set; }
+
+        /// <summary>
+        /// The MQTT topic subscribed to receive climate speed based on presets. When preset 'none' is received or `None` the `preset_mode` will be reset.
+        /// </summary>
+        public string? PresetModeStateTopic { get; set; }
+
+        /// <summary>
+        /// Defines a template to extract the `preset_mode` value from the payload received on `preset_mode_state_topic`.
+        /// </summary>
+        public string? PresetModeValueTemplate { get; set; }
+
+        /// <summary>
+        /// List of preset modes this climate is supporting. Common examples include `eco`, `away`, `boost`, `comfort`, `home`, `sleep` and `activity`.
+        /// </summary>
+        public IList<string>? PresetModes { get; set; }
 
         /// <summary>
         /// A template to render the value sent to the `swing_mode_command_topic` with.
@@ -309,12 +294,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
             {
                 TopicAndTemplate(s => s.ActionTopic, s => s.ActionTemplate);
                 TopicAndTemplate(s => s.AuxStateTopic, s => s.AuxStateTemplate);
-                TopicAndTemplate(s => s.AwayModeStateTopic, s => s.AwayModeStateTemplate);
+                TopicAndTemplate(s => s.PresetModeCommandTopic, s => s.PresetModeCommandTemplate);
+                TopicAndTemplate(s => s.PresetModeStateTopic, s => s.PresetModeValueTemplate);
                 TopicAndTemplate(s => s.CurrentTemperatureTopic, s => s.CurrentTemperatureTemplate);
                 TopicAndTemplate(s => s.FanModeCommandTopic, s => s.FanModeCommandTemplate);
                 TopicAndTemplate(s => s.FanModeStateTopic, s => s.FanModeStateTemplate);
-                TopicAndTemplate(s => s.HoldCommandTopic, s => s.HoldCommandTemplate);
-                TopicAndTemplate(s => s.HoldStateTopic, s => s.HoldStateTemplate);
                 TopicAndTemplate(s => s.ModeCommandTopic, s => s.ModeCommandTemplate);
                 TopicAndTemplate(s => s.ModeStateTopic, s => s.ModeStateTemplate);
                 TopicAndTemplate(s => s.SwingModeCommandTopic, s => s.SwingModeCommandTemplate);

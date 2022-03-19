@@ -18,11 +18,13 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// In an ideal scenario, the MQTT device will have a state_topic to publish state changes.
     /// If these messages are published with a RETAIN flag, the MQTT humidifier will receive an instant
     /// state update after subscription and will start with the correct state. Otherwise, the initial
-    /// state of the humidifier will be false / off.
+    /// state of the humidifier will be `unknown`. A MQTT device can reset the current state to
+    /// `unknown` using a `None` payload.
     /// 
     /// When a state_topic is not available, the humidifier will work in optimistic mode.In this mode,
     /// the humidifier will immediately change state after every command.Otherwise, the humidifier will
-    /// wait for state confirmation from the device (message from state_topic).
+    /// wait for state confirmation from the device (message from state_topic). The initial state is
+    /// set to `False` / `off` in optimistic mode.
     /// 
     /// Optimistic mode can be forced even if a state_topic is available.Try to enable it if you are
     /// experiencing incorrect humidifier operation.

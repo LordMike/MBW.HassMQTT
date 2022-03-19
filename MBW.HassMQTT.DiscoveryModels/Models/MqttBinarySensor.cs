@@ -12,10 +12,10 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// <summary>
     /// https://www.home-assistant.io/integrations/binary_sensor.mqtt/
     ///
-    /// The mqtt binary sensor platform uses an MQTT message received to set the binary sensor’s state to on or off.
+    /// The `mqtt` binary sensor platform uses an MQTT message received to set the binary sensor's state to `on`, `off` or `unknown`.
     /// 
-    /// The state will be updated only after a new message is published on state_topic matching payload_on or payload_off.
-    /// If these messages are published with the retain flag set, the binary sensor will receive an instant state update
+    /// The state will be updated only after a new message is published on `state_topic` matching `payload_on`, `payload_off` or
+    /// `None`. If these messages are published with the `retain` flag set, the binary sensor will receive an instant state update
     /// after subscription and Home Assistant will display the correct state on startup.Otherwise, the initial state
     /// displayed in Home Assistant will be unknown.
     /// 

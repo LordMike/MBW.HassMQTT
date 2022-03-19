@@ -18,11 +18,12 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// <remarks>
     /// In an ideal scenario, the MQTT device will have a state topic to publish state changes. If these messages
     /// are published with a RETAIN flag, the MQTT light will receive an instant state update after subscription
-    /// and will start with the correct state. Otherwise, the initial state of the switch will be false / off.
+    /// and will start with the correct state. Otherwise, the initial state of the switch will be `unknown`.
+    /// A MQTT device can reset the current state to `unknown` using a `None` payload.
     /// 
     /// When a state topic is not available, the light will work in optimistic mode.In this mode, the light will
     /// immediately change state after every command.Otherwise, the light will wait for state confirmation from
-    /// the device (message from state_topic).
+    /// the device (message from state_topic). The initial state is set to `False` / `off` in optimistic mode.
     /// 
     /// Optimistic mode can be forced, even if the state_topic is available.Try to enable it, if experiencing incorrect
     /// light operation.
@@ -44,6 +45,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to change the light’s brightness.
         /// </summary>
         public string? BrightnessCommandTopic { get; set; }
+
+        /// <summary>
+        /// Defines a template to compose message which will be sent to `brightness_command_topic`. Available variables: `value`.
+        /// </summary>
+        public string? BrightnessCommandTemplate { get; set; }
 
         /// <summary>
         /// Defines the maximum brightness value (i.e., 100%) of the MQTT device.
@@ -100,6 +106,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
         /// The MQTT topic to publish commands to change the light's effect state.
         /// </summary>
         public string? EffectCommandTopic { get; set; }
+
+        /// <summary>
+        /// Defines a template to compose message which will be sent to `effect_command_topic`. Available variables: `value`.
+        /// </summary>
+        public string? EffectCommandTemplate { get; set; }
 
         /// <summary>
         /// The list of effects the light supports.
@@ -253,6 +264,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
                 TopicAndTemplate(s => s.RgbStateTopic, s => s.RgbValueTemplate);
                 TopicAndTemplate(s => s.StateTopic, s => s.StateValueTemplate);
                 TopicAndTemplate(s => s.XyStateTopic, s => s.XyValueTemplate);
+                TopicAndTemplate(s => s.EffectCommandTopic, s => s.EffectCommandTemplate);
+                TopicAndTemplate(s => s.BrightnessCommandTopic, s => s.BrightnessCommandTemplate);
 
                 RuleFor(s => s.Schema).Equal("default");
             }

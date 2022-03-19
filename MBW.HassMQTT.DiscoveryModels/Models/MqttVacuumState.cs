@@ -17,6 +17,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
     /// use the state schema as legacy is deprecated and might be removed someday in the future. The state schema
     /// is preferred because the vacuum will then be represented as a StateVacuumDevice which is the preferred parent
     /// vacuum entity.
+    ///
+    /// The initial state of the state vacuum entity will set to `unknown` and can be reset by a device by sending
+    /// a `null` payload as state. The legacy `mqtt` vacuum does not support handling an `unknown` state.
     /// </summary>
     [DeviceType(HassDeviceType.Vacuum)]
     [PublicAPI]

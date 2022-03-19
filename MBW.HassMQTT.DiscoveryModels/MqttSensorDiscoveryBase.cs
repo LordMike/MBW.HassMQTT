@@ -246,15 +246,18 @@ namespace MBW.HassMQTT.DiscoveryModels
             /// <summary>
             /// Ensures that a topic is set, when a template is set
             /// </summary>
-            protected void TopicAndTemplate(Expression<Func<TInner, string?>> topicSelector, Expression<Func<TInner, string?>> templateSelector)
+            protected void TopicAndTemplate(Expression<Func<TInner, string?>> topicSelector, params Expression<Func<TInner, string?>>[] templateSelectors)
             {
-                Func<TInner, string?> templateSelectorF = templateSelector.Compile();
-                string? topicName = topicSelector.GetProperty().Name;
-                string? templateName = templateSelector.GetProperty().Name;
+                foreach (Expression<Func<TInner, string?>> templateSelector in templateSelectors)
+                {
+                    Func<TInner, string?> templateSelectorF = templateSelector.Compile();
+                    string? topicName = topicSelector.GetProperty().Name;
+                    string? templateName = templateSelector.GetProperty().Name;
 
-                RuleFor(topicSelector).NotNull().When(s => templateSelectorF(s) != null)
-                    .WithMessage($"The template '{templateName}' is set, but the topic '{topicName}' is not")
-                    .WithSeverity(Severity.Warning);
+                    RuleFor(topicSelector).NotNull().When(s => templateSelectorF(s) != null)
+                        .WithMessage($"The template '{templateName}' is set, but the topic '{topicName}' is not")
+                        .WithSeverity(Severity.Warning);
+                }
             }
         }
     }
