@@ -98,8 +98,6 @@ namespace MBW.HassMQTT.DiscoveryModels.Models
             {
                 TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
                 TopicAndTemplate(s => s.CommandTopic, s => s.CommandTemplate);
-
-                RuleFor(s => s.Options).NotEmpty();
             }
         }
     }
