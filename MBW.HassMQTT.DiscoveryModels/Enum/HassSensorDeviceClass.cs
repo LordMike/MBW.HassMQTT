@@ -10,13 +10,19 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         None,
 
         /// <summary>
+        /// Apparent power in VA
+        ///</summary>
+        [EnumMember(Value = "apparent_power")]
+        ApparentPower,
+
+        /// <summary>
         /// Air Quality Index
         ///</summary>
         [EnumMember(Value = "aqi")]
         AirQualityIndex,
 
         /// <summary>
-        /// Percentage of battery that is left.
+        /// Percentage of battery that is left
         ///</summary>
         [EnumMember(Value = "battery")]
         Battery,
@@ -34,37 +40,55 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         CarbonMonoxide,
 
         /// <summary>
-        /// Current in A.
+        /// Current in A
         ///</summary>
         [EnumMember(Value = "current")]
         Current,
 
         /// <summary>
-        /// Energy in Wh or kWh.
+        /// Date string (ISO 8601)
+        ///</summary>
+        [EnumMember(Value = "date")]
+        Date,
+
+        /// <summary>
+        /// Duration in days, hours, minutes or seconds
+        ///</summary>
+        [EnumMember(Value = "duration")]
+        Duration,
+
+        /// <summary>
+        /// Energy in Wh or kWh
         ///</summary>
         [EnumMember(Value = "energy")]
         Energy,
 
         /// <summary>
-        /// Gasvolume in m³.
+        /// Frequency in Hz, kHz, MHz or GHz
+        ///</summary>
+        [EnumMember(Value = "frequency")]
+        Frequency,
+
+        /// <summary>
+        /// Gasvolume in m³
         ///</summary>
         [EnumMember(Value = "gas")]
         Gas,
 
         /// <summary>
-        /// Percentage of humidity in the air.
+        /// Percentage of humidity in the air
         ///</summary>
         [EnumMember(Value = "humidity")]
         Humidity,
 
         /// <summary>
-        /// The current light level in lx or lm.
+        /// The current light level in lx or lm
         ///</summary>
         [EnumMember(Value = "illuminance")]
         Illuminance,
 
         /// <summary>
-        /// The monetary value.
+        /// The monetary value
         ///</summary>
         [EnumMember(Value = "monetary")]
         Monetary,
@@ -112,25 +136,31 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         Pm25,
 
         /// <summary>
-        /// Power factor in %.
+        /// Power factor in %
         ///</summary>
         [EnumMember(Value = "power_factor")]
         PowerFactor,
 
         /// <summary>
-        /// Power in W or kW.
+        /// Power in W or kW
         ///</summary>
         [EnumMember(Value = "power")]
         Power,
 
         /// <summary>
-        /// Pressure in hPa or mbar.
+        /// Pressure in hPa or mbar
         ///</summary>
         [EnumMember(Value = "pressure")]
         Pressure,
 
         /// <summary>
-        /// Signal strength in dB or dBm.
+        /// Reactive power in var
+        ///</summary>
+        [EnumMember(Value = "reactive_power")]
+        ReactivePower,
+
+        /// <summary>
+        /// Signal strength in dB or dBm
         ///</summary>
         [EnumMember(Value = "signal_strength")]
         SignalStrength,
@@ -142,19 +172,19 @@ namespace MBW.HassMQTT.DiscoveryModels.Enum
         SulphurDioxide,
 
         /// <summary>
-        /// Temperature in °C or °F.
+        /// Temperature in °C or °F
         ///</summary>
         [EnumMember(Value = "temperature")]
         Temperature,
 
         /// <summary>
-        /// Datetime object or timestamp string (ISO 8601).
+        /// Datetime object or timestamp string (ISO 8601)
         ///</summary>
         [EnumMember(Value = "timestamp")]
         Timestamp,
 
         /// <summary>
-        /// Concentration of volatile organic compounds in µg/m³.
+        /// Concentration of volatile organic compounds in µg/m³
         ///</summary>
         [EnumMember(Value = "volatile_organic_compounds")]
         VolatileOrganicCompounds,
