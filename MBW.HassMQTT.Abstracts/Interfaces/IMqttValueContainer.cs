@@ -1,12 +1,11 @@
-﻿namespace MBW.HassMQTT.Abstracts.Interfaces
+﻿namespace MBW.HassMQTT.Abstracts.Interfaces;
+
+public interface IMqttValueContainer
 {
-    public interface IMqttValueContainer
-    {
-        string PublishTopic { get; }
-        bool Dirty { get; }
+    string PublishTopic { get; }
+    bool Dirty { get; }
 
-        void SetDirty(bool dirty = true);
+    void SetDirty(bool dirty = true);
 
-        object GetSerializedValue(bool resetDirty);
-    }
+    object GetSerializedValue(bool resetDirty);
 }

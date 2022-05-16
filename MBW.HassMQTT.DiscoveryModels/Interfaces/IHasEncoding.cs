@@ -1,12 +1,11 @@
 ﻿#nullable enable
 
-namespace MBW.HassMQTT.DiscoveryModels.Interfaces
+namespace MBW.HassMQTT.DiscoveryModels.Interfaces;
+
+public interface IHasEncoding
 {
-    public interface IHasEncoding
-    {
-        /// <summary>
-        /// The encoding of the payloads received and published messages. Set to `""` to disable decoding of incoming payload.
-        /// </summary>
-        public string? Encoding { get; set; }
-    }
+    /// <summary>
+    /// The encoding of the payloads received and published messages. Set to `""` to disable decoding of incoming payload.
+    /// </summary>
+    public string? Encoding { get; set; }
 }

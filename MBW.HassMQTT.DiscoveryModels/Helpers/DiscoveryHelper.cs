@@ -3,18 +3,17 @@ using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
-namespace MBW.HassMQTT.DiscoveryModels.Helpers
+namespace MBW.HassMQTT.DiscoveryModels.Helpers;
+
+public static class DiscoveryHelper
 {
-    public static class DiscoveryHelper
+    public static HassDeviceType GetDeviceType<T>() where T : IHassDiscoveryDocument
     {
-        public static HassDeviceType GetDeviceType<T>() where T : IHassDiscoveryDocument
-        {
-            Attribute attribute = Attribute.GetCustomAttribute(typeof(T), typeof(DeviceTypeAttribute));
+        Attribute attribute = Attribute.GetCustomAttribute(typeof(T), typeof(DeviceTypeAttribute));
 
-            if (attribute == null)
-                throw new Exception($"Unable to locate [DeviceType()] attribute on {typeof(T).FullName}");
+        if (attribute == null)
+            throw new Exception($"Unable to locate [DeviceType()] attribute on {typeof(T).FullName}");
 
-            return ((DeviceTypeAttribute) attribute).DeviceType;
-        }
+        return ((DeviceTypeAttribute) attribute).DeviceType;
     }
 }

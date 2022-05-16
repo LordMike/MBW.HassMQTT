@@ -8,41 +8,40 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MQTTnet.Extensions.ManagedClient;
 
-namespace MBW.HassMQTT
+namespace MBW.HassMQTT;
+
+internal class MqttClientLifetimeService : IHostedService
 {
-    internal class MqttClientLifetimeService : IHostedService
+    private readonly IManagedMqttClient _client;
+    private readonly IManagedMqttClientOptions _options;
+
+    public MqttClientLifetimeService(IManagedMqttClient client, IManagedMqttClientOptions options, IServiceProvider serviceProvider)
     {
-        private readonly IManagedMqttClient _client;
-        private readonly IManagedMqttClientOptions _options;
+        _client = client;
+        _options = options;
 
-        public MqttClientLifetimeService(IManagedMqttClient client, IManagedMqttClientOptions options, IServiceProvider serviceProvider)
+        // Initialize initial receives
+        MqttEvents mqttEvents = serviceProvider.GetService<MqttEvents>();
+
+        if (mqttEvents != null)
         {
-            _client = client;
-            _options = options;
+            IEnumerable<IMqttEventReceiver> receivers = serviceProvider.GetServices<IMqttEventReceiver>();
 
-            // Initialize initial receives
-            MqttEvents mqttEvents = serviceProvider.GetService<MqttEvents>();
-
-            if (mqttEvents != null)
+            foreach (IMqttEventReceiver receiver in receivers)
             {
-                IEnumerable<IMqttEventReceiver> receivers = serviceProvider.GetServices<IMqttEventReceiver>();
-
-                foreach (IMqttEventReceiver receiver in receivers)
-                {
-                    mqttEvents.OnConnect += receiver.OnConnect;
-                    mqttEvents.OnDisconnect += receiver.OnDisconnect;
-                }
+                mqttEvents.OnConnect += receiver.OnConnect;
+                mqttEvents.OnDisconnect += receiver.OnDisconnect;
             }
         }
+    }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            await _client.StartAsync(_options);
-        }
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        await _client.StartAsync(_options);
+    }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            await _client.StopAsync();
-        }
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await _client.StopAsync();
     }
 }

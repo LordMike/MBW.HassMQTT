@@ -1,12 +1,11 @@
 ﻿#nullable enable
 
-namespace MBW.HassMQTT.DiscoveryModels.Interfaces
+namespace MBW.HassMQTT.DiscoveryModels.Interfaces;
+
+public interface IHasIcon
 {
-    public interface IHasIcon
-    {
-        /// <summary>
-        /// Icon for the entity.
-        /// </summary>
-        public string? Icon { get; set; }
-    }
+    /// <summary>
+    /// Icon for the entity.
+    /// </summary>
+    public string? Icon { get; set; }
 }

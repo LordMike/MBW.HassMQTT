@@ -2,45 +2,44 @@
 using System.Linq;
 using System.Text;
 
-namespace MBW.HassMQTT.Topics
+namespace MBW.HassMQTT.Topics;
+
+public class HassMqttTopicBuilder
 {
-    public class HassMqttTopicBuilder
+    private const char Seperator = '/';
+    private readonly string _discoveryPrefix;
+    private readonly string _servicePrefix;
+
+    public HassMqttTopicBuilder(HassConfiguration hassOptions)
     {
-        private const char Seperator = '/';
-        private readonly string _discoveryPrefix;
-        private readonly string _servicePrefix;
+        _discoveryPrefix = hassOptions.DiscoveryPrefix.TrimEnd('/');
+        _servicePrefix = hassOptions.TopicPrefix.TrimEnd('/');
+    }
 
-        public HassMqttTopicBuilder(HassConfiguration hassOptions)
+    private string Combine(string prefix, string[] segments)
+    {
+        StringBuilder sb = new StringBuilder(prefix.Length + segments.Length + segments.Sum(s => s.Length));
+
+        sb.Append(prefix);
+
+        foreach (string segment in segments)
         {
-            _discoveryPrefix = hassOptions.DiscoveryPrefix.TrimEnd('/');
-            _servicePrefix = hassOptions.TopicPrefix.TrimEnd('/');
+            sb.Append(Seperator);
+            sb.Append(segment);
         }
 
-        private string Combine(string prefix, string[] segments)
-        {
-            StringBuilder sb = new StringBuilder(prefix.Length + segments.Length + segments.Sum(s => s.Length));
+        Debug.Assert(sb.Capacity == sb.Length);
 
-            sb.Append(prefix);
+        return sb.ToString();
+    }
 
-            foreach (string segment in segments)
-            {
-                sb.Append(Seperator);
-                sb.Append(segment);
-            }
+    public string GetDiscoveryTopic(params string[] segments)
+    {
+        return Combine(_discoveryPrefix, segments);
+    }
 
-            Debug.Assert(sb.Capacity == sb.Length);
-
-            return sb.ToString();
-        }
-
-        public string GetDiscoveryTopic(params string[] segments)
-        {
-            return Combine(_discoveryPrefix, segments);
-        }
-
-        public string GetServiceTopic(params string[] segments)
-        {
-            return Combine(_servicePrefix, segments);
-        }
+    public string GetServiceTopic(params string[] segments)
+    {
+        return Combine(_servicePrefix, segments);
     }
 }

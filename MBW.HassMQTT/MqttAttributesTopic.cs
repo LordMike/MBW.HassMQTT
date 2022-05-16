@@ -3,64 +3,63 @@ using System.Linq;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 
-namespace MBW.HassMQTT
+namespace MBW.HassMQTT;
+
+public class MqttAttributesTopic : IMqttValueContainer
 {
-    public class MqttAttributesTopic : IMqttValueContainer
+    public string PublishTopic { get; }
+    public bool Dirty { get; private set; }
+
+    private readonly Dictionary<string, object> _attributes;
+
+    public MqttAttributesTopic(string topic)
     {
-        public string PublishTopic { get; }
-        public bool Dirty { get; private set; }
+        PublishTopic = topic;
+        _attributes = new Dictionary<string, object>();
+    }
 
-        private readonly Dictionary<string, object> _attributes;
+    public void RemoveAttribute(string name)
+    {
+        if (_attributes.Remove(name))
+            Dirty = true;
+    }
 
-        public MqttAttributesTopic(string topic)
-        {
-            PublishTopic = topic;
-            _attributes = new Dictionary<string, object>();
-        }
-
-        public void RemoveAttribute(string name)
+    public void SetAttribute(string name, object value)
+    {
+        if (value == default)
         {
             if (_attributes.Remove(name))
                 Dirty = true;
+
+            return;
         }
 
-        public void SetAttribute(string name, object value)
-        {
-            if (value == default)
-            {
-                if (_attributes.Remove(name))
-                    Dirty = true;
+        if (_attributes.TryGetValue(name, out object existing) && ComparisonHelper.IsSameValue(existing, value))
+            return;
 
-                return;
-            }
+        _attributes[name] = value;
+        Dirty = true;
+    }
 
-            if (_attributes.TryGetValue(name, out object existing) && ComparisonHelper.IsSameValue(existing, value))
-                return;
+    public void Clear()
+    {
+        if (!_attributes.Any())
+            return;
 
-            _attributes[name] = value;
-            Dirty = true;
-        }
+        _attributes.Clear();
+        Dirty = true;
+    }
 
-        public void Clear()
-        {
-            if (!_attributes.Any())
-                return;
+    public void SetDirty(bool dirty = true)
+    {
+        Dirty = dirty;
+    }
 
-            _attributes.Clear();
-            Dirty = true;
-        }
+    public object GetSerializedValue(bool resetDirty)
+    {
+        if (resetDirty)
+            Dirty = false;
 
-        public void SetDirty(bool dirty = true)
-        {
-            Dirty = dirty;
-        }
-
-        public object GetSerializedValue(bool resetDirty)
-        {
-            if (resetDirty)
-                Dirty = false;
-
-            return _attributes;
-        }
+        return _attributes;
     }
 }

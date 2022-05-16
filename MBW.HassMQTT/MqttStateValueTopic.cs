@@ -3,65 +3,64 @@ using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 using MBW.HassMQTT.Internal;
 
-namespace MBW.HassMQTT
+namespace MBW.HassMQTT;
+
+public class MqttStateValueTopic : IMqttValueContainer
 {
-    public class MqttStateValueTopic : IMqttValueContainer
+    private object _value;
+    public string PublishTopic { get; }
+    public bool Dirty { get; private set; }
+
+    public object Value
     {
-        private object _value;
-        public string PublishTopic { get; }
-        public bool Dirty { get; private set; }
-
-        public object Value
+        get => _value;
+        set
         {
-            get => _value;
-            set
-            {
-                if (ComparisonHelper.IsSameValue(value, Value))
-                    return;
+            if (ComparisonHelper.IsSameValue(value, Value))
+                return;
 
-                _value = value;
-                Dirty = true;
-            }
+            _value = value;
+            Dirty = true;
         }
+    }
 
-        public MqttStateValueTopic(string topic)
+    public MqttStateValueTopic(string topic)
+    {
+        PublishTopic = topic;
+    }
+
+    private static bool TryConvertStateValue(object val, out string str)
+    {
+        switch (val)
         {
-            PublishTopic = topic;
+            case DateTime asDateTime:
+                str = asDateTime.ToIso8601();
+                return true;
+            case DateTimeOffset asDateTimeOffset:
+                str = asDateTimeOffset.ToIso8601();
+                return true;
+            case string asString:
+                str = asString;
+                return true;
+            default:
+                str = null;
+                return false;
         }
+    }
 
-        private static bool TryConvertStateValue(object val, out string str)
-        {
-            switch (val)
-            {
-                case DateTime asDateTime:
-                    str = asDateTime.ToIso8601();
-                    return true;
-                case DateTimeOffset asDateTimeOffset:
-                    str = asDateTimeOffset.ToIso8601();
-                    return true;
-                case string asString:
-                    str = asString;
-                    return true;
-                default:
-                    str = null;
-                    return false;
-            }
-        }
+    public void SetDirty(bool dirty = true)
+    {
+        Dirty = dirty;
+    }
 
-        public void SetDirty(bool dirty = true)
-        {
-            Dirty = dirty;
-        }
+    public object GetSerializedValue(bool resetDirty)
+    {
+        if (resetDirty)
+            Dirty = false;
 
-        public object GetSerializedValue(bool resetDirty)
-        {
-            if (resetDirty)
-                Dirty = false;
+        if (TryConvertStateValue(Value, out string asString))
+            return asString;
 
-            if (TryConvertStateValue(Value, out string asString))
-                return asString;
-
-            return Value;
-        }
+        return Value;
     }
 }

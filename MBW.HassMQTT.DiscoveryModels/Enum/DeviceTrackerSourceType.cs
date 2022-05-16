@@ -1,10 +1,9 @@
-﻿namespace MBW.HassMQTT.DiscoveryModels.Enum
+﻿namespace MBW.HassMQTT.DiscoveryModels.Enum;
+
+public enum DeviceTrackerSourceType
 {
-    public enum DeviceTrackerSourceType
-    {
-        Gps,
-        Router,
-        Bluetooth,
-        BluetoothLe
-    }
+    Gps,
+    Router,
+    Bluetooth,
+    BluetoothLe
 }

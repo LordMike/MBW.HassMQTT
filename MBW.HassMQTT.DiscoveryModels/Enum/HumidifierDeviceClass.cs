@@ -1,15 +1,14 @@
 ﻿using System.Runtime.Serialization;
 
-namespace MBW.HassMQTT.DiscoveryModels.Enum
+namespace MBW.HassMQTT.DiscoveryModels.Enum;
+
+public enum HumidifierDeviceClass
 {
-    public enum HumidifierDeviceClass
-    {
-        Unknown,
+    Unknown,
 
-        [EnumMember(Value = "humidifier")]
-        Humidifier,
+    [EnumMember(Value = "humidifier")]
+    Humidifier,
 
-        [EnumMember(Value = "dehumidifier")]
-        Dehumidifier
-    }
+    [EnumMember(Value = "dehumidifier")]
+    Dehumidifier
 }

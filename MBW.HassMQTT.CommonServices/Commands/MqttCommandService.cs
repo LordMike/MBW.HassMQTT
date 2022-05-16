@@ -10,86 +10,85 @@ using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Extensions.ManagedClient;
 
-namespace MBW.HassMQTT.CommonServices.Commands
+namespace MBW.HassMQTT.CommonServices.Commands;
+
+internal class MqttCommandService : IHostedService, IMqttMessageReceiver
 {
-    internal class MqttCommandService : IHostedService, IMqttMessageReceiver
+    private readonly ILogger<MqttCommandService> _logger;
+    private readonly IManagedMqttClient _mqttClient;
+    private readonly string _topicPrefix;
+
+    private readonly List<(string[] filter, IMqttCommandHandler handler)> _handlers = new List<(string[] filter, IMqttCommandHandler handler)>();
+
+    public MqttCommandService(
+        ILogger<MqttCommandService> logger,
+        IOptions<HassConfiguration> hassConfig,
+        IManagedMqttClient mqttClient,
+        IEnumerable<IMqttCommandHandler> handlers)
     {
-        private readonly ILogger<MqttCommandService> _logger;
-        private readonly IManagedMqttClient _mqttClient;
-        private readonly string _topicPrefix;
+        _logger = logger;
+        _mqttClient = mqttClient;
+        _topicPrefix = hassConfig.Value.TopicPrefix.TrimEnd('/');
 
-        private readonly List<(string[] filter, IMqttCommandHandler handler)> _handlers = new List<(string[] filter, IMqttCommandHandler handler)>();
+        foreach (IMqttCommandHandler handler in handlers)
+            _handlers.Add((handler.GetFilter(), handler));
+    }
 
-        public MqttCommandService(
-            ILogger<MqttCommandService> logger,
-            IOptions<HassConfiguration> hassConfig,
-            IManagedMqttClient mqttClient,
-            IEnumerable<IMqttCommandHandler> handlers)
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        // Listen to topics we want to handle
+        // Take the filters of each command, and built a topic filter from it
+        // Null segments mean "+" (placeholder for one segment)
+
+        foreach ((string[] filter, IMqttCommandHandler _) in _handlers)
         {
-            _logger = logger;
-            _mqttClient = mqttClient;
-            _topicPrefix = hassConfig.Value.TopicPrefix.TrimEnd('/');
+            string subscription = $"{_topicPrefix}/{string.Join("/", filter.Select(x => x ?? "+"))}";
 
-            foreach (IMqttCommandHandler handler in handlers)
-                _handlers.Add((handler.GetFilter(), handler));
+            _logger.LogDebug("Subscribing to {filter}", subscription);
+
+            await _mqttClient.SubscribeAsync(subscription);
         }
+    }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task ReceiveAsync(MqttApplicationMessage argApplicationMessage, CancellationToken token = default)
+    {
+        // Skip prefix, split topic
+        string[] topicLevels = argApplicationMessage.Topic.Substring(_topicPrefix.Length + 1).Split('/');
+
+        _logger.LogDebug("Received {Topic}, value {Value}", argApplicationMessage.Topic, argApplicationMessage.ConvertPayloadToString());
+
+        foreach ((string[] filter, IMqttCommandHandler handler) in _handlers)
         {
-            // Listen to topics we want to handle
-            // Take the filters of each command, and built a topic filter from it
-            // Null segments mean "+" (placeholder for one segment)
+            if (filter.Length != topicLevels.Length)
+                continue;
 
-            foreach ((string[] filter, IMqttCommandHandler _) in _handlers)
+            bool wasMatch = true;
+            for (int i = 0; i < filter.Length; i++)
             {
-                string subscription = $"{_topicPrefix}/{string.Join("/", filter.Select(x => x ?? "+"))}";
+                if (filter[i] == null || filter[i] == topicLevels[i])
+                    continue;
 
-                _logger.LogDebug("Subscribing to {filter}", subscription);
-
-                await _mqttClient.SubscribeAsync(subscription);
+                wasMatch = false;
+                break;
             }
-        }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+            if (!wasMatch)
+                continue;
 
-        public async Task ReceiveAsync(MqttApplicationMessage argApplicationMessage, CancellationToken token = default)
-        {
-            // Skip prefix, split topic
-            string[] topicLevels = argApplicationMessage.Topic.Substring(_topicPrefix.Length + 1).Split('/');
+            _logger.LogDebug("Received {Topic} matches {Handler}", argApplicationMessage.Topic, handler.ToString());
 
-            _logger.LogDebug("Received {Topic}, value {Value}", argApplicationMessage.Topic, argApplicationMessage.ConvertPayloadToString());
-
-            foreach ((string[] filter, IMqttCommandHandler handler) in _handlers)
+            try
             {
-                if (filter.Length != topicLevels.Length)
-                    continue;
-
-                bool wasMatch = true;
-                for (int i = 0; i < filter.Length; i++)
-                {
-                    if (filter[i] == null || filter[i] == topicLevels[i])
-                        continue;
-
-                    wasMatch = false;
-                    break;
-                }
-
-                if (!wasMatch)
-                    continue;
-
-                _logger.LogDebug("Received {Topic} matches {Handler}", argApplicationMessage.Topic, handler.ToString());
-
-                try
-                {
-                    await handler.Handle(topicLevels, argApplicationMessage, token);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "Unable to handle message from {topic} using {handler}", argApplicationMessage.Topic, handler.GetType().FullName);
-                }
+                await handler.Handle(topicLevels, argApplicationMessage, token);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unable to handle message from {topic} using {handler}", argApplicationMessage.Topic, handler.GetType().FullName);
             }
         }
     }

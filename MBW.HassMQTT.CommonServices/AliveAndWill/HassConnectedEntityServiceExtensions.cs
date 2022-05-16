@@ -9,51 +9,50 @@ using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Client.Options;
 
-namespace MBW.HassMQTT.CommonServices.AliveAndWill
+namespace MBW.HassMQTT.CommonServices.AliveAndWill;
+
+public static class HassConnectedEntityServiceExtensions
 {
-    public static class HassConnectedEntityServiceExtensions
+    public static IServiceCollection AddHassConnectedEntityService(this IServiceCollection services, string systemName, Action<HassConnectedEntityServiceConfig> configuration = null)
     {
-        public static IServiceCollection AddHassConnectedEntityService(this IServiceCollection services, string systemName, Action<HassConnectedEntityServiceConfig> configuration = null)
-        {
-            services
-                .AddSingleton<AvailabilityDecoratorService>()
-                .AddSingleton<HassConnectedEntityService>()
-                .AddSingleton<IMqttEventReceiver>(x => x.GetRequiredService<HassConnectedEntityService>())
-                .AddHostedService(x => x.GetRequiredService<HassConnectedEntityService>())
-                .Configure<HassConnectedEntityServiceConfig>(x =>
-                {
-                    x.DeviceId = systemName;
-                    x.DiscoveryDeviceName = systemName;
-                    x.DiscoveryEntityName = $"{systemName} Status";
-                });
-
-            if (configuration != null)
-                services.PostConfigure(configuration);
-
-            return services;
-        }
-
-        public static MqttClientOptionsBuilder ConfigureHassConnectedEntityServiceLastWill(this MqttClientOptionsBuilder builder, IServiceProvider provider)
-        {
-            HassMqttTopicBuilder topicBuilder = provider.GetRequiredService<HassMqttTopicBuilder>();
-            HassConnectedEntityServiceConfig config = provider.GetRequiredService<IOptions<HassConnectedEntityServiceConfig>>().Value;
-
-            return builder.WithWillMessage(new MqttApplicationMessage
+        services
+            .AddSingleton<AvailabilityDecoratorService>()
+            .AddSingleton<HassConnectedEntityService>()
+            .AddSingleton<IMqttEventReceiver>(x => x.GetRequiredService<HassConnectedEntityService>())
+            .AddHostedService(x => x.GetRequiredService<HassConnectedEntityService>())
+            .Configure<HassConnectedEntityServiceConfig>(x =>
             {
-                Topic = topicBuilder.GetServiceTopic(config.DeviceId, config.EntityId, "state"),
-                Payload = Encoding.UTF8.GetBytes(config.ProblemMessage),
-                Retain = true
+                x.DeviceId = systemName;
+                x.DiscoveryDeviceName = systemName;
+                x.DiscoveryEntityName = $"{systemName} Status";
             });
-        }
 
-        public static IDiscoveryDocumentBuilder<TEntity> ConfigureAliveService<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : IHassDiscoveryDocument, IHasAvailability
+        if (configuration != null)
+            services.PostConfigure(configuration);
+
+        return services;
+    }
+
+    public static MqttClientOptionsBuilder ConfigureHassConnectedEntityServiceLastWill(this MqttClientOptionsBuilder builder, IServiceProvider provider)
+    {
+        HassMqttTopicBuilder topicBuilder = provider.GetRequiredService<HassMqttTopicBuilder>();
+        HassConnectedEntityServiceConfig config = provider.GetRequiredService<IOptions<HassConnectedEntityServiceConfig>>().Value;
+
+        return builder.WithWillMessage(new MqttApplicationMessage
         {
-            AvailabilityDecoratorService decorator = builder.HassMqttManager.GetService<AvailabilityDecoratorService>();
+            Topic = topicBuilder.GetServiceTopic(config.DeviceId, config.EntityId, "state"),
+            Payload = Encoding.UTF8.GetBytes(config.ProblemMessage),
+            Retain = true
+        });
+    }
 
-            if (decorator == null)
-                throw new InvalidOperationException($"Unable to locate the Alive services. Did you forget to configure services.{nameof(AddHassConnectedEntityService)}?");
+    public static IDiscoveryDocumentBuilder<TEntity> ConfigureAliveService<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : IHassDiscoveryDocument, IHasAvailability
+    {
+        AvailabilityDecoratorService decorator = builder.HassMqttManager.GetService<AvailabilityDecoratorService>();
 
-            return builder.ConfigureDiscovery(discovery => decorator.ApplyAvailabilityInformation(discovery));
-        }
+        if (decorator == null)
+            throw new InvalidOperationException($"Unable to locate the Alive services. Did you forget to configure services.{nameof(AddHassConnectedEntityService)}?");
+
+        return builder.ConfigureDiscovery(discovery => decorator.ApplyAvailabilityInformation(discovery));
     }
 }

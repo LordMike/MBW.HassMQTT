@@ -8,47 +8,46 @@ using MQTTnet.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace MBW.HassMQTT.Helpers
+namespace MBW.HassMQTT.Helpers;
+
+public static class MqttHelpers
 {
-    public static class MqttHelpers
+    private static readonly Encoding Encoding = new UTF8Encoding(false);
+
+    private static byte[] ConvertJson(JToken token)
     {
-        private static readonly Encoding Encoding = new UTF8Encoding(false);
+        using MemoryStream ms = new MemoryStream();
 
-        private static byte[] ConvertJson(JToken token)
+        using (StreamWriter sw = new StreamWriter(ms, Encoding))
+        using (JsonTextWriter jw = new JsonTextWriter(sw))
         {
-            using MemoryStream ms = new MemoryStream();
-
-            using (StreamWriter sw = new StreamWriter(ms, Encoding))
-            using (JsonTextWriter jw = new JsonTextWriter(sw))
-            {
-                token.WriteTo(jw);
-            }
-
-            return ms.ToArray();
+            token.WriteTo(jw);
         }
 
-        public static Task SendJsonAsync(this IManagedMqttClient mqttClient, string topic, JToken doc, CancellationToken token = default)
-        {
-            return mqttClient.PublishAsync(new MqttApplicationMessage
-            {
-                Topic = topic,
-                Retain = true,
-                QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce,
-                Payload = ConvertJson(doc)
-            }, token);
-        }
+        return ms.ToArray();
+    }
 
-        public static Task SendValueAsync(this IManagedMqttClient mqttClient, string topic, string value, CancellationToken token = default)
+    public static Task SendJsonAsync(this IManagedMqttClient mqttClient, string topic, JToken doc, CancellationToken token = default)
+    {
+        return mqttClient.PublishAsync(new MqttApplicationMessage
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(value);
+            Topic = topic,
+            Retain = true,
+            QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce,
+            Payload = ConvertJson(doc)
+        }, token);
+    }
 
-            return mqttClient.PublishAsync(new MqttApplicationMessage
-            {
-                Topic = topic,
-                Retain = true,
-                QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce,
-                Payload = bytes
-            }, token);
-        }
+    public static Task SendValueAsync(this IManagedMqttClient mqttClient, string topic, string value, CancellationToken token = default)
+    {
+        byte[] bytes = Encoding.UTF8.GetBytes(value);
+
+        return mqttClient.PublishAsync(new MqttApplicationMessage
+        {
+            Topic = topic,
+            Retain = true,
+            QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce,
+            Payload = bytes
+        }, token);
     }
 }

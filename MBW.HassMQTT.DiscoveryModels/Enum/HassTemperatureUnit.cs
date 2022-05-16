@@ -1,15 +1,14 @@
 ﻿using System.Runtime.Serialization;
 
-namespace MBW.HassMQTT.DiscoveryModels.Enum
+namespace MBW.HassMQTT.DiscoveryModels.Enum;
+
+public enum HassTemperatureUnit
 {
-    public enum HassTemperatureUnit
-    {
-        None,
+    None,
 
-        [EnumMember(Value = "C")]
-        Celcius,
+    [EnumMember(Value = "C")]
+    Celcius,
 
-        [EnumMember(Value = "F")]
-        Fahrenheit
-    }
+    [EnumMember(Value = "F")]
+    Fahrenheit
 }
