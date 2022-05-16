@@ -33,6 +33,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Helpers
                     return Math.Abs(asDouble - (double)b) < double.Epsilon;
                 case DateTime asDateTime:
                     return asDateTime.Equals((DateTime)b);
+                case DateTimeOffset asDateTimeOffset:
+                    return asDateTimeOffset.Equals((DateTimeOffset)b);
                 default:
                     return Comparer.DefaultInvariant.Compare(a, b) == 0;
             }

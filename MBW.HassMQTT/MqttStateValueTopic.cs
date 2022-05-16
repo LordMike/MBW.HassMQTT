@@ -1,6 +1,7 @@
 ﻿using System;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
+using MBW.HassMQTT.Internal;
 
 namespace MBW.HassMQTT
 {
@@ -33,7 +34,10 @@ namespace MBW.HassMQTT
             switch (val)
             {
                 case DateTime asDateTime:
-                    str = asDateTime.ToString("O");
+                    str = asDateTime.ToIso8601();
+                    return true;
+                case DateTimeOffset asDateTimeOffset:
+                    str = asDateTimeOffset.ToIso8601();
                     return true;
                 case string asString:
                     str = asString;

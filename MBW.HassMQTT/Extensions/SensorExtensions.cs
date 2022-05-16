@@ -85,5 +85,7 @@ namespace MBW.HassMQTT.Extensions
 
             throw new InvalidOperationException($"Unable to find sensor {deviceId}/{entityId} - is it configured?");
         }
+
+        public static ISensorContainer GetSensor<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : IHassDiscoveryDocument => builder.HassMqttManager.GetSensor(builder.DeviceId, builder.EntityId);
     }
 }
