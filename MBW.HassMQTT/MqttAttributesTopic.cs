@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
@@ -34,8 +35,20 @@ public class MqttAttributesTopic : IMqttValueContainer
             return;
         }
 
-        if (_attributes.TryGetValue(name, out object existing) && ComparisonHelper.IsSameValue(existing, value))
+        if (_attributes.TryGetValue(name, out object existing))
+        {
+            try
+            {
+                if (ComparisonHelper.IsSameValue(existing, value))
+                    return;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException($"Unable to compare values for '{PublishTopic}'", e);
+            }
+
             return;
+        }
 
         _attributes[name] = value;
         Dirty = true;

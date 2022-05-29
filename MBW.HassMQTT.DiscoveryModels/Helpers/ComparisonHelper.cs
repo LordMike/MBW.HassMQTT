@@ -14,7 +14,7 @@ public static class ComparisonHelper
             return false;
 
         if (a.GetType() != b.GetType())
-            throw new InvalidOperationException("Attempted to compare two objects of differing types");
+            throw new InvalidOperationException($"Attempted to compare two objects of differing types: {a.GetType().FullName} and {b.GetType().FullName}");
 
         // Arrays
         if (a.GetType().IsArray)

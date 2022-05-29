@@ -16,8 +16,15 @@ public class MqttStateValueTopic : IMqttValueContainer
         get => _value;
         set
         {
-            if (ComparisonHelper.IsSameValue(value, Value))
-                return;
+            try
+            {
+                if (ComparisonHelper.IsSameValue(value, Value))
+                    return;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Unable to compare values for '" + PublishTopic + "'", e);
+            }
 
             _value = value;
             Dirty = true;
