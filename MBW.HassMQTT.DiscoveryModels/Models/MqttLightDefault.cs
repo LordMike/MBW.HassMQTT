@@ -198,6 +198,46 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     public string? RgbValueTemplate { get; set; }
 
     /// <summary>
+    /// Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgbw_command_topic`. Available variables: `red`, `green`, `blue` and `white`.
+    /// </summary>
+    public string? RgbwCommandTemplate { get; set; }
+
+    /// <summary>
+    /// Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgbw_command_topic`. Available variables: `red`, `green`, `blue` and `white`.
+    /// </summary>
+    public string? RgbwCommandTopic { get; set; }
+
+    /// <summary>
+    /// The MQTT topic subscribed to receive RGBW state updates. The expected payload is the RGBW values separated by commas, for example, `255,0,127,64`.
+    /// </summary>
+    public string? RgbwStateTopic { get; set; }
+
+    /// <summary>
+    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the RGBW value.
+    /// </summary>
+    public string? RgbwValueTemplate { get; set; }
+
+    /// <summary>
+    /// Defines a [template](/docs/configuration/templating/) to compose message which will be sent to `rgbww_command_topic`. Available variables: `red`, `green`, `blue`, `cold_white` and `warm_white`.
+    /// </summary>
+    public string? RgbwwCommandTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic to publish commands to change the light's RGBWW state.
+    /// </summary>
+    public string? RgbwwCommandTopic { get; set; }
+
+    /// <summary>
+    /// The MQTT topic subscribed to receive RGBWW state updates. The expected payload is the RGBWW values separated by commas, for example, `255,0,127,64,32`.
+    /// </summary>
+    public string? RgbwwStateTopic { get; set; }
+
+    /// <summary>
+    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the RGBWW value.
+    /// </summary>
+    public string? RgbwwValueTemplate { get; set; }
+
+    /// <summary>
     /// The schema to use. Must be `default` or omitted to select the default schema.
     /// </summary>
     public string Schema { get; set; } = "default";
@@ -266,6 +306,10 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
             TopicAndTemplate(s => s.XyStateTopic, s => s.XyValueTemplate);
             TopicAndTemplate(s => s.EffectCommandTopic, s => s.EffectCommandTemplate);
             TopicAndTemplate(s => s.BrightnessCommandTopic, s => s.BrightnessCommandTemplate);
+            TopicAndTemplate(s => s.RgbwCommandTopic, s => s.RgbwCommandTemplate);
+            TopicAndTemplate(s => s.RgbwStateTopic, s => s.RgbwValueTemplate);
+            TopicAndTemplate(s => s.RgbwwCommandTopic, s => s.RgbwwCommandTemplate);
+            TopicAndTemplate(s => s.RgbwwStateTopic, s => s.RgbwwValueTemplate);
 
             RuleFor(s => s.Schema).Equal("default");
         }

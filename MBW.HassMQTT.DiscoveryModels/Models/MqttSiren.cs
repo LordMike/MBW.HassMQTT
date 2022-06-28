@@ -32,6 +32,8 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
 {
     public MqttSiren(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
+        // optimistic
+
     }
 
     /// <summary>
@@ -58,6 +60,11 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
     /// The name to use when displaying this siren.
     /// </summary>
     public string? Name { get; set; }
+
+    /// <summary>
+    /// Flag that defines if siren works in optimistic mode.
+    /// </summary>
+    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The payload that represents the available state.

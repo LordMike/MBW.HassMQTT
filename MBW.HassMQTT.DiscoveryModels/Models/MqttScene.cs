@@ -22,7 +22,7 @@ public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneV
     }
 
     /// <summary>
-    /// The MQTT topic to publish commands to change the switch state.
+    /// The MQTT topic to publish `payload_on` to activate the scene.
     /// </summary>
     public string? CommandTopic { get; set; }
 
@@ -32,8 +32,7 @@ public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneV
     public string? Name { get; set; }
 
     /// <summary>
-    /// The payload that represents on state.
-    /// If specified, will be used for both comparing to the value in the state_topic (see value_template and state_on for details) and sending as on command to the command_topic.
+    /// The payload that will be sent to `command_topic` when activating the MQTT scene.
     /// </summary>
     public string? PayloadOn { get; set; }
 
