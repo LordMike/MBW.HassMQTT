@@ -35,6 +35,13 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     public string CommandTopic { get; set; }
 
     /// <summary>
+    /// The type/class of the number.
+    /// See https://www.home-assistant.io/integrations/number/#device-class
+    /// </summary>
+    /// <remarks>Default value: 'None'</remarks>
+    public HassNumberDeviceClass? DeviceClass { get; set; }
+
+    /// <summary>
     /// Minimum value.
     /// </summary>
     public float? Min { get; set; }
