@@ -61,7 +61,7 @@ public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPan
     public bool? CodeTriggerRequired { get; set; }
 
     /// <summary>
-    /// The [template](/docs/configuration/templating/#processing-incoming-data) used for the command payload. Available variables: `action` and `code`.
+    /// The [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) used for the command payload. Available variables: `action` and `code`.
     /// </summary>
     public string? CommandTemplate { get; set; }
 
@@ -111,7 +111,7 @@ public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPan
     public string StateTopic { get; set; }
 
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the value.
+    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value.
     /// </summary>
     public string? ValueTemplate { get; set; }
 

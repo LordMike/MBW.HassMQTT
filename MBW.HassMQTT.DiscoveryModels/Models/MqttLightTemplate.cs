@@ -41,27 +41,27 @@ public class MqttLightTemplate : MqttSensorDiscoveryBase<MqttLightTemplate, Mqtt
     }
 
     /// <summary>
-    /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract blue color from the state payload value. Expected result of the template is an integer from 0-255 range.
+    /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract blue color from the state payload value. Expected result of the template is an integer from 0-255 range.
     /// </summary>
     public string? BlueTemplate { get; set; }
 
     /// <summary>
-    /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract brightness from the state payload value. Expected result of the template is an integer from 0-255 range.
+    /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract brightness from the state payload value. Expected result of the template is an integer from 0-255 range.
     /// </summary>
     public string? BrightnessTemplate { get; set; }
 
     /// <summary>
-    /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract color temperature from the state payload value. Expected result of the template is an integer representing mired units.
+    /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract color temperature from the state payload value. Expected result of the template is an integer representing mired units.
     /// </summary>
     public string? ColorTempTemplate { get; set; }
 
     /// <summary>
-    /// The [template](/docs/configuration/templating/#processing-incoming-data) for *off* state changes. Available variables: `state` and `transition`.
+    /// The [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) for *off* state changes. Available variables: `state` and `transition`.
     /// </summary>
     public string CommandOffTemplate { get; set; }
 
     /// <summary>
-    /// The [template](/docs/configuration/templating/#processing-incoming-data) for *on* state changes. Available variables: `state`, `brightness`, `color_temp`, `red`, `green`, `blue`, `white_value`, `flash`, `transition` and `effect`. Values `red`, `green`, `blue`, `brightness` are provided as integers from range 0-255. Value of `color_temp` is provided as integer representing mired units.
+    /// The [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) for *on* state changes. Available variables: `state`, `brightness`, `color_temp`, `red`, `green`, `blue`, `white_value`, `flash`, `transition` and `effect`. Values `red`, `green`, `blue`, `brightness` are provided as integers from range 0-255. Value of `color_temp` is provided as integer representing mired units.
     /// </summary>
     public string CommandOnTemplate { get; set; }
 
@@ -76,12 +76,12 @@ public class MqttLightTemplate : MqttSensorDiscoveryBase<MqttLightTemplate, Mqtt
     public IList<string>? EffectList { get; set; }
 
     /// <summary>
-    /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract effect from the state payload value.
+    /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract effect from the state payload value.
     /// </summary>
     public string? EffectTemplate { get; set; }
 
     /// <summary>
-    /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract green color from the state payload value. Expected result of the template is an integer from 0-255 range.
+    /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract green color from the state payload value. Expected result of the template is an integer from 0-255 range.
     /// </summary>
     public string? GreenTemplate { get; set; }
 
@@ -106,7 +106,7 @@ public class MqttLightTemplate : MqttSensorDiscoveryBase<MqttLightTemplate, Mqtt
     public bool? Optimistic { get; set; }
 
     /// <summary>
-    /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract red color from the state payload value. Expected result of the template is an integer from 0-255 range.
+    /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract red color from the state payload value. Expected result of the template is an integer from 0-255 range.
     /// </summary>
     public string? RedTemplate { get; set; }
 
@@ -116,7 +116,7 @@ public class MqttLightTemplate : MqttSensorDiscoveryBase<MqttLightTemplate, Mqtt
     public string? Schema { get; set; } = "template";
 
     /// <summary>
-    /// [Template](/docs/configuration/templating/#processing-incoming-data) to extract state from the state payload value.
+    /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract state from the state payload value.
     /// </summary>
     public string? StateTemplate { get; set; }
 

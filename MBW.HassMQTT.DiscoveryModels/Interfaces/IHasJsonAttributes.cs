@@ -5,7 +5,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Interfaces;
 public interface IHasJsonAttributes
 {
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the JSON dictionary from messages received on the `json_attributes_topic`.
+    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the JSON dictionary from messages received on the `json_attributes_topic`.
     /// </summary>
     string? JsonAttributesTemplate { get; set; }
 

@@ -72,7 +72,7 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
     public string OscillationStateTopic { get; set; }
 
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the oscillation.
+    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the oscillation.
     /// </summary>
     public string? OscillationValueTemplate { get; set; }
 
@@ -167,7 +167,7 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
     public string? StateTopic { get; set; }
 
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the state.
+    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the state.
     /// </summary>
     public string? StateValueTemplate { get; set; }
 

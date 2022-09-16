@@ -88,7 +88,7 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     public string? StateUnlocked { get; set; }
 
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract a value from the payload.
+    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the payload.
     /// </summary>
     public string? ValueTemplate { get; set; }
 

@@ -24,7 +24,7 @@ public class MqttTagScanner : MqttSensorDiscoveryBase<MqttTagScanner, MqttTagSca
     public string Topic { get; set; }
 
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) that returns a tag ID.
+    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a tag ID.
     /// </summary>
     public string? ValueTemplate { get; set; }
 

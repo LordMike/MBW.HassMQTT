@@ -79,7 +79,7 @@ public class MqttDeviceTrigger : MqttSensorDiscoveryBase<MqttDeviceTrigger, Mqtt
     public string Subtype { get; set; }
 
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#processing-incoming-data) to extract the value.
+    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value.
     /// </summary>
     public string? ValueTemplate { get; set; }
 
