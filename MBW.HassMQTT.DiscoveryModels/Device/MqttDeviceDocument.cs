@@ -120,6 +120,11 @@ public class MqttDeviceDocument : INotifyPropertyChanged
     public string? SwVersion { get; set; }
 
     /// <summary>
+    /// The hardware version of the device.
+    /// </summary>
+    public string? HwVersion { get; set; }
+
+    /// <summary>
     /// Identifier of a device that routes messages between this device and Home Assistant.
     /// Examples of such devices are hubs, or parent devices of a sub-device.
     ///

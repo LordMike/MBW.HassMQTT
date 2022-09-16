@@ -78,6 +78,13 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <summary>
+    /// Control how the number should be displayed in the UI. Can be set to `box` or `slider` to force a display mode.
+    ///
+    /// Default: "auto"
+    /// </summary>
+    public string? Mode { get; set; }
+
     public string? UniqueId { get; set; }
     public IList<AvailabilityModel>? Availability { get; set; }
     public AvailabilityMode? AvailabilityMode { get; set; }

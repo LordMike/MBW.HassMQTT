@@ -122,8 +122,14 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     /// - rgb
     /// - rgbw
     /// - rgbww
+    /// - white
     /// </summary>
     public IList<string>? SupportedColorModes { get; set; }
+
+    /// <summary>
+    /// Defines the maximum white level (i.e., 100%) of the MQTT device. This is used when setting the light to white mode.
+    /// </summary>
+    public byte? WhiteScale { get; set; }
 
     public string? UniqueId { get; set; }
     public IList<AvailabilityModel>? Availability { get; set; }
