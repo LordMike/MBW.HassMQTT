@@ -17,7 +17,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.Climate)]
 [PublicAPI]
-public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.MqttClimateValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.MqttClimateValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasEncoding
 {
     public MqttClimate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -49,6 +51,16 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// heat mode works in optimistic mode (see below).
     /// </summary>
     public string? AuxStateTopic { get; set; }
+
+    /// <summary>
+    /// A template with which the value received on `current_humidity_topic` will be rendered.
+    /// </summary>
+    public string? CurrentHumidityTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic on which to listen for the current humidity.
+    /// </summary>
+    public string? CurrentHumidityTopic { get; set; }
 
     /// <summary>
     /// A template with which the value received on `current_temperature_topic` will be rendered.
@@ -91,9 +103,21 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public int? Initial { get; set; }
 
     /// <summary>
+    /// The minimum target humidity percentage that can be set.
+    /// </summary>
+    /// <remarks>Default value: 99</remarks>
+    public int? MaxHumidity { get; set; }
+
+    /// <summary>
     /// Maximum set point available.
     /// </summary>
     public float? MaxTemp { get; set; }
+
+    /// <summary>
+    /// min_humidity
+    /// </summary>
+    /// <remarks>Default value: 30</remarks>
+    public int? MinHumidity { get; set; }
 
     /// <summary>
     /// Minimum set point available.
@@ -106,7 +130,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? ModeCommandTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic to publish commands to change the HVAC operation mode.
+    /// The MQTT topic to publish commands to change the HVAC operation mode. Use with `mode_command_template` if you only want to publish the power state.
     /// </summary>
     public string? ModeCommandTopic { get; set; }
 
@@ -131,6 +155,12 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? Name { get; set; }
 
     /// <summary>
+    /// Flag that defines if the climate works in optimistic mode
+    /// </summary>
+    /// <remarks>Default value: `true` if no state topic defined, else `false`.</remarks>
+    public bool? Optimistic { get; set; }
+
+    /// <summary>
     /// The payload that represents disabled state.
     /// </summary>
     public string? PayloadOff { get; set; }
@@ -139,11 +169,6 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// The payload that represents enabled state.
     /// </summary>
     public string? PayloadOn { get; set; }
-
-    /// <summary>
-    /// The MQTT topic to publish commands to change the power state. This is useful if your device has a separate power toggle in addition to mode.
-    /// </summary>
-    public string? PowerCommandTopic { get; set; }
 
     /// <summary>
     /// The desired precision for this device. Can be used to match your actual thermostat's precision. Supported values are `0.1`, `0.5` and `1.0`.
@@ -199,6 +224,26 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// A list of supported swing modes.
     /// </summary>
     public IList<string>? SwingModes { get; set; }
+
+    /// <summary>
+    /// Defines a template to generate the payload to send to `target_humidity_command_topic`.
+    /// </summary>
+    public string? TargetHumidityCommandTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic to publish commands to change the target humidity.
+    /// </summary>
+    public string? TargetHumidityCommandTopic { get; set; }
+
+    /// <summary>
+    /// The MQTT topic subscribed to receive the target humidity. If this is not set, the target humidity works in optimistic mode (see below).
+    /// </summary>
+    public string? TargetHumidityStateTopic { get; set; }
+
+    /// <summary>
+    /// Defines a template to extract a value for the climate `target_humidity` state.
+    /// </summary>
+    public string? TargetHumidityStateTemplate { get; set; }
 
     /// <summary>
     /// A template to render the value sent to the `temperature_command_topic` with.
@@ -309,7 +354,11 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
             TopicAndTemplate(s => s.TemperatureLowCommandTopic, s => s.TemperatureLowCommandTemplate);
             TopicAndTemplate(s => s.TemperatureLowStateTopic, s => s.TemperatureLowStateTemplate);
             TopicAndTemplate(s => s.TemperatureStateTopic, s => s.TemperatureStateTemplate);
+            TopicAndTemplate(s => s.CurrentHumidityTopic, s => s.CurrentHumidityTemplate);
+            TopicAndTemplate(s => s.TargetHumidityCommandTopic, s => s.TargetHumidityCommandTemplate);
+            TopicAndTemplate(s => s.TargetHumidityStateTopic, s => s.TargetHumidityStateTemplate);
 
+            MinMax(s => s.MinHumidity, s => s.MaxHumidity, 30, 99);
             MinMax(s => s.MinTemp, s => s.MaxTemp, -30, 60, (s => s.Initial, 21));
 
             RuleFor(s => s.Precision)

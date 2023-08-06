@@ -38,6 +38,16 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     }
 
     /// <summary>
+    /// A regular expression to validate a supplied code when it is set during the service call to `open`, `lock` or `unlock` the MQTT lock.
+    /// </summary>
+    public string CodeFormat { get; set; }
+    
+    /// <summary>
+    /// Defines a template to generate the payload to send to `command_topic`. The lock command template accepts the parameters `value` and `code`. The `value` parameter will contain the configured value for either `payload_open`, `payload_lock` or `payload_unlock`. The `code` parameter is set during the service call to `open`, `lock` or `unlock` the MQTT lock and will be set `None` if no code was passed.
+    /// </summary>
+    public string CommandTemplate { get; set; }
+    
+    /// <summary>
     /// The MQTT topic to publish commands to change the lock state.
     /// </summary>
     public string CommandTopic { get; set; }
@@ -68,27 +78,45 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     /// The payload sent to the lock to open it.
     /// </summary>
     /// <remarks>Default value: 'OPEN'</remarks>
-    public string? payload_open { get; set; }
+    public string? PayloadOpen { get; set; }
 
     /// <summary>
-    /// The payload sent to by the lock when it's locked.
+    /// The payload sent to `state_topic` by the lock when it's jammed.
+    /// </summary>
+    /// <remarks>Default value: 'JAMMED'</remarks>
+    public string? StateJammed { get; set; }
+    
+    /// <summary>
+    /// The payload sent to `state_topic` by the lock when it's locked.
     /// </summary>
     /// <remarks>Default value: 'LOCKED'</remarks>
     public string? StateLocked { get; set; }
+    
+    /// <summary>
+    /// The payload sent to `state_topic` by the lock when it's locking.
+    /// </summary>
+    /// <remarks>Default value: 'LOCKING'</remarks>
+    public string? StateLocking { get; set; }
 
     /// <summary>
-    /// The MQTT topic subscribed to receive state updates.
+    /// The MQTT topic subscribed to receive state updates. It accepts states configured with `state_jammed`, `state_locked`, `state_unlocked`, `state_locking` or `state_unlocking`.
     /// </summary>
     public string? StateTopic { get; set; }
 
     /// <summary>
-    /// The payload sent to by the lock when it's unlocked.
+    /// The payload sent to `state_topic` by the lock when it's unlocked.
     /// </summary>
     /// <remarks>Default value: 'UNLOCKED'</remarks>
     public string? StateUnlocked { get; set; }
+    
+    /// <summary>
+    /// The payload sent to `state_topic` by the lock when it's unlocking.
+    /// </summary>
+    /// <remarks>Default value: 'UNLOCKING'</remarks>
+    public string? StateUnlocking { get; set; }
 
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract a value from the payload.
+    /// Defines a template to extract a state value from the payload.
     /// </summary>
     public string? ValueTemplate { get; set; }
 

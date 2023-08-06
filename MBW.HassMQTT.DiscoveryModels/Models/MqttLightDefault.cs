@@ -35,7 +35,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.Light)]
 [PublicAPI]
-public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLightDefault.MqttLightDefaultValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLightDefault.MqttLightDefaultValidator>,
+    IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain,
+    IHasEntityCategory, IHasObjectId, IHasEncoding
 {
     public MqttLightDefault(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -128,12 +130,17 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     public string? EffectValueTemplate { get; set; }
 
     /// <summary>
+    /// Defines a template to compose message which will be sent to `hs_command_topic`. Available variables: `hue` and `sat`.
+    /// </summary>
+    public string? HsCommandTemplate { get; set; }
+
+    /// <summary>
     /// The MQTT topic to publish commands to change the light's color state in HS format (Hue Saturation). Brightness is sent separately in the `brightness_command_topic`. Range for Hue: 0° .. 360°, Range of Saturation: 0..100.
     /// </summary>
     public string? HsCommandTopic { get; set; }
 
     /// <summary>
-    /// The MQTT topic subscribed to receive color state updates in HS format. Brightness is received separately in the `brightness_state_topic`.
+    /// The MQTT topic subscribed to receive color state updates in HS format. Brightness is received separately in the `brightness_state_topic`. The expected payload is the hue and saturation values separated by commas, for example, `359.5,100.0`.
     /// </summary>
     public string? HsStateTopic { get; set; }
 
@@ -263,12 +270,17 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     public int? WhiteScale { get; set; }
 
     /// <summary>
+    /// Defines a template to compose message which will be sent to `xy_command_topic`. Available variables: `x` and `y`.
+    /// </summary>
+    public string? XyCommandTemplate { get; set; }
+    
+    /// <summary>
     /// The MQTT topic to publish commands to change the light's XY state.
     /// </summary>
     public string? XyCommandTopic { get; set; }
 
     /// <summary>
-    /// The MQTT topic subscribed to receive XY state updates.
+    /// The MQTT topic subscribed to receive XY state updates. The expected payload is the X and Y color values separated by commas, for example, `0.675,0.322`.
     /// </summary>
     public string? XyStateTopic { get; set; }
 
@@ -310,6 +322,8 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
             TopicAndTemplate(s => s.RgbwStateTopic, s => s.RgbwValueTemplate);
             TopicAndTemplate(s => s.RgbwwCommandTopic, s => s.RgbwwCommandTemplate);
             TopicAndTemplate(s => s.RgbwwStateTopic, s => s.RgbwwValueTemplate);
+            TopicAndTemplate(s => s.HsCommandTopic, s => s.HsCommandTemplate);
+            TopicAndTemplate(s => s.XyCommandTopic, s => s.XyCommandTemplate);
 
             RuleFor(s => s.Schema).Equal("default");
         }
