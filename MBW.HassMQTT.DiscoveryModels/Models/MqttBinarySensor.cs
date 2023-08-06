@@ -82,7 +82,7 @@ public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBi
     public string StateTopic { get; set; }
 
     /// <summary>
-    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a string to be compared to `payload_on`/`payload_off`. Available variables: `entity_id`. Remove this option when 'payload_on' and 'payload_off' are sufficient to match your payloads (i.e no pre-processing of original message is required).
+    /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) that returns a string to be compared to `payload_on`/`payload_off`. Remove this option when `payload_on` and `payload_off` are sufficient to match your payloads (i.e no pre-processing of original message is required).
     /// </summary>
     public string? ValueTemplate { get; set; }
 
