@@ -17,7 +17,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.DeviceTracker)]
 [PublicAPI]
-public class MqttDeviceTracker : MqttSensorDiscoveryBase<MqttDeviceTracker, MqttDeviceTracker.MqttDeviceTrackerValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasObjectId
+public class MqttDeviceTracker :
+    MqttSensorDiscoveryBase<MqttDeviceTracker, MqttDeviceTracker.MqttDeviceTrackerValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasObjectId
 {
     public MqttDeviceTracker(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -52,9 +54,9 @@ public class MqttDeviceTracker : MqttSensorDiscoveryBase<MqttDeviceTracker, Mqtt
     public DeviceTrackerSourceType? SourceType { get; set; }
 
     /// <summary>
-    /// State topic
+    /// The MQTT topic subscribed to receive device tracker state changes. The states defined in `state_topic` override the location states defined by the `json_attributes_topic`. This state override is turned inactive if the `state_topic` receives a message containing `payload_reset`. The `state_topic` can only be omitted if `json_attributes_topic` is used.
     /// </summary>
-    public string StateTopic { get; set; }
+    public string? StateTopic { get; set; }
 
     /// <summary>
     /// Defines a template that returns a device tracker state.
