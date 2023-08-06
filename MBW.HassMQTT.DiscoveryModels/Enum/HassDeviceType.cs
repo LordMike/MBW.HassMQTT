@@ -64,5 +64,8 @@ public enum HassDeviceType
     Button,
 
     [EnumMember(Value = "siren")]
-    Siren
+    Siren,
+
+    [EnumMember(Value = "update")]
+    Update
 }
