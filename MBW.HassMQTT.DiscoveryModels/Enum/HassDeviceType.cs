@@ -67,5 +67,8 @@ public enum HassDeviceType
     Siren,
 
     [EnumMember(Value = "update")]
-    Update
+    Update,
+
+    [EnumMember(Value = "text")]
+    Text
 }
