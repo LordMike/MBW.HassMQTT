@@ -31,12 +31,20 @@ public class MqttDeviceTracker : MqttSensorDiscoveryBase<MqttDeviceTracker, Mqtt
     /// <summary>
     /// The payload value that represents the ‘home’ state for the device.
     /// </summary>
+    /// <remarks>Default value: 'home'</remarks>
     public string? PayloadHome { get; set; }
 
     /// <summary>
     /// The payload value that represents the ‘not_home’ state for the device.
     /// </summary>
+    /// <remarks>Default value: 'not_home'</remarks>
     public string? PayloadNotHome { get; set; }
+
+    /// <summary>
+    /// The payload value that will have the device's location automatically derived from Home Assistant's zones.
+    /// </summary>
+    /// <remarks>Default value: None</remarks>
+    public string? PayloadReset { get; set; }
 
     /// <summary>
     /// Attribute of a device tracker that affects state when being used to track a person. Valid options are gps, router, bluetooth, or bluetooth_le.
