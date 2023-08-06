@@ -58,7 +58,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? CurrentHumidityTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic on which to listen for the current humidity.
+    /// The MQTT topic on which to listen for the current humidity. It will also be used for messages published to command topic.
     /// </summary>
     public string? CurrentHumidityTopic { get; set; }
 
@@ -68,7 +68,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? CurrentTemperatureTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic on which to listen for the current temperature.
+    /// The MQTT topic on which to listen for the current temperature. A `"None"` value received will reset the current humidity. Empty values (`'''`) will be ignored.
     /// </summary>
     public string? CurrentTemperatureTopic { get; set; }
 
@@ -236,7 +236,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? TargetHumidityCommandTopic { get; set; }
 
     /// <summary>
-    /// The MQTT topic subscribed to receive the target humidity. If this is not set, the target humidity works in optimistic mode (see below).
+    /// The MQTT topic subscribed to receive the target humidity. If this is not set, the target humidity works in optimistic mode (see below). A `"None"` value received will reset the target humidity. Empty values (`'''`) will be ignored.
     /// </summary>
     public string? TargetHumidityStateTopic { get; set; }
 
@@ -266,7 +266,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? TemperatureHighCommandTopic { get; set; }
 
     /// <summary>
-    /// A template to render the value received on the `temperature_high_state_topic` with.
+    /// A template to render the value received on the `temperature_high_state_topic` with. A `"None"` value received will reset the temperature high set point. Empty values (`'''`) will be ignored.
     /// </summary>
     public string? TemperatureHighStateTemplate { get; set; }
 
@@ -286,7 +286,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? TemperatureLowCommandTopic { get; set; }
 
     /// <summary>
-    /// A template to render the value received on the `temperature_low_state_topic` with.
+    /// A template to render the value received on the `temperature_low_state_topic` with. A `"None"` value received will reset the temperature low set point. Empty values (`'''`) will be ignored.
     /// </summary>
     public string? TemperatureLowStateTemplate { get; set; }
 
@@ -301,7 +301,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? TemperatureStateTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic to subscribe for changes in the target temperature. If this is not set, the target temperature works in optimistic mode (see below).
+    /// The MQTT topic to subscribe for changes in the target temperature. If this is not set, the target temperature works in optimistic mode (see below). A `"None"` value received will reset the temperature set point. Empty values (`'''`) will be ignored.
     /// </summary>
     public string? TemperatureStateTopic { get; set; }
 
