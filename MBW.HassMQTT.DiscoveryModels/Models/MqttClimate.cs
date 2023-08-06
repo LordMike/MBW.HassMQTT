@@ -58,7 +58,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? CurrentHumidityTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic on which to listen for the current humidity. It will also be used for messages published to command topic.
+    /// The MQTT topic on which to listen for the current humidity. A `"None"` value received will reset the current humidity. Empty values (`'''`) will be ignored. 
     /// </summary>
     public string? CurrentHumidityTopic { get; set; }
 
@@ -68,7 +68,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? CurrentTemperatureTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic on which to listen for the current temperature. A `"None"` value received will reset the current humidity. Empty values (`'''`) will be ignored.
+    /// The MQTT topic on which to listen for the current temperature. A `"None"` value received will reset the current temperature. Empty values (`'''`) will be ignored.
     /// </summary>
     public string? CurrentTemperatureTopic { get; set; }
 
