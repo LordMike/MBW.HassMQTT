@@ -48,7 +48,7 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
     public string CommandTopic { get; set; }
 
     /// <summary>
-    /// The device class of the MQTT device. Must be either humidifier or dehumidifier.
+    /// The device class of the MQTT device. Must be either `humidifier`, `dehumidifier` or `null`.
     /// </summary>
     public HumidifierDeviceClass? DeviceClass { get; set; }
 

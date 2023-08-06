@@ -57,6 +57,26 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
     public bool? Optimistic { get; set; }
 
     /// <summary>
+    /// Defines a template to generate the payload to send to `direction_command_topic`.
+    /// </summary>
+    public string? DirectionCommandTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic to publish commands to change the direction state.
+    /// </summary>
+    public string? DirectionCommandTopic { get; set; }
+    
+    /// <summary>
+    /// The MQTT topic subscribed to receive direction state updates.
+    /// </summary>
+    public string? DirectionStateTopic { get; set; }
+    
+    /// <summary>
+    /// Defines a template to extract a value from the direction.
+    /// </summary>
+    public string? DirectionValueTemplate { get; set; }
+    
+    /// <summary>
     /// Defines a template to generate the payload to send to oscillation_command_topic.
     /// </summary>
     public string? OscillationCommandTemplate { get; set; }
@@ -196,6 +216,8 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
             TopicAndTemplate(s => s.PresetModeCommandTopic, s => s.PresetModeCommandTemplate);
             TopicAndTemplate(s => s.PresetModeStateTopic, s => s.PresetModeValueTemplate);
             TopicAndTemplate(s => s.StateTopic, s => s.StateValueTemplate);
+            TopicAndTemplate(s => s.DirectionStateTopic, s => s.DirectionValueTemplate);
+            TopicAndTemplate(s => s.DirectionCommandTopic, s => s.DirectionCommandTemplate);
 
             MinMax(s => s.SpeedRangeMin, s => s.SpeedRangeMax, 1, 100);
         }
