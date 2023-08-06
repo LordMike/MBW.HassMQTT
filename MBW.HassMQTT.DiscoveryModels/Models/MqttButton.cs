@@ -29,7 +29,6 @@ public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttBut
     /// </summary>
     public string? CommandTopic { get; set; }
 
-
     /// <summary>
     /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to generate the payload to send to `command_topic`.
     /// </summary>

@@ -50,7 +50,7 @@ public class MqttDeviceDocument : INotifyPropertyChanged
 
         Connections.CollectionChanged += (sender, args) =>
         {
-            object oldValue = null;
+            object? oldValue = null;
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Move:
@@ -64,7 +64,7 @@ public class MqttDeviceDocument : INotifyPropertyChanged
         };
         Identifiers.CollectionChanged += (sender, args) =>
         {
-            object oldValue = null;
+            object? oldValue = null;
             switch (args.Action)
             {
                 case NotifyCollectionChangedAction.Move:
