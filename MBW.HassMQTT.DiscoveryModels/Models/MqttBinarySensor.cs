@@ -34,7 +34,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.BinarySensor)]
 [PublicAPI]
-public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBinarySensor.MqttBinarySensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBinarySensor.MqttBinarySensorValidator>,
+    IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory,
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttBinarySensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -55,11 +57,6 @@ public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBi
     /// Sends update events (which results in update of [state object](/docs/configuration/state_object/)'s `last_changed`) even if the sensor's state hasn't changed. Useful if you want to have meaningful value graphs in history or want to create an automation that triggers on *every* incoming state message (not only when the sensor's new state is different to the current one).
     /// </summary>
     public bool? ForceUpdate { get; set; }
-
-    /// <summary>
-    /// The name of the binary sensor.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// For sensors that only send `on` state updates (like PIRs), this variable sets a delay in seconds after which the sensor's state will be updated back to `off`.
@@ -97,6 +94,7 @@ public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBi
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttBinarySensorValidator : MqttSensorDiscoveryBaseValidator<MqttBinarySensor>
     {

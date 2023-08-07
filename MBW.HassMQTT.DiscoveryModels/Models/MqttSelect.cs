@@ -19,7 +19,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.Select)]
 [PublicAPI]
-public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSelectValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSelectValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttSelect(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -51,11 +53,6 @@ public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSel
     /// The MQTT topic to publish commands to change the selected option.
     /// </summary>
     public string CommandTopic { get; set; }
-
-    /// <summary>
-    /// The name of the Select.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// Flag that defines if the select works in optimistic mode.
@@ -90,6 +87,7 @@ public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSel
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttSelectValidator : MqttSensorDiscoveryBaseValidator<MqttSelect>
     {

@@ -15,7 +15,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.Scene)]
 [PublicAPI]
-public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
+public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasName
 {
     public MqttScene(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -25,11 +26,6 @@ public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneV
     /// The MQTT topic to publish `payload_on` to activate the scene.
     /// </summary>
     public string? CommandTopic { get; set; }
-
-    /// <summary>
-    /// The name to use when displaying this switch.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// The payload that will be sent to `command_topic` when activating the MQTT scene.
@@ -45,9 +41,12 @@ public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneV
     public bool? Retain { get; set; }
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
+    public string? Name { get; set; }
 
     public class MqttSceneValidator : MqttSensorDiscoveryBaseValidator<MqttScene>
     {
-        public MqttSceneValidator() { }
+        public MqttSceneValidator()
+        {
+        }
     }
 }

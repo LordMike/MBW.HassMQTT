@@ -18,7 +18,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.Sensor)]
 [PublicAPI]
-public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSensorValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSensorValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasObjectId,
+    IHasEncoding, IHasName
 {
     public MqttSensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -45,11 +47,6 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     /// entity’s attributes.
     /// </summary>
     public string? LastResetValueTemplate { get; set; }
-
-    /// <summary>
-    /// The name of the MQTT sensor.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// The state_class of the sensor.
@@ -83,6 +80,7 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttSensorValidator : MqttSensorDiscoveryBaseValidator<MqttSensor>
     {

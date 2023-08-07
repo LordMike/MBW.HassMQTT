@@ -17,7 +17,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttText : MqttSensorDiscoveryBase<MqttText, MqttText.MqttTextValidator>, IHasUniqueId,
     IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasObjectId, IHasQos, IHasEntityCategory,
-    IHasEncoding, IHasRetain
+    IHasEncoding, IHasRetain, IHasName
 {
     public MqttText(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -52,12 +52,6 @@ public class MqttText : MqttSensorDiscoveryBase<MqttText, MqttText.MqttTextValid
     public HassTextMode? Mode { get; set; }
 
     /// <summary>
-    /// The name of the text entity.
-    /// </summary>
-    /// <remarks>The default is 'MQTT Text'</remarks>
-    public string? Name { get; set; }
-
-    /// <summary>
     /// A valid regular expression the text being set or received must match with.
     /// </summary>
     public string? Pattern { get; set; }
@@ -85,6 +79,7 @@ public class MqttText : MqttSensorDiscoveryBase<MqttText, MqttText.MqttTextValid
     public MqttQosLevel? Qos { get; set; }
     public string? Encoding { get; set; }
     public bool? Retain { get; set; }
+    public string? Name { get; set; }
 
     public class MqttTextValidator : MqttSensorDiscoveryBaseValidator<MqttText>
     {

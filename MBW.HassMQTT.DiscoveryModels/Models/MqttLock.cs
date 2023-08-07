@@ -31,7 +31,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.Lock)]
 [PublicAPI]
-public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValidator>, IHasUniqueId, IHasAvailability,
+    IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId,
+    IHasEncoding, IHasName
 {
     public MqttLock(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -41,21 +43,16 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     /// A regular expression to validate a supplied code when it is set during the service call to `open`, `lock` or `unlock` the MQTT lock.
     /// </summary>
     public string CodeFormat { get; set; }
-    
+
     /// <summary>
     /// Defines a template to generate the payload to send to `command_topic`. The lock command template accepts the parameters `value` and `code`. The `value` parameter will contain the configured value for either `payload_open`, `payload_lock` or `payload_unlock`. The `code` parameter is set during the service call to `open`, `lock` or `unlock` the MQTT lock and will be set `None` if no code was passed.
     /// </summary>
     public string CommandTemplate { get; set; }
-    
+
     /// <summary>
     /// The MQTT topic to publish commands to change the lock state.
     /// </summary>
     public string CommandTopic { get; set; }
-
-    /// <summary>
-    /// The name of the lock.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// Flag that defines if lock works in optimistic mode.
@@ -85,13 +82,13 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     /// </summary>
     /// <remarks>Default value: 'JAMMED'</remarks>
     public string? StateJammed { get; set; }
-    
+
     /// <summary>
     /// The payload sent to `state_topic` by the lock when it's locked.
     /// </summary>
     /// <remarks>Default value: 'LOCKED'</remarks>
     public string? StateLocked { get; set; }
-    
+
     /// <summary>
     /// The payload sent to `state_topic` by the lock when it's locking.
     /// </summary>
@@ -108,7 +105,7 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     /// </summary>
     /// <remarks>Default value: 'UNLOCKED'</remarks>
     public string? StateUnlocked { get; set; }
-    
+
     /// <summary>
     /// The payload sent to `state_topic` by the lock when it's unlocking.
     /// </summary>
@@ -132,6 +129,7 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttLockValidator : MqttSensorDiscoveryBaseValidator<MqttLock>
     {

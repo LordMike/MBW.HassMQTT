@@ -50,7 +50,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.Cover)]
 [PublicAPI]
-public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttCover(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -65,11 +67,6 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     /// Sets the [class of the device](/integrations/cover/), changing the device state and icon that is displayed on the frontend.
     /// </summary>
     public string? DeviceClass { get; set; }
-
-    /// <summary>
-    /// The name of the cover.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// Flag that defines if switch works in optimistic mode.
@@ -213,6 +210,7 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttCoverValidator : MqttSensorDiscoveryBaseValidator<MqttCover>
     {

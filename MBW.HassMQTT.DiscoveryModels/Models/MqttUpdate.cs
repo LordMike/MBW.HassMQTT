@@ -19,7 +19,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpdateValidator>, IHasUniqueId,
     IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasObjectId, IHasQos, IHasEntityCategory,
-    IHasEncoding, IHasRetain
+    IHasEncoding, IHasRetain, IHasName
 {
     public MqttUpdate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -51,11 +51,6 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// The MQTT topic subscribed to receive an update of the latest version.
     /// </summary>
     public string? LatestVersionTopic { get; set; }
-
-    /// <summary>
-    /// The name of the Update.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// The MQTT payload to start installing process.
@@ -99,6 +94,7 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     public MqttQosLevel? Qos { get; set; }
     public string? Encoding { get; set; }
     public bool? Retain { get; set; }
+    public string? Name { get; set; }
 
     public class MqttUpdateValidator : MqttSensorDiscoveryBaseValidator<MqttUpdate>
     {

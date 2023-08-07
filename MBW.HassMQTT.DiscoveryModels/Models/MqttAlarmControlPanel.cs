@@ -33,7 +33,10 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.AlarmControlPanel)]
 [PublicAPI]
-public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPanel, MqttAlarmControlPanel.MqttAlarmControlPanelValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttAlarmControlPanel :
+    MqttSensorDiscoveryBase<MqttAlarmControlPanel, MqttAlarmControlPanel.MqttAlarmControlPanelValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttAlarmControlPanel(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -69,11 +72,6 @@ public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPan
     /// The MQTT topic to publish commands to change the alarm state.
     /// </summary>
     public string CommandTopic { get; set; }
-
-    /// <summary>
-    /// The name of the alarm.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// The payload to set armed-away mode on your Alarm Panel.
@@ -133,6 +131,7 @@ public class MqttAlarmControlPanel : MqttSensorDiscoveryBase<MqttAlarmControlPan
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttAlarmControlPanelValidator : MqttSensorDiscoveryBaseValidator<MqttAlarmControlPanel>
     {

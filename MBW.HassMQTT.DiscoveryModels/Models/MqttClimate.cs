@@ -19,7 +19,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.MqttClimateValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttClimate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -150,11 +150,6 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public IList<string>? Modes { get; set; }
 
     /// <summary>
-    /// The name of the HVAC.
-    /// </summary>
-    public string? Name { get; set; }
-
-    /// <summary>
     /// Flag that defines if the climate works in optimistic mode
     /// </summary>
     /// <remarks>Default value: `true` if no state topic defined, else `false`.</remarks>
@@ -174,12 +169,12 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// A template to render the value sent to the `power_command_topic` with. The `value` parameter is the payload set for `payload_on` or `payload_off`.
     /// </summary>
     public string? PowerCommandTemplate { get; set; }
-    
+
     /// <summary>
     /// The MQTT topic to publish commands to change the HVAC power state. Sends the payload configured with `payload_on` if the climate is turned on via the `climate.turn_on`, or the payload configured with `payload_off` if the climate is turned off via the `climate.turn_off` service. Note that `optimistic` mode is not supported through `climate.turn_on` and `climate.turn_off` services. When called, these services will send a power command to the device but will not optimistically update the state of the climate entity. The climate device should report its state back via `mode_state_topic`.
     /// </summary>
     public string? PowerCommandTopic { get; set; }
-    
+
     /// <summary>
     /// The desired precision for this device. Can be used to match your actual thermostat's precision. Supported values are `0.1`, `0.5` and `1.0`.
     /// </summary>
@@ -342,6 +337,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttClimateValidator : MqttSensorDiscoveryBaseValidator<MqttClimate>
     {

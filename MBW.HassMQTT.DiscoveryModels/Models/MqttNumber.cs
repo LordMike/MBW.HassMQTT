@@ -18,7 +18,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.Number)]
 [PublicAPI]
-public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNumberValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNumberValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttNumber(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -50,11 +52,6 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     /// Maximum value.
     /// </summary>
     public float? Max { get; set; }
-
-    /// <summary>
-    /// The name of the Number.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// Flag that defines if number works in optimistic mode.
@@ -97,6 +94,7 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttNumberValidator : MqttSensorDiscoveryBaseValidator<MqttNumber>
     {

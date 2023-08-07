@@ -30,7 +30,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.Fan)]
 [PublicAPI]
-public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator>, IHasUniqueId, IHasAvailability,
+    IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId,
+    IHasEncoding, IHasName
 {
     public MqttFan(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -47,11 +49,6 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
     public string CommandTopic { get; set; }
 
     /// <summary>
-    /// The name of the fan.
-    /// </summary>
-    public string? Name { get; set; }
-
-    /// <summary>
     /// Flag that defines if lock works in optimistic mode
     /// </summary>
     public bool? Optimistic { get; set; }
@@ -65,17 +62,17 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
     /// The MQTT topic to publish commands to change the direction state.
     /// </summary>
     public string? DirectionCommandTopic { get; set; }
-    
+
     /// <summary>
     /// The MQTT topic subscribed to receive direction state updates.
     /// </summary>
     public string? DirectionStateTopic { get; set; }
-    
+
     /// <summary>
     /// Defines a template to extract a value from the direction.
     /// </summary>
     public string? DirectionValueTemplate { get; set; }
-    
+
     /// <summary>
     /// Defines a template to generate the payload to send to oscillation_command_topic.
     /// </summary>
@@ -203,6 +200,7 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttFanValidator : MqttSensorDiscoveryBaseValidator<MqttFan>
     {

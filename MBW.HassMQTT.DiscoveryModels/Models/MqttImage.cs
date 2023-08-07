@@ -18,7 +18,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Image)]
 [PublicAPI]
 public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageValidator>, IHasAvailability,
-    IHasEnabledByDefault, IHasEncoding, IHasEntityCategory, IHasIcon, IHasJsonAttributes, IHasObjectId, IHasUniqueId
+    IHasEnabledByDefault, IHasEncoding, IHasEntityCategory, IHasIcon, IHasJsonAttributes, IHasObjectId, IHasUniqueId,
+    IHasName
 {
     public MqttImage(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -28,27 +29,22 @@ public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageV
     /// The content type of and image data message received on `image_topic`. This option cannot be used with the `from_url_topic` because the content type is derived when downloading the image.
     /// </summary>
     public string? ContentType { get; set; }
-    
+
     /// <summary>
     /// The encoding of the image payloads received. Set to `"b64"` to enable base64 decoding of image payload. If not set, the image payload must be raw binary data.
     /// </summary>
     public string? ImageEncoding { get; set; }
-    
+
     /// <summary>
     /// The MQTT topic to subscribe to receive the image payload of the image to be downloaded. Ensure the `content_type` type option is set to the corresponding content type. This option cannot be used together with the `url_topic` option. But at least one of these option is required.
     /// </summary>
     public string? ImageTopic { get; set; }
-    
-    /// <summary>
-    /// The name of the image.
-    /// </summary>
-    public string? Name { get; set; }
-    
+
     /// <summary>
     /// Defines a template to extract the image URL from a message received at `url_topic`.
     /// </summary>
     public string? UrlTemplate { get; set; }
-    
+
     /// <summary>
     /// The MQTT topic to subscribe to receive an image URL. A `url_template` option can extract the URL from the message. The `content_type` will be derived from the image when downloaded. This option cannot be used together with the `image_topic` option, but at least one of these options is required.
     /// </summary>
@@ -64,6 +60,7 @@ public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageV
     public string? JsonAttributesTopic { get; set; }
     public string? ObjectId { get; set; }
     public string? UniqueId { get; set; }
+    public string? Name { get; set; }
 
     public class MqttImageValidator : MqttSensorDiscoveryBaseValidator<MqttImage>
     {

@@ -28,7 +28,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.Switch)]
 [PublicAPI]
-public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwitchValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwitchValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttSwitch(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -45,11 +47,6 @@ public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwi
     /// </summary>
     /// <remarks>Default value: 'None'</remarks>
     public HassSwitchDeviceClass? DeviceClass { get; set; }
-
-    /// <summary>
-    /// The name to use when displaying this switch.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// Flag that defines if switch works in optimistic mode.
@@ -98,6 +95,7 @@ public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwi
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttSwitchValidator : MqttSensorDiscoveryBaseValidator<MqttSwitch>
     {

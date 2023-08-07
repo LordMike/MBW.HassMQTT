@@ -34,7 +34,10 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.Light)]
 [PublicAPI]
-public class MqttLightTemplate : MqttSensorDiscoveryBase<MqttLightTemplate, MqttLightTemplate.MqttLightTemplateValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttLightTemplate :
+    MqttSensorDiscoveryBase<MqttLightTemplate, MqttLightTemplate.MqttLightTemplateValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttLightTemplate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -96,11 +99,6 @@ public class MqttLightTemplate : MqttSensorDiscoveryBase<MqttLightTemplate, Mqtt
     public int? MinMireds { get; set; }
 
     /// <summary>
-    /// The name of the light.
-    /// </summary>
-    public string? Name { get; set; }
-
-    /// <summary>
     /// Flag that defines if the light works in optimistic mode.
     /// </summary>
     public bool? Optimistic { get; set; }
@@ -137,6 +135,7 @@ public class MqttLightTemplate : MqttSensorDiscoveryBase<MqttLightTemplate, Mqtt
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttLightTemplateValidator : MqttSensorDiscoveryBaseValidator<MqttLightTemplate>
     {

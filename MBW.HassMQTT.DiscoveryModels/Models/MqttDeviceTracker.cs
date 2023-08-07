@@ -19,16 +19,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttDeviceTracker :
     MqttSensorDiscoveryBase<MqttDeviceTracker, MqttDeviceTracker.MqttDeviceTrackerValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasObjectId
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasObjectId, IHasName
 {
     public MqttDeviceTracker(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
     }
-
-    /// <summary>
-    /// The name of the MQTT device_tracker.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// The payload value that represents the ‘home’ state for the device.
@@ -71,6 +66,7 @@ public class MqttDeviceTracker :
     public string? JsonAttributesTopic { get; set; }
     public string? Icon { get; set; }
     public string? ObjectId { get; set; }
+    public string? Name { get; set; }
 
     public class MqttDeviceTrackerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTracker>
     {

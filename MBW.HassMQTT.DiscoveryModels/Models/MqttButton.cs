@@ -18,7 +18,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.Button)]
 [PublicAPI]
-public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttButtonValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttButtonValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasEncoding, IHasName
 {
     public MqttButton(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -42,12 +44,6 @@ public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttBut
     public HassButtonDeviceClass? DeviceClass { get; set; }
 
     /// <summary>
-    /// The name to use when displaying this button.
-    /// </summary>
-    /// <remarks>Default value: 'MQTT Button'</remarks>
-    public string? Name { get; set; }
-
-    /// <summary>
     /// The payload to send to trigger the button.
     /// </summary>
     /// <remarks>Default value: 'PRESS'</remarks>
@@ -65,6 +61,7 @@ public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttBut
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttButtonValidator : MqttSensorDiscoveryBaseValidator<MqttButton>
     {

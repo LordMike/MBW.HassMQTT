@@ -23,7 +23,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.DeviceTrigger)]
 [PublicAPI]
-public class MqttDeviceTrigger : MqttSensorDiscoveryBase<MqttDeviceTrigger, MqttDeviceTrigger.MqttDeviceTriggerValidator>, IHasQos
+public class
+    MqttDeviceTrigger : MqttSensorDiscoveryBase<MqttDeviceTrigger, MqttDeviceTrigger.MqttDeviceTriggerValidator>,
+        IHasQos
 {
     public MqttDeviceTrigger(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {

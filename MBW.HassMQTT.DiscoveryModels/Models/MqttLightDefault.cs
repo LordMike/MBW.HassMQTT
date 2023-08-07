@@ -37,7 +37,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLightDefault.MqttLightDefaultValidator>,
     IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain,
-    IHasEntityCategory, IHasObjectId, IHasEncoding
+    IHasEntityCategory, IHasObjectId, IHasEncoding, IHasName
 {
     public MqttLightDefault(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -158,11 +158,6 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     /// The minimum color temperature in mireds.
     /// </summary>
     public int? MinMireds { get; set; }
-
-    /// <summary>
-    /// The name of the light.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// Defines when on the payload_on is sent. Using `last` (the default) will send any style (brightness, color, etc) topics first and then a `payload_on` to the `command_topic`. Using `first` will send the `payload_on` and then any style topics. Using `brightness` will only send brightness commands instead of the `payload_on` to turn the light on.
@@ -301,6 +296,7 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
+    public string? Name { get; set; }
 
     public class MqttLightDefaultValidator : MqttSensorDiscoveryBaseValidator<MqttLightDefault>
     {

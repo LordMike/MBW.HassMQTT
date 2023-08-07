@@ -23,7 +23,9 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.Vacuum)]
 [PublicAPI]
-public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVacuumValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId
+public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVacuumValidator>, IHasUniqueId,
+    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasObjectId, IHasName
 {
     public MqttVacuum(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -38,11 +40,6 @@ public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVac
     /// List of possible fan speeds for the vacuum.
     /// </summary>
     public IList<string>? FanSpeedList { get; set; }
-
-    /// <summary>
-    /// The name of the vacuum.
-    /// </summary>
-    public string? Name { get; set; }
 
     /// <summary>
     /// The payload to send to the `command_topic` to begin a spot cleaning cycle.
@@ -120,6 +117,7 @@ public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVac
     public bool? Retain { get; set; }
     public EntityCategory? EntityCategory { get; set; }
     public string? ObjectId { get; set; }
+    public string? Name { get; set; }
 
     public class MqttVacuumValidator : MqttSensorDiscoveryBaseValidator<MqttVacuum>
     {
