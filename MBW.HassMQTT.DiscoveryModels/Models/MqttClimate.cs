@@ -130,7 +130,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? ModeCommandTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic to publish commands to change the HVAC operation mode. Use `power_command_topic` if you only want to publish the power state.
+    /// The MQTT topic to publish commands to change the HVAC operation mode.
     /// </summary>
     public string? ModeCommandTopic { get; set; }
 
@@ -176,7 +176,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? PowerCommandTemplate { get; set; }
     
     /// <summary>
-    /// The MQTT topic to publish commands to change the HVAC power state. Sends the payload configured with `payload_on` if the climate is turned on via the `climate.turn_on`, or the payload configured with `payload_off` if the climate is turned off via the `climate.turn_off` service. The climate device reports it's state back via `mode_command_topic`. Note that when this option is used in `optimistic` mode, service `climate.turn_on` will send a the message configured with `payload_on` to the device but will not update the state of the climate.
+    /// The MQTT topic to publish commands to change the HVAC power state. Sends the payload configured with `payload_on` if the climate is turned on via the `climate.turn_on`, or the payload configured with `payload_off` if the climate is turned off via the `climate.turn_off` service. Note that `optimistic` mode is not supported through `climate.turn_on` and `climate.turn_off` services. When called, these services will send a power command to the device but will not optimistically update the state of the climate entity. The climate device should report its state back via `mode_state_topic`.
     /// </summary>
     public string? PowerCommandTopic { get; set; }
     
