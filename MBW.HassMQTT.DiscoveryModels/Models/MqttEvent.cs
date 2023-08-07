@@ -25,16 +25,6 @@ public class MqttEvent : MqttSensorDiscoveryBase<MqttEvent, MqttEvent.MqttEventV
     }
 
     /// <summary>
-    /// Defines a template to generate the payload to send to `command_topic`.
-    /// </summary>
-    public string? CommandTemplate { get; set; }
-
-    /// <summary>
-    /// The MQTT topic to publish commands to trigger the event.
-    /// </summary>
-    public string? CommandTopic { get; set; }
-
-    /// <summary>
     /// The type/class of the event to set the icon in the frontend. The `device_class` can be `null`.
     /// </summary>
     public HassEventDeviceClass? DeviceClass { get; set; }
@@ -72,7 +62,6 @@ public class MqttEvent : MqttSensorDiscoveryBase<MqttEvent, MqttEvent.MqttEventV
         public MqttEventValidator()
         {
             TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
-            TopicAndTemplate(s => s.CommandTopic, s => s.CommandTemplate);
 
             RuleFor(s => s.StateTopic)
                 .NotEmpty();
