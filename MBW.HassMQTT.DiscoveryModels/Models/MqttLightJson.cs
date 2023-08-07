@@ -37,7 +37,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJson.MqttLightJsonValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName
+    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttLightJson(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -94,11 +94,6 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     public int? MinMireds { get; set; }
 
     /// <summary>
-    /// Flag that defines if the light works in optimistic mode.
-    /// </summary>
-    public bool? Optimistic { get; set; }
-
-    /// <summary>
     /// The schema to use. Must be `json` to select the JSON schema.
     /// </summary>
     public string? Schema { get; set; } = "json";
@@ -141,6 +136,7 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttLightJsonValidator : MqttSensorDiscoveryBaseValidator<MqttLightJson>
     {

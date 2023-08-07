@@ -30,7 +30,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwitchValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName
+    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttSwitch(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -47,11 +47,6 @@ public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwi
     /// </summary>
     /// <remarks>Default value: 'None'</remarks>
     public HassSwitchDeviceClass? DeviceClass { get; set; }
-
-    /// <summary>
-    /// Flag that defines if switch works in optimistic mode.
-    /// </summary>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The payload that represents `off` state. If specified, will be used for both comparing to the value in the `state_topic` (see `value_template` and `state_off` for details) and sending as `off` command to the `command_topic`.
@@ -96,6 +91,7 @@ public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwi
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttSwitchValidator : MqttSensorDiscoveryBaseValidator<MqttSwitch>
     {

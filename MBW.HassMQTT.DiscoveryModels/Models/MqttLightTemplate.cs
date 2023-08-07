@@ -37,7 +37,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 public class MqttLightTemplate :
     MqttSensorDiscoveryBase<MqttLightTemplate, MqttLightTemplate.MqttLightTemplateValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName
+    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttLightTemplate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -99,11 +99,6 @@ public class MqttLightTemplate :
     public int? MinMireds { get; set; }
 
     /// <summary>
-    /// Flag that defines if the light works in optimistic mode.
-    /// </summary>
-    public bool? Optimistic { get; set; }
-
-    /// <summary>
     /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract red color from the state payload value. Expected result of the template is an integer from 0-255 range.
     /// </summary>
     public string? RedTemplate { get; set; }
@@ -136,6 +131,7 @@ public class MqttLightTemplate :
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttLightTemplateValidator : MqttSensorDiscoveryBaseValidator<MqttLightTemplate>
     {

@@ -19,7 +19,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.MqttClimateValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName
+    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttClimate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -148,12 +148,6 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// A list of supported modes. Needs to be a subset of the default values.
     /// </summary>
     public IList<string>? Modes { get; set; }
-
-    /// <summary>
-    /// Flag that defines if the climate works in optimistic mode
-    /// </summary>
-    /// <remarks>Default value: `true` if no state topic defined, else `false`.</remarks>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The MQTT topic to publish commands to change the HVAC operation mode. Use `power_command_topic` if you only want to publish the power state.
@@ -338,6 +332,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttClimateValidator : MqttSensorDiscoveryBaseValidator<MqttClimate>
     {

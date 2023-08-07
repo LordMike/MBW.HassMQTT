@@ -30,7 +30,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName
+    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttSiren(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -56,11 +56,6 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
     /// The MQTT topic to publish commands to change the siren state. Without command template a JSON payload is published. When the siren turn on service is called, the startup parameters will be added to the JSON payload. The `state` value of the JSON payload will be set to the the `payload_on` or `payload_off` configured payload.
     /// </summary>
     public string? CommandTopic { get; set; }
-
-    /// <summary>
-    /// Flag that defines if siren works in optimistic mode.
-    /// </summary>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The payload that represents the available state.
@@ -125,6 +120,7 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttSirenValidator : MqttSensorDiscoveryBaseValidator<MqttSiren>
     {

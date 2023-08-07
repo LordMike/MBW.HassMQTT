@@ -32,7 +32,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator>, IHasUniqueId, IHasAvailability,
     IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId,
-    IHasEncoding, IHasName
+    IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttFan(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -47,11 +47,6 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
     /// The MQTT topic to publish commands to change the fan state.
     /// </summary>
     public string CommandTopic { get; set; }
-
-    /// <summary>
-    /// Flag that defines if lock works in optimistic mode
-    /// </summary>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// Defines a template to generate the payload to send to `direction_command_topic`.
@@ -201,6 +196,7 @@ public class MqttFan : MqttSensorDiscoveryBase<MqttFan, MqttFan.MqttFanValidator
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttFanValidator : MqttSensorDiscoveryBaseValidator<MqttFan>
     {

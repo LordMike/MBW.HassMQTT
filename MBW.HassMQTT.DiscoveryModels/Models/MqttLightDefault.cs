@@ -37,7 +37,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLightDefault.MqttLightDefaultValidator>,
     IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain,
-    IHasEntityCategory, IHasObjectId, IHasEncoding, IHasName
+    IHasEntityCategory, IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttLightDefault(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -163,11 +163,6 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     /// Defines when on the payload_on is sent. Using `last` (the default) will send any style (brightness, color, etc) topics first and then a `payload_on` to the `command_topic`. Using `first` will send the `payload_on` and then any style topics. Using `brightness` will only send brightness commands instead of the `payload_on` to turn the light on.
     /// </summary>
     public string? OnCommandType { get; set; }
-
-    /// <summary>
-    /// Flag that defines if switch works in optimistic mode.
-    /// </summary>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The payload that represents disabled state.
@@ -297,6 +292,7 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttLightDefaultValidator : MqttSensorDiscoveryBaseValidator<MqttLightDefault>
     {

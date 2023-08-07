@@ -33,7 +33,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValidator>, IHasUniqueId, IHasAvailability,
     IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId,
-    IHasEncoding, IHasName
+    IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttLock(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -53,11 +53,6 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     /// The MQTT topic to publish commands to change the lock state.
     /// </summary>
     public string CommandTopic { get; set; }
-
-    /// <summary>
-    /// Flag that defines if lock works in optimistic mode.
-    /// </summary>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The payload sent to the lock to lock it.
@@ -130,6 +125,7 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttLockValidator : MqttSensorDiscoveryBaseValidator<MqttLock>
     {

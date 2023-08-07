@@ -21,7 +21,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSelectValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName
+    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttSelect(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -55,12 +55,6 @@ public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSel
     public string CommandTopic { get; set; }
 
     /// <summary>
-    /// Flag that defines if the select works in optimistic mode.
-    /// Default: true if no state_topic defined, else false.
-    /// </summary>
-    public bool? Optimistic { get; set; }
-
-    /// <summary>
     /// List of options that can be selected. An empty list or a list with a single item is allowed.
     /// </summary>
     public IList<string> Options { get; set; } = new List<string>();
@@ -88,6 +82,7 @@ public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSel
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttSelectValidator : MqttSensorDiscoveryBaseValidator<MqttSelect>
     {

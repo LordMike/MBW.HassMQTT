@@ -20,7 +20,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNumberValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName
+    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttNumber(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -52,13 +52,6 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     /// Maximum value.
     /// </summary>
     public float? Max { get; set; }
-
-    /// <summary>
-    /// Flag that defines if number works in optimistic mode.
-    /// 
-    /// Default: true if no state_topic defined, else false.
-    /// </summary>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The MQTT topic subscribed to receive number values.
@@ -95,6 +88,7 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttNumberValidator : MqttSensorDiscoveryBaseValidator<MqttNumber>
     {

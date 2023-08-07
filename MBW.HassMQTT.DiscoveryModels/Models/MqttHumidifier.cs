@@ -33,7 +33,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidifier.MqttHumidifierValidator>,
     IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain,
-    IHasEntityCategory, IHasObjectId, IHasEncoding, IHasName
+    IHasEntityCategory, IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttHumidifier(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -83,11 +83,6 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
     /// The maximum target humidity percentage that can be set.
     /// </summary>
     public int? MinHumidity { get; set; }
-
-    /// <summary>
-    /// Flag that defines if humidifier works in optimistic mode
-    /// </summary>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The payload that represents the stop state.
@@ -180,6 +175,7 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttHumidifierValidator : MqttSensorDiscoveryBaseValidator<MqttHumidifier>
     {

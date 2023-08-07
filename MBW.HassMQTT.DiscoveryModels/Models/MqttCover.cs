@@ -52,7 +52,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverValidator>, IHasUniqueId,
     IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName
+    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
 {
     public MqttCover(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -67,11 +67,6 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     /// Sets the [class of the device](/integrations/cover/), changing the device state and icon that is displayed on the frontend.
     /// </summary>
     public string? DeviceClass { get; set; }
-
-    /// <summary>
-    /// Flag that defines if switch works in optimistic mode.
-    /// </summary>
-    public bool? Optimistic { get; set; }
 
     /// <summary>
     /// The command payload that closes the cover.
@@ -211,6 +206,7 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     public string? ObjectId { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
+    public bool? Optimistic { get; set; }
 
     public class MqttCoverValidator : MqttSensorDiscoveryBaseValidator<MqttCover>
     {
