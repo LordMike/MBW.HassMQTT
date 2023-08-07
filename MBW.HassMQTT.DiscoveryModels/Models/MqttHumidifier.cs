@@ -31,11 +31,33 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </remarks>
 [DeviceType(HassDeviceType.Humidifier)]
 [PublicAPI]
-public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidifier.MqttHumidifierValidator>, IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasEncoding
+public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidifier.MqttHumidifierValidator>,
+    IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain,
+    IHasEntityCategory, IHasObjectId, IHasEncoding
 {
     public MqttHumidifier(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
     }
+
+    /// <summary>
+    /// A template to render the value received on the `action_topic` with.
+    /// </summary>
+    public string? ActionTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic to subscribe for changes of the current action. Valid values: `off`, `humidifying`, `drying`, `idle`
+    /// </summary>
+    public string? ActionTopic { get; set; }
+
+    /// <summary>
+    /// A template with which the value received on `current_humidity_topic` will be rendered.
+    /// </summary>
+    public string? CurrentHumidityTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic on which to listen for the current humidity. A `"None"` value received will reset the current humidity. Empty values (`'''`) will be ignored.
+    /// </summary>
+    public string? CurrentHumidityTopic { get; set; }
 
     /// <summary>
     /// Defines a template to generate the payload to send to command_topic.
@@ -173,6 +195,8 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
             TopicAndTemplate(s => s.ModeCommandTopic, s => s.ModeCommandTemplate);
             TopicAndTemplate(s => s.ModeStateTopic, s => s.ModeStateTemplate);
             TopicAndTemplate(s => s.StateTopic, s => s.StateValueTemplate);
+            TopicAndTemplate(s => s.ActionTopic, s => s.ActionTemplate);
+            TopicAndTemplate(s => s.CurrentHumidityTopic, s => s.CurrentHumidityTemplate);
 
             RuleFor(s => s.DeviceClass)
                 .IsInEnum()

@@ -70,5 +70,8 @@ public enum HassDeviceType
     Update,
 
     [EnumMember(Value = "text")]
-    Text
+    Text,
+    
+    [EnumMember(Value = "image")]
+    Image
 }

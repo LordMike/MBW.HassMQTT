@@ -98,7 +98,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public IList<string>? FanModes { get; set; }
 
     /// <summary>
-    /// Set the initial target temperature.
+    /// Set the initial target temperature. The default value depends on the temperature unit and will be 21° or 69.8°F.
     /// </summary>
     public int? Initial { get; set; }
 
@@ -109,7 +109,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public int? MaxHumidity { get; set; }
 
     /// <summary>
-    /// Maximum set point available.
+    /// Maximum set point available. The default value depends on the temperature unit, and will be 35°C or 95°F.
     /// </summary>
     public float? MaxTemp { get; set; }
 
@@ -120,7 +120,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public int? MinHumidity { get; set; }
 
     /// <summary>
-    /// Minimum set point available.
+    /// Minimum set point available. The default value depends on the temperature unit, and will be 7°C or 44.6°F.
     /// </summary>
     public float? MinTemp { get; set; }
 
@@ -130,7 +130,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public string? ModeCommandTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic to publish commands to change the HVAC operation mode. Use with `mode_command_template` if you only want to publish the power state.
+    /// The MQTT topic to publish commands to change the HVAC operation mode. Use `power_command_topic` if you only want to publish the power state.
     /// </summary>
     public string? ModeCommandTopic { get; set; }
 
@@ -161,15 +161,25 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public bool? Optimistic { get; set; }
 
     /// <summary>
-    /// The payload that represents disabled state.
+    /// The MQTT topic to publish commands to change the HVAC operation mode. Use `power_command_topic` if you only want to publish the power state.
     /// </summary>
     public string? PayloadOff { get; set; }
 
     /// <summary>
-    /// The payload that represents enabled state.
+    /// The payload sent to turn the device on.
     /// </summary>
     public string? PayloadOn { get; set; }
 
+    /// <summary>
+    /// A template to render the value sent to the `power_command_topic` with. The `value` parameter is the payload set for `payload_on` or `payload_off`.
+    /// </summary>
+    public string? PowerCommandTemplate { get; set; }
+    
+    /// <summary>
+    /// The MQTT topic to publish commands to change the HVAC power state. Sends the payload configured with `payload_on` if the climate is turned on via the `climate.turn_on`, or the payload configured with `payload_off` if the climate is turned off via the `climate.turn_off` service. The climate device reports it's state back via `mode_command_topic`. Note that when this option is used in `optimistic` mode, service `climate.turn_on` will send a the message configured with `payload_on` to the device but will not update the state of the climate.
+    /// </summary>
+    public string? PowerCommandTopic { get; set; }
+    
     /// <summary>
     /// The desired precision for this device. Can be used to match your actual thermostat's precision. Supported values are `0.1`, `0.5` and `1.0`.
     /// </summary>
@@ -357,6 +367,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
             TopicAndTemplate(s => s.CurrentHumidityTopic, s => s.CurrentHumidityTemplate);
             TopicAndTemplate(s => s.TargetHumidityCommandTopic, s => s.TargetHumidityCommandTemplate);
             TopicAndTemplate(s => s.TargetHumidityStateTopic, s => s.TargetHumidityStateTemplate);
+            TopicAndTemplate(s => s.PowerCommandTopic, s => s.PowerCommandTemplate);
 
             MinMax(s => s.MinHumidity, s => s.MaxHumidity, 30, 99);
             MinMax(s => s.MinTemp, s => s.MaxTemp, -30, 60, (s => s.Initial, 21));
