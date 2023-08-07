@@ -73,5 +73,8 @@ public enum HassDeviceType
     Text,
     
     [EnumMember(Value = "image")]
-    Image
+    Image,
+    
+    [EnumMember(Value = "event")]
+    Event
 }
