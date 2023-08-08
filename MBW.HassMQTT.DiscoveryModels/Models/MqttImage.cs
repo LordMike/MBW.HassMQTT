@@ -26,7 +26,7 @@ public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageV
     }
 
     /// <summary>
-    /// The content type of and image data message received on `image_topic`. This option cannot be used with the `from_url_topic` because the content type is derived when downloading the image.
+    /// The content type of and image data message received on `image_topic`. This option cannot be used with the `url_topic` because the content type is derived when downloading the image.
     /// </summary>
     public string? ContentType { get; set; }
 
