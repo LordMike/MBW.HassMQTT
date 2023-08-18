@@ -24,7 +24,7 @@ public static class HassConnectedEntityServiceExtensions
             {
                 x.DeviceId = systemName;
                 x.DiscoveryDeviceName = systemName;
-                x.DiscoveryEntityName = $"{systemName} Status";
+                x.DiscoveryEntityName = "Status";
             });
 
         if (configuration != null)

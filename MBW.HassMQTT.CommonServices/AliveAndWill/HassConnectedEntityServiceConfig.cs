@@ -17,6 +17,6 @@ public class HassConnectedEntityServiceConfig
     {
         DeviceId = Assembly.GetEntryAssembly()?.GetName().Name ?? "TODO_ReplaceMe_HassConnectedEntityServiceConfig";
         DiscoveryDeviceName = DeviceId;
-        DiscoveryEntityName = $"{DeviceId} Status";
+        DiscoveryEntityName = "Status";
     }
 }
