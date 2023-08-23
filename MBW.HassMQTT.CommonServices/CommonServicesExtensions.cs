@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MQTTnet;
+using MQTTnet.Client.Options;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Server;
 
@@ -42,6 +43,19 @@ public static class CommonServicesExtensions
 
                         if (mqttConfig.KeepAlivePeriod.HasValue)
                             builder.WithKeepAlivePeriod(mqttConfig.KeepAlivePeriod.Value);
+
+                        if (mqttConfig.EnableTls)
+                        {
+                            builder.WithTls(new MqttClientOptionsBuilderTlsParameters
+                            {
+                                UseTls = true,
+                                CertificateValidationHandler = null,
+                                SslProtocol = mqttConfig.TlsProtocols,
+                                AllowUntrustedCertificates = mqttConfig.TlsAllowUntrustedCertificates,
+                                IgnoreCertificateChainErrors = mqttConfig.TlsIgnoreCertificateChainErrors,
+                                IgnoreCertificateRevocationErrors = mqttConfig.TlsIgnoreCertificateRevocationErrors
+                            });
+                        }
                     });
 
                 optionsBuilder.WithAutoReconnect()

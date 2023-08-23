@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Authentication;
 
 namespace MBW.HassMQTT.CommonServices;
 
@@ -17,4 +18,10 @@ public class CommonMqttConfiguration
     public TimeSpan ReconnectInterval { get; set; } = TimeSpan.FromSeconds(5);
 
     public TimeSpan? KeepAlivePeriod { get; set; }
+
+    public bool EnableTls { get; set; }
+    public SslProtocols TlsProtocols { get; set; } = SslProtocols.Default;
+    public bool TlsAllowUntrustedCertificates { get; set; }
+    public bool TlsIgnoreCertificateChainErrors { get; set; }
+    public bool TlsIgnoreCertificateRevocationErrors { get; set; }
 }
