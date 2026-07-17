@@ -154,6 +154,20 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
             if (typeof(IHasJsonAttributes).IsAssignableFrom(type))
                 TopicAndTemplate(s => ((IHasJsonAttributes)s).JsonAttributesTopic, s => ((IHasJsonAttributes)s).JsonAttributesTemplate);
 
+            if (typeof(IHasColorTemperatureRange).IsAssignableFrom(type))
+            {
+                MinMax(
+                    s => ((IHasColorTemperatureRange)s).MinKelvin,
+                    s => ((IHasColorTemperatureRange)s).MaxKelvin,
+                    2000,
+                    6535);
+                MinMax(
+                    s => ((IHasColorTemperatureRange)s).MinMireds,
+                    s => ((IHasColorTemperatureRange)s).MaxMireds,
+                    153,
+                    500);
+            }
+
             // Enums
             IEnumerable<PropertyInfo> enumProps = type.GetProperties()
                 .Where(s => Nullable.GetUnderlyingType(s.PropertyType)?.IsEnum ?? s.PropertyType.IsEnum);

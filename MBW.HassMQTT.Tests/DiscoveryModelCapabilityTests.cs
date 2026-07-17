@@ -25,6 +25,11 @@ public class DiscoveryModelCapabilityTests
             [nameof(IHasGroup.Group)] = typeof(IHasGroup),
             [nameof(IHasMessageExpiryInterval.MessageExpiryInterval)] = typeof(IHasMessageExpiryInterval),
             [nameof(IHasVisibleByDefault.VisibleByDefault)] = typeof(IHasVisibleByDefault),
+            [nameof(IHasColorTemperatureRange.ColorTempKelvin)] = typeof(IHasColorTemperatureRange),
+            [nameof(IHasColorTemperatureRange.MaxKelvin)] = typeof(IHasColorTemperatureRange),
+            [nameof(IHasColorTemperatureRange.MaxMireds)] = typeof(IHasColorTemperatureRange),
+            [nameof(IHasColorTemperatureRange.MinKelvin)] = typeof(IHasColorTemperatureRange),
+            [nameof(IHasColorTemperatureRange.MinMireds)] = typeof(IHasColorTemperatureRange),
         };
 
         Type discoveryDocumentType = typeof(IHassDiscoveryDocument);
@@ -336,5 +341,62 @@ public class DiscoveryModelCapabilityTests
         Assert.Contains(result.Errors, failure => failure.PropertyName == nameof(MqttSensor.DeviceClass));
         Assert.Contains(result.Errors, failure => failure.PropertyName == nameof(MqttSensor.StateClass));
         Assert.Contains(result.Errors, failure => failure.PropertyName == nameof(MqttSensor.UnitOfMeasurement));
+    }
+
+    [Fact]
+    public void LightSchemasShareKelvinColorTemperatureCapability()
+    {
+        IHassDiscoveryDocument[] models =
+        {
+            new MqttLightDefault("homeassistant/light/default/config", "default-light"),
+            new MqttLightJson("homeassistant/light/json/config", "json-light"),
+            new MqttLightTemplate("homeassistant/light/template/config", "template-light"),
+        };
+
+        foreach (IHassDiscoveryDocument model in models)
+        {
+            IHasColorTemperatureRange colorTemperature = Assert.IsAssignableFrom<IHasColorTemperatureRange>(model);
+            colorTemperature.ColorTempKelvin = true;
+            colorTemperature.MinKelvin = 2000;
+            colorTemperature.MaxKelvin = 6535;
+
+            JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+            Assert.True(json.Value<bool>("color_temp_kelvin"));
+            Assert.Equal(2000, json.Value<int>("min_kelvin"));
+            Assert.Equal(6535, json.Value<int>("max_kelvin"));
+        }
+    }
+
+    [Fact]
+    public void JsonLightUsesCurrentFeatureFlagsAndHasNoLegacyColorModeFlag()
+    {
+        var model = new MqttLightJson("homeassistant/light/example/config", "json-light")
+        {
+            Flash = true,
+            Transition = true,
+            SupportedColorModes = new List<string> { "rgbww", "white" },
+        };
+
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+        Assert.True(json.Value<bool>("flash"));
+        Assert.True(json.Value<bool>("transition"));
+        Assert.Equal(new[] { "rgbww", "white" }, json["supported_color_modes"]!.Values<string>());
+        Assert.Null(typeof(MqttLightJson).GetProperty("ColorMode"));
+    }
+
+    [Fact]
+    public void SharedColorTemperatureCapabilityValidatesBounds()
+    {
+        var model = new MqttLightJson("homeassistant/light/example/config", "json-light")
+        {
+            MinKelvin = 6500,
+            MaxKelvin = 2000,
+        };
+        model.Device.Identifiers.Add("example");
+
+        ValidationResult result = MqttLightJson.Validator.Validate(model);
+
+        Assert.Contains(result.Errors, failure => failure.PropertyName.Contains(nameof(IHasColorTemperatureRange.MinKelvin)));
+        Assert.Contains(result.Errors, failure => failure.PropertyName.Contains(nameof(IHasColorTemperatureRange.MaxKelvin)));
     }
 }

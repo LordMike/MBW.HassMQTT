@@ -37,7 +37,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJson.MqttLightJsonValidator>, IHasUniqueId,
     IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval
+    IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval,
+    IHasColorTemperatureRange
 {
     public MqttLightJson(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -53,10 +54,8 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     /// </summary>
     public int? BrightnessScale { get; set; }
 
-    /// <summary>
-    /// Flag that defines if the light supports color modes.
-    /// </summary>
-    public bool? ColorMode { get; set; }
+    /// <inheritdoc />
+    public bool? ColorTempKelvin { get; set; }
 
     /// <summary>
     /// The MQTT topic to publish commands to change the light’s state.
@@ -73,6 +72,9 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     /// </summary>
     public IList<string>? EffectList { get; set; }
 
+    /// <summary>Whether the light supports flash commands.</summary>
+    public bool? Flash { get; set; }
+
     /// <summary>
     /// The duration, in seconds, of a “long” flash.
     /// </summary>
@@ -83,14 +85,14 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     /// </summary>
     public int? FlashTimeShort { get; set; }
 
-    /// <summary>
-    /// The maximum color temperature in mireds.
-    /// </summary>
+    /// <inheritdoc />
+    public int? MaxKelvin { get; set; }
+    /// <inheritdoc />
     public int? MaxMireds { get; set; }
 
-    /// <summary>
-    /// The minimum color temperature in mireds.
-    /// </summary>
+    /// <inheritdoc />
+    public int? MinKelvin { get; set; }
+    /// <inheritdoc />
     public int? MinMireds { get; set; }
 
     /// <summary>
@@ -117,6 +119,9 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     /// - white
     /// </summary>
     public IList<string>? SupportedColorModes { get; set; }
+
+    /// <summary>Whether the light supports transition commands.</summary>
+    public bool? Transition { get; set; }
 
     /// <summary>
     /// Defines the maximum white level (i.e., 100%) of the MQTT device. This is used when setting the light to white mode.
@@ -164,7 +169,7 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
             // TODO: Make enums
             HashSet<string> validColors = new HashSet<string>(StringComparer.Ordinal)
             {
-                "onoff", "brightness", "color_temp", "hs", "xy", "rgb", "rgbw", "rgbww"
+                "onoff", "brightness", "color_temp", "hs", "xy", "rgb", "rgbw", "rgbww", "white"
             };
 
             RuleFor(s => s.SupportedColorModes)
@@ -172,7 +177,7 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
                 .ForEach(x =>
                     x.Must(validColors.Contains)
                         .WithMessage("{PropertyName} must be one of " + string.Join(", ", validColors)))
-                .When(s => s.ColorMode.GetValueOrDefault(false));
+                .When(s => s.SupportedColorModes != null);
 
             RuleFor(s => s.FlashTimeShort)
                 .GreaterThanOrEqualTo(1);

@@ -37,7 +37,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 public class MqttLightTemplate :
     MqttSensorDiscoveryBase<MqttLightTemplate, MqttLightTemplate.MqttLightTemplateValidator>, IHasUniqueId,
     IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval
+    IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval,
+    IHasColorTemperatureRange
 {
     public MqttLightTemplate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -57,6 +58,9 @@ public class MqttLightTemplate :
     /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract color temperature from the state payload value. Expected result of the template is an integer representing mired units.
     /// </summary>
     public string? ColorTempTemplate { get; set; }
+
+    /// <inheritdoc />
+    public bool? ColorTempKelvin { get; set; }
 
     /// <summary>
     /// The [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) for *off* state changes. Available variables: `state` and `transition`.
@@ -88,14 +92,14 @@ public class MqttLightTemplate :
     /// </summary>
     public string? GreenTemplate { get; set; }
 
-    /// <summary>
-    /// The maximum color temperature in mireds.
-    /// </summary>
+    /// <inheritdoc />
+    public int? MaxKelvin { get; set; }
+    /// <inheritdoc />
     public int? MaxMireds { get; set; }
 
-    /// <summary>
-    /// The minimum color temperature in mireds.
-    /// </summary>
+    /// <inheritdoc />
+    public int? MinKelvin { get; set; }
+    /// <inheritdoc />
     public int? MinMireds { get; set; }
 
     /// <summary>

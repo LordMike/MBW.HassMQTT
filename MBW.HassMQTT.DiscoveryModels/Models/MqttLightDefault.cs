@@ -37,7 +37,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLightDefault.MqttLightDefaultValidator>,
     IHasUniqueId, IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain,
-    IHasEntityCategory, IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval
+    IHasEntityCategory, IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval,
+    IHasColorTemperatureRange
 {
     public MqttLightDefault(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -99,6 +100,9 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     /// </summary>
     public string? ColorTempValueTemplate { get; set; }
 
+    /// <inheritdoc />
+    public bool? ColorTempKelvin { get; set; }
+
     /// <summary>
     /// The MQTT topic to publish commands to change the switch state.
     /// </summary>
@@ -149,14 +153,14 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     /// </summary>
     public string? HsValueTemplate { get; set; }
 
-    /// <summary>
-    /// The maximum color temperature in mireds.
-    /// </summary>
+    /// <inheritdoc />
+    public int? MaxKelvin { get; set; }
+    /// <inheritdoc />
     public int? MaxMireds { get; set; }
 
-    /// <summary>
-    /// The minimum color temperature in mireds.
-    /// </summary>
+    /// <inheritdoc />
+    public int? MinKelvin { get; set; }
+    /// <inheritdoc />
     public int? MinMireds { get; set; }
 
     /// <summary>
