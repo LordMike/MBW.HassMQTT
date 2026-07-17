@@ -101,4 +101,51 @@ public class DiscoveryModelCapabilityTests
 
         Assert.Contains(result.Errors, failure => failure.ErrorMessage.Contains("cannot be used together"));
     }
+
+    [Fact]
+    public void TemporalFamiliesShareSchemaAndSerializeFamilySpecificFields()
+    {
+        var date = new MqttDate("homeassistant/date/example/config", "date-example")
+        {
+            CommandTopic = "example/date/set",
+            StateTopic = "example/date/state",
+        };
+        var dateTime = new MqttDateTime("homeassistant/datetime/example/config", "datetime-example")
+        {
+            CommandTopic = "example/datetime/set",
+            Timezone = "Europe/Copenhagen",
+        };
+        var time = new MqttTime("homeassistant/time/example/config", "time-example")
+        {
+            CommandTopic = "example/time/set",
+            Icon = "mdi:clock",
+        };
+
+        Assert.IsAssignableFrom<IHasAvailability>(date);
+        Assert.IsAssignableFrom<IHasDefaultEntityId>(dateTime);
+        Assert.IsAssignableFrom<IHasMessageExpiryInterval>(time);
+
+        JObject dateJson = JObject.FromObject(date, CustomJsonSerializer.Serializer);
+        JObject dateTimeJson = JObject.FromObject(dateTime, CustomJsonSerializer.Serializer);
+        JObject timeJson = JObject.FromObject(time, CustomJsonSerializer.Serializer);
+
+        Assert.Equal("example/date/set", dateJson.Value<string>("command_topic"));
+        Assert.Equal("example/date/state", dateJson.Value<string>("state_topic"));
+        Assert.Equal("Europe/Copenhagen", dateTimeJson.Value<string>("timezone"));
+        Assert.Equal("mdi:clock", timeJson.Value<string>("icon"));
+        Assert.Null(dateJson["platform"]);
+        Assert.Null(dateTimeJson["platform"]);
+        Assert.Null(timeJson["platform"]);
+    }
+
+    [Fact]
+    public void TemporalFamiliesRequireCommandTopic()
+    {
+        var model = new MqttDate("homeassistant/date/example/config", "example");
+        model.Device.Identifiers.Add("example");
+
+        ValidationResult result = MqttDate.Validator.Validate(model);
+
+        Assert.Contains(result.Errors, failure => failure.PropertyName == nameof(MqttDate.CommandTopic));
+    }
 }

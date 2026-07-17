@@ -76,5 +76,14 @@ public enum HassDeviceType
     Image,
     
     [EnumMember(Value = "event")]
-    Event
+    Event,
+
+    [EnumMember(Value = "date")]
+    Date,
+
+    [EnumMember(Value = "datetime")]
+    DateTime,
+
+    [EnumMember(Value = "time")]
+    Time,
 }
