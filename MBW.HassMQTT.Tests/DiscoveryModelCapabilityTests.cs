@@ -193,4 +193,27 @@ public class DiscoveryModelCapabilityTests
         Assert.Equal("example/mower/start", json.Value<string>("start_mowing_command_topic"));
         Assert.False(json.Value<bool>("optimistic"));
     }
+
+    [Fact]
+    public void ValveSerializesPositionAndStateSchema()
+    {
+        var model = new MqttValve("homeassistant/valve/example/config", "valve-example")
+        {
+            CommandTopic = "example/valve/set",
+            StateTopic = "example/valve/state",
+            ReportsPosition = true,
+            PositionClosed = 0,
+            PositionOpen = 100,
+            Group = new List<string> { "irrigation" },
+        };
+
+        Assert.IsAssignableFrom<IHasGroup>(model);
+        Assert.IsAssignableFrom<IHasAvailabilityPayloads>(model);
+
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+        Assert.True(json.Value<bool>("reports_position"));
+        Assert.Equal(0, json.Value<int>("position_closed"));
+        Assert.Equal(100, json.Value<int>("position_open"));
+        Assert.Equal("example/valve/state", json.Value<string>("state_topic"));
+    }
 }

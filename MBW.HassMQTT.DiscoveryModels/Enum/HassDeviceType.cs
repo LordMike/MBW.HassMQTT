@@ -92,4 +92,7 @@ public enum HassDeviceType
 
     [EnumMember(Value = "lawn_mower")]
     LawnMower,
+
+    [EnumMember(Value = "valve")]
+    Valve,
 }
