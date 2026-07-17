@@ -10,6 +10,12 @@ public enum HassSensorDeviceClass
     None,
 
     /// <summary>
+    /// A sensor whose state is restricted to a configured list of values.
+    /// </summary>
+    [EnumMember(Value = "enum")]
+    Enum,
+
+    /// <summary>
     /// Apparent power in VA
     ///</summary>
     [EnumMember(Value = "apparent_power")]

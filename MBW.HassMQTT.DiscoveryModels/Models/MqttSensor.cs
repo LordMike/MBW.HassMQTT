@@ -49,6 +49,11 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     public string? LastResetValueTemplate { get; set; }
 
     /// <summary>
+    /// The allowed state values for an enum sensor. Cannot be empty or be used with a state class or unit.
+    /// </summary>
+    public IList<string>? Options { get; set; }
+
+    /// <summary>
     /// The state_class of the sensor.
     /// See https://developers.home-assistant.io/docs/core/entity/sensor/#available-state-classes
     /// </summary>
@@ -110,6 +115,25 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
 
             RuleFor(s => s.ExpireAfter)
                 .GreaterThanOrEqualTo(0);
+
+            RuleFor(s => s.Options)
+                .NotEmpty()
+                .When(s => s.Options != null);
+
+            RuleFor(s => s.DeviceClass)
+                .Equal(HassSensorDeviceClass.Enum)
+                .When(s => s.Options != null)
+                .WithMessage("DeviceClass must be Enum when Options is configured");
+
+            RuleFor(s => s.StateClass)
+                .Null()
+                .When(s => s.Options != null)
+                .WithMessage("StateClass cannot be used together with Options");
+
+            RuleFor(s => s.UnitOfMeasurement)
+                .Null()
+                .When(s => s.Options != null)
+                .WithMessage("UnitOfMeasurement cannot be used together with Options");
         }
     }
 }

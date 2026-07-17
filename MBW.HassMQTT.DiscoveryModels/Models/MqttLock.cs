@@ -73,6 +73,11 @@ public class MqttLock : MqttSensorDiscoveryBase<MqttLock, MqttLock.MqttLockValid
     public string? PayloadOpen { get; set; }
 
     /// <summary>
+    /// The payload received on the state topic that resets the state to unknown.
+    /// </summary>
+    public string? PayloadReset { get; set; }
+
+    /// <summary>
     /// The payload sent to `state_topic` by the lock when it's jammed.
     /// </summary>
     /// <remarks>Default value: 'JAMMED'</remarks>

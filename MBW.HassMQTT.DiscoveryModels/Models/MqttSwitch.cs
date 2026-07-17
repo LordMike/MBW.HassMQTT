@@ -37,6 +37,11 @@ public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwi
     }
 
     /// <summary>
+    /// Defines a template used to generate the payload sent to <see cref="CommandTopic"/>.
+    /// </summary>
+    public string? CommandTemplate { get; set; }
+
+    /// <summary>
     /// The MQTT topic to publish commands to change the switch state.
     /// </summary>
     public string? CommandTopic { get; set; }
@@ -116,6 +121,7 @@ public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwi
     {
         public MqttSwitchValidator()
         {
+            TopicAndTemplate(s => s.CommandTopic, s => s.CommandTemplate);
             TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
         }
     }

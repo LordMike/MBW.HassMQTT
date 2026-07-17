@@ -84,6 +84,11 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     public string? PayloadStop { get; set; }
 
     /// <summary>
+    /// The command payload that stops the tilt.
+    /// </summary>
+    public string? PayloadStopTilt { get; set; }
+
+    /// <summary>
     /// Number which represents closed position.
     /// </summary>
     public int? PositionClosed { get; set; }

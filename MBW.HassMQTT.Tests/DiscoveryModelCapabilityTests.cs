@@ -285,4 +285,56 @@ public class DiscoveryModelCapabilityTests
         Assert.Null(typeof(MqttClimate).GetProperty("AuxStateTemplate"));
         Assert.Null(typeof(MqttClimate).GetProperty("AuxStateTopic"));
     }
+
+    [Fact]
+    public void CompactFamilyAdditionsSerializeWithDocumentedNames()
+    {
+        var cover = new MqttCover("homeassistant/cover/example/config", "cover-example")
+        {
+            PayloadStopTilt = "HALT_TILT",
+        };
+        var mqttLock = new MqttLock("homeassistant/lock/example/config", "lock-example")
+        {
+            PayloadReset = "None",
+        };
+        var mqttSwitch = new MqttSwitch("homeassistant/switch/example/config", "switch-example")
+        {
+            CommandTopic = "example/switch/set",
+            CommandTemplate = "{{ value | lower }}",
+        };
+        var sensor = new MqttSensor("homeassistant/sensor/example/config", "sensor-example")
+        {
+            StateTopic = "example/sensor/state",
+            DeviceClass = HassSensorDeviceClass.Enum,
+            Options = new List<string> { "auto", "manual" },
+        };
+
+        Assert.Equal("HALT_TILT", JObject.FromObject(cover, CustomJsonSerializer.Serializer).Value<string>("payload_stop_tilt"));
+        Assert.Equal("None", JObject.FromObject(mqttLock, CustomJsonSerializer.Serializer).Value<string>("payload_reset"));
+        Assert.Equal("{{ value | lower }}", JObject.FromObject(mqttSwitch, CustomJsonSerializer.Serializer).Value<string>("command_template"));
+
+        JObject sensorJson = JObject.FromObject(sensor, CustomJsonSerializer.Serializer);
+        Assert.Equal("enum", sensorJson.Value<string>("device_class"));
+        Assert.Equal(new[] { "auto", "manual" }, sensorJson["options"]!.Values<string>());
+    }
+
+    [Fact]
+    public void SensorOptionsEnforceEnumSchemaRelationships()
+    {
+        var sensor = new MqttSensor("homeassistant/sensor/example/config", "sensor-example")
+        {
+            StateTopic = "example/sensor/state",
+            DeviceClass = HassSensorDeviceClass.Temperature,
+            Options = new List<string> { "hot", "cold" },
+            StateClass = HassStateClass.Measurement,
+            UnitOfMeasurement = "C",
+        };
+        sensor.Device.Identifiers.Add("example");
+
+        ValidationResult result = MqttSensor.Validator.Validate(sensor);
+
+        Assert.Contains(result.Errors, failure => failure.PropertyName == nameof(MqttSensor.DeviceClass));
+        Assert.Contains(result.Errors, failure => failure.PropertyName == nameof(MqttSensor.StateClass));
+        Assert.Contains(result.Errors, failure => failure.PropertyName == nameof(MqttSensor.UnitOfMeasurement));
+    }
 }
