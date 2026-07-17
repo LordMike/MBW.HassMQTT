@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.10" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageReference Include="MQTTnet.Server" Version="5.2.0.1603" />
     <PackageReference Include="xunit" Version="2.9.3" />
@@ -22,6 +23,7 @@
     <ProjectReference Include="..\MBW.HassMQTT\MBW.HassMQTT.csproj" />
     <ProjectReference Include="..\MBW.HassMQTT.CommonServices\MBW.HassMQTT.CommonServices.csproj" />
     <ProjectReference Include="..\MBW.HassMQTT.DiscoveryModels\MBW.HassMQTT.DiscoveryModels.csproj" />
+    <ProjectReference Include="..\MBW.HassMQTT.SourceGenerators\MBW.HassMQTT.SourceGenerators.csproj" />
   </ItemGroup>
 
 </Project>
