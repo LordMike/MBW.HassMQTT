@@ -24,8 +24,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Vacuum)]
 [PublicAPI]
 public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVacuumValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasName
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasDefaultEntityId, IHasName, IHasVisibleByDefault, IHasMessageExpiryInterval
 {
     public MqttVacuum(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -107,8 +107,18 @@ public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVac
     public IList<string>? SupportedFeatures { get; set; }
 
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
     public MqttQosLevel? Qos { get; set; }
     public string? JsonAttributesTemplate { get; set; }
     public string? JsonAttributesTopic { get; set; }
@@ -116,7 +126,12 @@ public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVac
     public bool? EnabledByDefault { get; set; }
     public bool? Retain { get; set; }
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
     public string? Name { get; set; }
 
     public class MqttVacuumValidator : MqttSensorDiscoveryBaseValidator<MqttVacuum>

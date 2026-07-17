@@ -36,8 +36,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Light)]
 [PublicAPI]
 public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJson.MqttLightJsonValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval
 {
     public MqttLightJson(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -124,8 +124,18 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     public byte? WhiteScale { get; set; }
 
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
     public MqttQosLevel? Qos { get; set; }
     public string? JsonAttributesTemplate { get; set; }
     public string? JsonAttributesTopic { get; set; }
@@ -133,7 +143,16 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     public bool? EnabledByDefault { get; set; }
     public bool? Retain { get; set; }
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public IList<string>? Group { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
     public string? Encoding { get; set; }
     public string? Name { get; set; }
     public bool? Optimistic { get; set; }

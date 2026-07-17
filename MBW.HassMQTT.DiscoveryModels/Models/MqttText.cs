@@ -16,7 +16,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Text)]
 [PublicAPI]
 public class MqttText : MqttSensorDiscoveryBase<MqttText, MqttText.MqttTextValidator>, IHasUniqueId,
-    IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasObjectId, IHasQos, IHasEntityCategory,
+    IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasDefaultEntityId, IHasQos, IHasEntityCategory, IHasEntityPicture, IHasVisibleByDefault, IHasMessageExpiryInterval,
     IHasEncoding, IHasRetain, IHasName
 {
     public MqttText(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
@@ -68,14 +68,27 @@ public class MqttText : MqttSensorDiscoveryBase<MqttText, MqttText.MqttTextValid
     public string? ValueTemplate { get; set; }
 
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
     public string? JsonAttributesTemplate { get; set; }
     public string? JsonAttributesTopic { get; set; }
     public string? Icon { get; set; }
     public bool? EnabledByDefault { get; set; }
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
     public MqttQosLevel? Qos { get; set; }
     public string? Encoding { get; set; }
     public bool? Retain { get; set; }

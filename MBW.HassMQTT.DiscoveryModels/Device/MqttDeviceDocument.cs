@@ -105,9 +105,19 @@ public class MqttDeviceDocument : INotifyPropertyChanged
     public string? Model { get; set; }
 
     /// <summary>
+    /// The model identifier of the device.
+    /// </summary>
+    public string? ModelId { get; set; }
+
+    /// <summary>
     /// The name of the device.
     /// </summary>
     public string? Name { get; set; }
+
+    /// <summary>
+    /// The serial number of the device.
+    /// </summary>
+    public string? SerialNumber { get; set; }
 
     /// <summary>
     /// Suggest an area if the device isn’t in one yet.

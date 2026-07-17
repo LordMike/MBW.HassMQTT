@@ -18,7 +18,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Update)]
 [PublicAPI]
 public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpdateValidator>, IHasUniqueId,
-    IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasObjectId, IHasQos, IHasEntityCategory,
+    IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasDefaultEntityId, IHasQos, IHasEntityCategory, IHasEntityPicture, IHasVisibleByDefault, IHasMessageExpiryInterval,
     IHasEncoding, IHasRetain, IHasName
 {
     public MqttUpdate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
@@ -37,9 +37,7 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// <remarks>Default value: 'None'</remarks>
     public HassUpdateDeviceClass? DeviceClass { get; set; }
 
-    /// <summary>
-    /// Picture URL for the entity.
-    /// </summary>
+    /// <inheritdoc />
     public string? EntityPicture { get; set; }
 
     /// <summary>
@@ -83,14 +81,25 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     public string? ValueTemplate { get; set; }
 
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
     public string? JsonAttributesTemplate { get; set; }
     public string? JsonAttributesTopic { get; set; }
     public string? Icon { get; set; }
     public bool? EnabledByDefault { get; set; }
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
     public MqttQosLevel? Qos { get; set; }
     public string? Encoding { get; set; }
     public bool? Retain { get; set; }

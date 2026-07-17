@@ -23,7 +23,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Camera)]
 [PublicAPI]
 public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCameraValidator>, IHasUniqueId,
-    IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasObjectId,
+    IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasDefaultEntityId, IHasEntityPicture, IHasVisibleByDefault,
     IHasEncoding, IHasName
 {
     public MqttCamera(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
@@ -41,14 +41,25 @@ public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCam
     public string? Encoding { get; set; }
 
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
     public string? JsonAttributesTemplate { get; set; }
     public string? JsonAttributesTopic { get; set; }
     public string? Icon { get; set; }
     public bool? EnabledByDefault { get; set; }
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
     public string? Name { get; set; }
 
     public class MqttCameraValidator : MqttSensorDiscoveryBaseValidator<MqttCamera>

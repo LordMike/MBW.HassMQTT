@@ -16,7 +16,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Scene)]
 [PublicAPI]
 public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasName
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasDefaultEntityId, IHasName, IHasEntityPicture, IHasVisibleByDefault, IHasMessageExpiryInterval
 {
     public MqttScene(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -33,14 +33,31 @@ public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneV
     public string? PayloadOn { get; set; }
 
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
     public MqttQosLevel? Qos { get; set; }
     public string? Icon { get; set; }
     public bool? EnabledByDefault { get; set; }
     public bool? Retain { get; set; }
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
     public string? Name { get; set; }
 
     public class MqttSceneValidator : MqttSensorDiscoveryBaseValidator<MqttScene>

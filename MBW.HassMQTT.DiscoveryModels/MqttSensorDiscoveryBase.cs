@@ -124,12 +124,28 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 
             if (typeof(IHasAvailability).IsAssignableFrom(type))
             {
+#pragma warning disable 618
                 RuleForEach(s => ((IHasAvailability)s).Availability)
                     .SetValidator(AvailabilityModel.Validator);
 
                 RuleFor(s => ((IHasAvailability)s).AvailabilityMode)
                     .IsInEnum()
                     .When(s => ((IHasAvailability)s).AvailabilityMode.HasValue);
+
+                TopicAndTemplate(
+                    s => ((IHasAvailability)s).AvailabilityTopic,
+                    s => ((IHasAvailability)s).AvailabilityTemplate);
+
+                RuleFor(s => ((IHasAvailability)s).Availability)
+                    .Empty()
+                    .When(s => ((IHasAvailability)s).AvailabilityTopic != null)
+                    .WithMessage("Availability and AvailabilityTopic cannot be used together");
+
+                RuleFor(s => ((IHasAvailability)s).AvailabilityTopic)
+                    .Null()
+                    .When(s => ((IHasAvailability)s).Availability?.Any() == true)
+                    .WithMessage("AvailabilityTopic and Availability cannot be used together");
+#pragma warning restore 618
             }
 
             if (typeof(IHasQos).IsAssignableFrom(type))
