@@ -25,6 +25,7 @@ namespace MBW.HassMQTT.DiscoveryModels;
 /// </summary>
 public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDocument, IMqttValueContainer, INotifyPropertyChanged where T : IHassDiscoveryDocument where TValidator : AbstractValidator<T>, new()
 {
+    private MqttDeviceDocument _device = null!;
     private long _revision;
     private long _publishedRevision;
 
@@ -58,7 +59,19 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
     /// Device details for this entity, usually this is duplicated between multiple entities to let HA link them together.
     /// At least one of identifiers or connections must be present to identify the device.
     /// </summary>
-    public MqttDeviceDocument Device { get; }
+    [JsonProperty]
+    public MqttDeviceDocument Device
+    {
+        get => _device;
+        private set
+        {
+            if (_device != null)
+                _device.PropertyChanged -= DeviceOnPropertyChanged;
+
+            _device = value ?? new MqttDeviceDocument();
+            _device.PropertyChanged += DeviceOnPropertyChanged;
+        }
+    }
 
     public MqttSensorDiscoveryBase(string discoveryTopic, string uniqueId)
     {
@@ -73,7 +86,11 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 #pragma warning restore 618
 
         Device = new MqttDeviceDocument();
-        Device.PropertyChanged += (_, _) => MarkDirty();
+    }
+
+    private void DeviceOnPropertyChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        MarkDirty();
     }
 
     public void MarkDirty()

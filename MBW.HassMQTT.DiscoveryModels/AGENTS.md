@@ -95,7 +95,11 @@ Maintain the working checklist in the agent's native task/plan state. Categorize
 
 ## Verification
 
-- Add serialization tests for exact snake-case keys, enum wire values, null omission, and shared capability properties.
+- For every MQTT entity document, curate each meaningful configuration example into a C# raw JSON string and round-trip it through the concrete discovery model. Include discovery JSON embedded in command examples, but exclude state, command, event, attribute, automation, and device-message payloads.
+- Convert YAML examples manually to their JSON semantics. Remove only the editorial `mqtt` and entity-family/device-discovery envelopes, split multi-entity examples, and preserve values, arrays, maps, explicit defaults, and template strings. Do not add a YAML dependency, fixture generator, extraction script, or separate snapshot file for this work.
+- Compare parsed JSON semantically: ignore object-property order and formatting, but require array order, values, numeric kinds, and property presence to match. Keep any narrowly accepted normalization explicit in the individual test case and link it to a tracking issue.
+- Add synthetic round-trip cases for meaningful shapes not covered by the documentation, especially enum values, nested maps, connection tuples, explicit false and zero values, multiline templates, and alternate schemas such as the three MQTT light forms.
+- When establishing or refreshing the example corpus, complete all families and run the entire corpus before repairing entity-specific mismatches. Fix only fixture translations and shared serialization or test-harness defects needed to obtain trustworthy failures, then review the complete discrepancy inventory before changing entity models.
 - Add shared validation tests at the capability level and entity-specific tests only for entity-specific constraints.
 - Add contract tests where useful to ensure that a model exposing a shared property implements its canonical capability interface with the canonical type.
 - Build and test the complete solution after each logical family group and before marking the sync complete.
