@@ -4,18 +4,18 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.Services;
+using MBW.HassMQTT.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MQTTnet;
-using MQTTnet.Extensions.ManagedClient;
 
 namespace MBW.HassMQTT.CommonServices.Commands;
 
 internal class MqttCommandService : IHostedService, IMqttMessageReceiver
 {
     private readonly ILogger<MqttCommandService> _logger;
-    private readonly IManagedMqttClient _mqttClient;
+    private readonly IHassMqttClient _mqttClient;
     private readonly string _topicPrefix;
 
     private readonly List<(string[] filter, IMqttCommandHandler handler)> _handlers = new List<(string[] filter, IMqttCommandHandler handler)>();
@@ -23,7 +23,7 @@ internal class MqttCommandService : IHostedService, IMqttMessageReceiver
     public MqttCommandService(
         ILogger<MqttCommandService> logger,
         IOptions<HassConfiguration> hassConfig,
-        IManagedMqttClient mqttClient,
+        IHassMqttClient mqttClient,
         IEnumerable<IMqttCommandHandler> handlers)
     {
         _logger = logger;
@@ -46,7 +46,10 @@ internal class MqttCommandService : IHostedService, IMqttMessageReceiver
 
             _logger.LogDebug("Subscribing to {filter}", subscription);
 
-            await _mqttClient.SubscribeAsync(subscription);
+            MqttClientSubscribeOptions options = new MqttClientSubscribeOptionsBuilder()
+                .WithTopicFilter(filter => filter.WithTopic(subscription))
+                .Build();
+            await _mqttClient.SubscribeAsync(options, cancellationToken);
         }
     }
 

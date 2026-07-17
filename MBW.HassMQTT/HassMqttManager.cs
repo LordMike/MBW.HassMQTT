@@ -1,15 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
 using MBW.HassMQTT.Abstracts.Interfaces;
-using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
+using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.Extensions;
-using MBW.HassMQTT.Helpers;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Internal;
 using MBW.HassMQTT.Serialization;
@@ -17,27 +17,34 @@ using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MQTTnet.Extensions.ManagedClient;
+using MQTTnet;
+using MQTTnet.Exceptions;
+using MQTTnet.Protocol;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace MBW.HassMQTT;
 
-public class HassMqttManager
+public class HassMqttManager : IMqttEventReceiver
 {
-    private readonly ManualResetEventSlim _lockObject = new ManualResetEventSlim(true);
+    private readonly SemaphoreSlim _flushLock = new SemaphoreSlim(1, 1);
     private readonly IServiceProvider _serviceProvider;
     private readonly HassMqttManagerConfiguration _config;
-    private readonly IManagedMqttClient _mqttClient;
+    private readonly IHassMqttClient _mqttClient;
     private readonly ILogger<HassMqttManager> _logger;
     private readonly ConcurrentDictionary<string, IDiscoveryDocumentBuilder> _discoveryDocuments;
     private readonly ConcurrentDictionary<string, MqttStateValueTopic> _values;
     private readonly ConcurrentDictionary<string, MqttAttributesTopic> _attributes;
-    private readonly ConcurrentBag<string> _removeTopics;
+    private readonly ConcurrentDictionary<string, byte> _removeTopics;
 
     internal HassMqttTopicBuilder TopicBuilder { get; }
 
-    public HassMqttManager(IServiceProvider serviceProvider, IOptions<HassMqttManagerConfiguration> config, IManagedMqttClient mqttClient, HassMqttTopicBuilder topicBuilder, ILogger<HassMqttManager> logger)
+    public HassMqttManager(
+        IServiceProvider serviceProvider,
+        IOptions<HassMqttManagerConfiguration> config,
+        IHassMqttClient mqttClient,
+        HassMqttTopicBuilder topicBuilder,
+        ILogger<HassMqttManager> logger)
     {
         _serviceProvider = serviceProvider;
         _config = config.Value;
@@ -47,25 +54,19 @@ public class HassMqttManager
         _discoveryDocuments = new ConcurrentDictionary<string, IDiscoveryDocumentBuilder>(StringComparer.OrdinalIgnoreCase);
         _values = new ConcurrentDictionary<string, MqttStateValueTopic>(StringComparer.OrdinalIgnoreCase);
         _attributes = new ConcurrentDictionary<string, MqttAttributesTopic>(StringComparer.OrdinalIgnoreCase);
-        _removeTopics = new ConcurrentBag<string>();
+        _removeTopics = new ConcurrentDictionary<string, byte>(StringComparer.OrdinalIgnoreCase);
     }
 
-    /// <summary>
-    /// Sends an empty discovery document on startup, removing a sensor from HASS
-    /// </summary>
-    public void RemoveSensor<TEntity>(string deviceId, string entityId) where TEntity : IHassDiscoveryDocument
-    {
-        _removeTopics.Add(TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId));
-    }
+    public void RemoveSensor<TEntity>(string deviceId, string entityId) where TEntity : IHassDiscoveryDocument =>
+        _removeTopics.TryAdd(TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId), 0);
 
     public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId, string uniqueId = null) where TEntity : IHassDiscoveryDocument
     {
         uniqueId ??= $"{deviceId}_{entityId}".ToLower();
 
-        IDiscoveryDocumentBuilder builder = _discoveryDocuments.GetOrAdd(uniqueId, s =>
+        IDiscoveryDocumentBuilder builder = _discoveryDocuments.GetOrAdd(uniqueId, _ =>
         {
             string discoveryTopic = TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId);
-
             DiscoveryDocumentBuilder<TEntity> newBuilder = new DiscoveryDocumentBuilder<TEntity>(this)
             {
                 Discovery = ActivatorUtilities.CreateInstance<TEntity>(_serviceProvider, discoveryTopic, uniqueId),
@@ -84,11 +85,8 @@ public class HassMqttManager
 
     public bool TryGetSensor(string deviceId, string entityId, out ISensorContainer sensor)
     {
-        string uniqueId = $"{deviceId}_{entityId}";
-
-        _discoveryDocuments.TryGetValue(uniqueId, out IDiscoveryDocumentBuilder builder);
+        _discoveryDocuments.TryGetValue($"{deviceId}_{entityId}", out IDiscoveryDocumentBuilder builder);
         sensor = builder as ISensorContainer;
-
         return sensor != null;
     }
 
@@ -96,138 +94,168 @@ public class HassMqttManager
     {
         if (string.IsNullOrWhiteSpace(topic))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(topic));
-
-        return _attributes.GetOrAdd(topic, s => new MqttAttributesTopic(topic));
+        return _attributes.GetOrAdd(topic, static value => new MqttAttributesTopic(value));
     }
 
     public MqttStateValueTopic GetValueSender(string topic)
     {
         if (string.IsNullOrWhiteSpace(topic))
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(topic));
-
-        return _values.GetOrAdd(topic, s => new MqttStateValueTopic(topic));
-    }
-
-    private async Task SendValue(IMqttValueContainer container, bool resetDirty, CancellationToken token)
-    {
-        await SendValue(container.PublishTopic, container.GetSerializedValue(false), token);
-
-        // Set to not-dirty _after_ sending the value
-        if (resetDirty)
-            container.SetDirty(false);
-    }
-
-    private async Task SendValue(string topic, object value, CancellationToken token)
-    {
-        bool log = _logger.IsEnabled(LogLevel.Debug);
-
-        object sentValue;
-        if (value is string str)
-        {
-            sentValue = str;
-            await _mqttClient.SendValueAsync(topic, str, token);
-        }
-        else if (value == null)
-        {
-            sentValue = "<null>";
-            await _mqttClient.SendValueAsync(topic, string.Empty, token);
-        }
-        else
-        {
-            sentValue = null;
-
-            JToken converted = JToken.FromObject(value, CustomJsonSerializer.Serializer);
-            await _mqttClient.SendJsonAsync(topic, converted, token);
-
-            if (log)
-                sentValue = converted.ToString(Formatting.None);
-        }
-
-        if (log)
-            _logger.LogDebug("Pushed {Value} to {Topic}", sentValue, topic);
+        return _values.GetOrAdd(topic, static value => new MqttStateValueTopic(value));
     }
 
     public void MarkAllValuesDirty()
     {
+        foreach (IDiscoveryDocumentBuilder value in _discoveryDocuments.Values)
+            value.DiscoveryUntyped.MarkDirty();
         foreach (MqttStateValueTopic value in _values.Values)
-            value.SetDirty();
-
+            value.MarkDirty();
         foreach (MqttAttributesTopic value in _attributes.Values)
-            value.SetDirty();
+            value.MarkDirty();
     }
 
-    public async Task FlushAll(CancellationToken token = default)
+    public async Task<MqttFlushResult> FlushAll(CancellationToken token = default)
     {
-        if (!_lockObject.Wait(0))
-        {
-            _logger.LogDebug("Unable to acquire exclusive flushing lock");
-            return;
-        }
+        if (!await _flushLock.WaitAsync(0, token))
+            return new MqttFlushResult(MqttFlushStatus.Busy);
 
+        int discoveryDocuments = 0, removedTopics = 0, values = 0, attributes = 0;
         try
         {
-            int discoveryDocs = 0, values = 0, attributes = 0;
+            if (!_mqttClient.IsConnected)
+                return Result(MqttFlushStatus.Disconnected);
 
-            foreach (IDiscoveryDocumentBuilder value in _discoveryDocuments.Values.Where(s => s.DiscoveryUntyped.Dirty))
+            foreach (IDiscoveryDocumentBuilder builder in _discoveryDocuments.Values.Where(value => value.DiscoveryUntyped.Dirty))
             {
-                string uniqueId = (value.DiscoveryUntyped as IHasUniqueId)?.UniqueId ?? value.ToString();
+                IHassDiscoveryDocument discovery = builder.DiscoveryUntyped;
+                string uniqueId = (discovery as IHasUniqueId)?.UniqueId ?? builder.ToString();
 
-                if (_config.SendDiscoveryDocuments)
+                if (!_config.SendDiscoveryDocuments)
                 {
-                    if (_config.ValidateDiscoveryDocuments)
-                    {
-                        ValidationContext<IHassDiscoveryDocument> validationContext = new ValidationContext<IHassDiscoveryDocument>(value.DiscoveryUntyped);
-                        ValidationResult validation = await value.DiscoveryUntyped.Validator.ValidateAsync(validationContext, token);
-
-                        if (!validation.IsValid)
-                            throw new ValidationException(validation.Errors);
-                    }
-
-                    _logger.LogDebug("Sending discovery document for {identifier}", uniqueId);
-
-                    await SendValue(value.DiscoveryUntyped, true, token);
-                    discoveryDocs++;
+                    discovery.MarkPublished(discovery.Revision);
+                    continue;
                 }
-                else
+
+                if (_config.ValidateDiscoveryDocuments)
                 {
-                    _logger.LogDebug("Not sending discovery for {identifier}, due to configuration", uniqueId);
-                    value.DiscoveryUntyped.SetDirty(false);
+                    ValidationResult validation = await discovery.Validator.ValidateAsync(new ValidationContext<IHassDiscoveryDocument>(discovery), token);
+                    if (!validation.IsValid)
+                        throw new ValidationException(validation.Errors);
                 }
+
+                _logger.LogDebug("Publishing discovery document for {Identifier}", uniqueId);
+                MqttFlushStatus status = await Publish(discovery, token);
+                if (status != MqttFlushStatus.Completed)
+                    return Result(status);
+                discoveryDocuments++;
             }
 
-            while (_removeTopics.TryTake(out string topic))
+            foreach (string topic in _removeTopics.Keys)
             {
-                if (_config.SendDiscoveryDocuments)
-                    await SendValue(topic, string.Empty, token);
+                MqttFlushStatus status = await Publish(topic, Array.Empty<byte>(), token);
+                if (status != MqttFlushStatus.Completed)
+                    return Result(status);
+                _removeTopics.TryRemove(topic, out _);
+                removedTopics++;
             }
 
-            foreach (MqttStateValueTopic value in _values.Values.Where(s => s.Dirty))
+            foreach (MqttStateValueTopic value in _values.Values.Where(value => value.Dirty))
             {
-                _logger.LogDebug("Sending state value for {topic}", value.PublishTopic);
-
-                await SendValue(value, true, token);
+                MqttFlushStatus status = await Publish(value, token);
+                if (status != MqttFlushStatus.Completed)
+                    return Result(status);
                 values++;
             }
 
-            foreach (MqttAttributesTopic value in _attributes.Values.Where(s => s.Dirty))
+            foreach (MqttAttributesTopic value in _attributes.Values.Where(value => value.Dirty))
             {
-                _logger.LogDebug("Sending attributes for {topic}", value.PublishTopic);
-
-                await SendValue(value, true, token);
+                MqttFlushStatus status = await Publish(value, token);
+                if (status != MqttFlushStatus.Completed)
+                    return Result(status);
                 attributes++;
             }
 
-            if (discoveryDocs > 0 || values > 0 || attributes > 0)
-                _logger.LogInformation("Pushed {discovery} discovery documents, {values} values and {attributes} attribute changes", discoveryDocs, values, attributes);
+            if (discoveryDocuments + removedTopics + values + attributes > 0)
+            {
+                _logger.LogInformation(
+                    "Published {Discovery} discovery documents, {Removed} removals, {Values} values and {Attributes} attribute changes",
+                    discoveryDocuments, removedTopics, values, attributes);
+            }
+
+            return Result(MqttFlushStatus.Completed);
         }
         finally
         {
-            _lockObject.Set();
+            _flushLock.Release();
+        }
+
+        MqttFlushResult Result(MqttFlushStatus status) => new(status, discoveryDocuments, removedTopics, values, attributes);
+    }
+
+    private async Task<MqttFlushStatus> Publish(IMqttValueContainer container, CancellationToken token)
+    {
+        long revision = container.Revision;
+        byte[] payload = Serialize(container.GetSerializedValue());
+        MqttFlushStatus status = await Publish(container.PublishTopic, payload, token);
+        if (status == MqttFlushStatus.Completed)
+            container.MarkPublished(revision);
+        return status;
+    }
+
+    private async Task<MqttFlushStatus> Publish(string topic, byte[] payload, CancellationToken token)
+    {
+        try
+        {
+            MqttApplicationMessage message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(payload)
+                .WithRetainFlag()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+                .Build();
+
+            MqttClientPublishResult result = await _mqttClient.PublishAsync(message, token);
+            if (!result.IsSuccess)
+            {
+                _logger.LogError("MQTT broker rejected publish to {Topic}: {ReasonCode} {ReasonString}", topic, result.ReasonCode, result.ReasonString);
+                return MqttFlushStatus.BrokerRejected;
+            }
+
+            _logger.LogDebug("Published retained value to {Topic}", topic);
+            return MqttFlushStatus.Completed;
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (MqttClientNotConnectedException)
+        {
+            return MqttFlushStatus.Disconnected;
+        }
+        catch (MqttCommunicationException exception)
+        {
+            _logger.LogWarning(exception, "MQTT publish to {Topic} was interrupted; values remain dirty", topic);
+            return MqttFlushStatus.Interrupted;
         }
     }
 
-    internal T GetService<T>()
+    private static byte[] Serialize(object value)
     {
-        return _serviceProvider.GetService<T>();
+        if (value is string text)
+            return Encoding.UTF8.GetBytes(text);
+        if (value == null)
+            return Array.Empty<byte>();
+
+        JToken converted = JToken.FromObject(value, CustomJsonSerializer.Serializer);
+        return Encoding.UTF8.GetBytes(converted.ToString(Formatting.None));
     }
+
+    async Task IMqttEventReceiver.OnConnect(MqttClientConnectedEventArgs args, CancellationToken token)
+    {
+        MarkAllValuesDirty();
+        await FlushAll(token);
+    }
+
+    Task IMqttEventReceiver.OnDisconnect(MqttClientDisconnectedEventArgs args, CancellationToken token) => Task.CompletedTask;
+
+    internal T GetService<T>() => _serviceProvider.GetService<T>();
 }

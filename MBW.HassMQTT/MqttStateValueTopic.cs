@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Threading;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 using MBW.HassMQTT.Internal;
@@ -7,27 +8,39 @@ namespace MBW.HassMQTT;
 
 public class MqttStateValueTopic : IMqttValueContainer
 {
+    private readonly object _syncRoot = new object();
     private object _value;
+    private long _revision;
+    private long _publishedRevision;
+
     public string PublishTopic { get; }
-    public bool Dirty { get; private set; }
+    public bool Dirty => Revision != Interlocked.Read(ref _publishedRevision);
+    public long Revision => Interlocked.Read(ref _revision);
 
     public object Value
     {
-        get => _value;
+        get
+        {
+            lock (_syncRoot)
+                return _value;
+        }
         set
         {
-            try
+            lock (_syncRoot)
             {
-                if (ComparisonHelper.IsSameValue(value, Value))
-                    return;
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException("Unable to compare values for '" + PublishTopic + "'", e);
-            }
+                try
+                {
+                    if (ComparisonHelper.IsSameValue(value, _value))
+                        return;
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidOperationException("Unable to compare values for '" + PublishTopic + "'", e);
+                }
 
-            _value = value;
-            Dirty = true;
+                _value = value;
+                Interlocked.Increment(ref _revision);
+            }
         }
     }
 
@@ -55,19 +68,16 @@ public class MqttStateValueTopic : IMqttValueContainer
         }
     }
 
-    public void SetDirty(bool dirty = true)
+    public void MarkDirty() => Interlocked.Increment(ref _revision);
+
+    public void MarkPublished(long revision) => Interlocked.Exchange(ref _publishedRevision, revision);
+
+    public object GetSerializedValue()
     {
-        Dirty = dirty;
-    }
+        object value;
+        lock (_syncRoot)
+            value = _value;
 
-    public object GetSerializedValue(bool resetDirty)
-    {
-        if (resetDirty)
-            Dirty = false;
-
-        if (TryConvertStateValue(Value, out string asString))
-            return asString;
-
-        return Value;
+        return TryConvertStateValue(value, out string asString) ? asString : value;
     }
 }

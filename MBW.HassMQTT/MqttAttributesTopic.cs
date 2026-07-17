@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 
@@ -8,71 +8,77 @@ namespace MBW.HassMQTT;
 
 public class MqttAttributesTopic : IMqttValueContainer
 {
-    public string PublishTopic { get; }
-    public bool Dirty { get; private set; }
+    private readonly object _syncRoot = new object();
+    private readonly Dictionary<string, object> _attributes = new Dictionary<string, object>();
+    private long _revision;
+    private long _publishedRevision;
 
-    private readonly Dictionary<string, object> _attributes;
+    public string PublishTopic { get; }
+    public bool Dirty => Revision != Interlocked.Read(ref _publishedRevision);
+    public long Revision => Interlocked.Read(ref _revision);
 
     public MqttAttributesTopic(string topic)
     {
         PublishTopic = topic;
-        _attributes = new Dictionary<string, object>();
     }
 
     public void RemoveAttribute(string name)
     {
-        if (_attributes.Remove(name))
-            Dirty = true;
+        lock (_syncRoot)
+        {
+            if (_attributes.Remove(name))
+                Interlocked.Increment(ref _revision);
+        }
     }
 
     public void SetAttribute(string name, object value)
     {
-        if (value == default)
+        lock (_syncRoot)
         {
-            if (_attributes.Remove(name))
-                Dirty = true;
-
-            return;
-        }
-
-        if (_attributes.TryGetValue(name, out object existing))
-        {
-            try
+            if (value == default)
             {
-                if (ComparisonHelper.IsSameValue(existing, value))
-                    return;
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException($"Unable to compare values for '{PublishTopic}'", e);
+                if (_attributes.Remove(name))
+                    Interlocked.Increment(ref _revision);
+                return;
             }
 
-            return;
-        }
+            if (_attributes.TryGetValue(name, out object existing))
+            {
+                try
+                {
+                    if (ComparisonHelper.IsSameValue(existing, value))
+                        return;
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidOperationException($"Unable to compare values for '{PublishTopic}'", e);
+                }
+            }
 
-        _attributes[name] = value;
-        Dirty = true;
+            _attributes[name] = value;
+            Interlocked.Increment(ref _revision);
+        }
     }
 
     public void Clear()
     {
-        if (!_attributes.Any())
-            return;
+        lock (_syncRoot)
+        {
+            if (_attributes.Count == 0)
+                return;
 
-        _attributes.Clear();
-        Dirty = true;
+            _attributes.Clear();
+            Interlocked.Increment(ref _revision);
+        }
     }
 
-    public void SetDirty(bool dirty = true)
-    {
-        Dirty = dirty;
-    }
+    public void MarkDirty() => Interlocked.Increment(ref _revision);
 
-    public object GetSerializedValue(bool resetDirty)
-    {
-        if (resetDirty)
-            Dirty = false;
+    public void MarkPublished(long revision) => Interlocked.Exchange(ref _publishedRevision, revision);
 
-        return _attributes;
+    public object GetSerializedValue()
+    {
+        lock (_syncRoot)
+            return new Dictionary<string, object>(_attributes);
     }
 }

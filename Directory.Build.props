@@ -3,6 +3,7 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <DefaultTargetFramework>net10.0</DefaultTargetFramework>
+    <RuntimeTargetFrameworks>net8.0;net10.0</RuntimeTargetFrameworks>
   </PropertyGroup>
   
   <!-- Common NuGet properties -->
@@ -37,7 +38,7 @@
   
   <ItemGroup>
     <!-- Private packages, for builds only, not to be included in dependencies -->
-    <PackageReference Include="Jetbrains.Annotations" Version="2025.2.4" PrivateAssets="all" />
+    <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" PrivateAssets="all" />
     <PackageReference Include="MinVer" Version="7.0.0" PrivateAssets="all" />
   </ItemGroup>
   
@@ -47,7 +48,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.301" PrivateAssets="All"/>
   </ItemGroup>
 
   <Import Project="_Imports\Local.targets" Condition="Exists('_Imports\Local.targets')" />

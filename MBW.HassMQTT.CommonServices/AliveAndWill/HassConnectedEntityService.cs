@@ -11,9 +11,7 @@ using MBW.HassMQTT.Services;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using MQTTnet.Client.Connecting;
-using MQTTnet.Client.Disconnecting;
-using MQTTnet.Extensions.ManagedClient;
+using MQTTnet;
 
 namespace MBW.HassMQTT.CommonServices.AliveAndWill;
 
@@ -24,8 +22,7 @@ namespace MBW.HassMQTT.CommonServices.AliveAndWill;
 public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
 {
     private readonly HassConnectedEntityServiceConfig _config;
-    private readonly IManagedMqttClient _mqttClient;
-    private readonly MqttEvents _mqttEvents;
+    private readonly IHassMqttClient _mqttClient;
     private readonly HassMqttManager _hassMqttManager;
 
     public string OkMessage => _config.OkMessage;
@@ -34,14 +31,12 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
     public string StateTopic { get; }
 
     public HassConnectedEntityService(IOptions<HassConnectedEntityServiceConfig> options,
-        IManagedMqttClient mqttClient,
-        MqttEvents mqttEvents,
+        IHassMqttClient mqttClient,
         HassMqttManager hassMqttManager,
         HassMqttTopicBuilder topicBuilder)
     {
         _config = options.Value;
         _mqttClient = mqttClient;
-        _mqttEvents = mqttEvents;
         _hassMqttManager = hassMqttManager;
 
         StateTopic = topicBuilder.GetServiceTopic(_config.DeviceId, _config.EntityId, "state");
@@ -92,6 +87,12 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
     {
         // Do nothing
         return Task.CompletedTask;
+    }
+
+    async Task IMqttEventReceiver.OnStopping(CancellationToken token)
+    {
+        if (_mqttClient.IsConnected)
+            await _mqttClient.SendValueAsync(StateTopic, ProblemMessage, token);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

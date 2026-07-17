@@ -16,8 +16,4 @@
     <PackageTags>home-assistant hass mqtt discovery</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" PrivateAssets="all" />
-  </ItemGroup>
-
 </Project>

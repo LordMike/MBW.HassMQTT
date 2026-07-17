@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.Abstracts.Interfaces;
@@ -24,6 +25,9 @@ namespace MBW.HassMQTT.DiscoveryModels;
 /// </summary>
 public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDocument, IMqttValueContainer, INotifyPropertyChanged where T : IHassDiscoveryDocument where TValidator : AbstractValidator<T>, new()
 {
+    private long _revision;
+    private long _publishedRevision;
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     public static TValidator Validator { get; } = new TValidator();
@@ -36,12 +40,15 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         if (nameof(Dirty) != propertyName)
-            Dirty = true;
+            MarkDirty();
     }
 
     /// <inheritdoc />
     [JsonIgnore]
-    public bool Dirty { get; private set; }
+    public bool Dirty => Revision != Interlocked.Read(ref _publishedRevision);
+
+    [JsonIgnore]
+    public long Revision => Interlocked.Read(ref _revision);
 
     /// <inheritdoc />
     [JsonIgnore]
@@ -66,19 +73,21 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 #pragma warning restore 618
 
         Device = new MqttDeviceDocument();
-        Device.PropertyChanged += (_, _) => SetDirty();
+        Device.PropertyChanged += (_, _) => MarkDirty();
     }
 
-    public void SetDirty(bool dirty = true)
+    public void MarkDirty()
     {
-        Dirty = dirty;
+        Interlocked.Increment(ref _revision);
     }
 
-    public object GetSerializedValue(bool resetDirty)
+    public void MarkPublished(long revision)
     {
-        if (resetDirty)
-            Dirty = false;
+        Interlocked.Exchange(ref _publishedRevision, revision);
+    }
 
+    public object GetSerializedValue()
+    {
         return this;
     }
 

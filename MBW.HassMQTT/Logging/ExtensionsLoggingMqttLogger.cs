@@ -1,58 +1,34 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Logging;
-using MQTTnet.Diagnostics;
+using MQTTnet.Diagnostics.Logger;
 
 namespace MBW.HassMQTT.Logging;
 
-/// <summary>
-/// Logging class to map between <see cref="IMqttNetLogger"/>, <see cref="IMqttNetScopedLogger"/> and <see cref="ILogger"/>
-/// </summary>
-internal class ExtensionsLoggingMqttLogger : IMqttNetLogger, IMqttNetScopedLogger
+internal sealed class ExtensionsLoggingMqttLogger : IMqttNetLogger
 {
-    private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger _logger;
-    private readonly string _source;
 
-    public event EventHandler<MqttNetLogMessagePublishedEventArgs> LogMessagePublished;
+    public bool IsEnabled => true;
 
     public ExtensionsLoggingMqttLogger(ILoggerFactory loggerFactory, string source)
     {
-        _source = source;
-        _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger(source);
-    }
-
-    public IMqttNetScopedLogger CreateScopedLogger(string source)
-    {
-        return new ExtensionsLoggingMqttLogger(_loggerFactory, $"{_source}.{source}");
-    }
-
-    public void Publish(MqttNetLogLevel logLevel, string message, object[] parameters, Exception exception)
-    {
-        Publish(logLevel, _source, message, parameters, exception);
     }
 
     public void Publish(MqttNetLogLevel logLevel, string source, string message, object[] parameters, Exception exception)
     {
-        LogLevel level;
-        switch (logLevel)
+        LogLevel level = logLevel switch
         {
-            case MqttNetLogLevel.Verbose:
-                level = LogLevel.Trace;
-                break;
-            case MqttNetLogLevel.Info:
-                level = LogLevel.Information;
-                break;
-            case MqttNetLogLevel.Warning:
-                level = LogLevel.Warning;
-                break;
-            case MqttNetLogLevel.Error:
-                level = LogLevel.Error;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
-        }
+            MqttNetLogLevel.Verbose => LogLevel.Trace,
+            MqttNetLogLevel.Info => LogLevel.Information,
+            MqttNetLogLevel.Warning => LogLevel.Warning,
+            MqttNetLogLevel.Error => LogLevel.Error,
+            _ => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null)
+        };
 
-        _logger.Log(level, exception, message, parameters);
+        _logger.Log(level, exception, "{MqttSource}: {MqttMessage}", source, Format(message, parameters));
     }
+
+    private static string Format(string message, object[] parameters) =>
+        parameters is { Length: > 0 } ? string.Format(message, parameters) : message;
 }

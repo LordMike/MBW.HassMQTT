@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Logging;
 using MBW.HassMQTT.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,48 +10,42 @@ namespace MBW.HassMQTT.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddMqttClientFactoryWithLogging(this IServiceCollection services, Action<IMqttFactory> configure = null, string loggingSource = "MqttNet")
+    public static IServiceCollection AddMqttClientFactoryWithLogging(this IServiceCollection services, Action<MqttClientFactory> configure = null, string loggingSource = "MqttNet")
     {
-        return services.AddSingleton<IMqttFactory>(provider =>
+        return services.AddSingleton(provider =>
         {
             ILoggerFactory loggerFactory = provider.GetRequiredService<ILoggerFactory>();
             ExtensionsLoggingMqttLogger logger = new ExtensionsLoggingMqttLogger(loggerFactory, loggingSource);
-
-            MqttFactory factory = new MqttFactory(logger);
-
+            MqttClientFactory factory = new MqttClientFactory(logger);
             configure?.Invoke(factory);
-
             return factory;
         });
     }
 
     public static IServiceCollection AddMqttLifetimeService(this IServiceCollection services)
     {
-        return services.AddHostedService<MqttClientLifetimeService>();
+        services.AddSingleton<MqttClientLifetimeService>();
+        services.AddSingleton<IHassMqttClient>(provider => provider.GetRequiredService<MqttClientLifetimeService>());
+        services.AddHostedService(provider => provider.GetRequiredService<MqttClientLifetimeService>());
+        return services;
     }
 
-    public static IServiceCollection AddMqttEvents(this IServiceCollection services)
-    {
-        return services.AddSingleton<MqttEvents>();
-    }
+    public static IServiceCollection AddMqttEvents(this IServiceCollection services) => services.AddSingleton<MqttEvents>();
 
-    public static IServiceCollection AddMqttMessageReceiverService(this IServiceCollection services)
-    {
-        return services.AddSingleton<MqttMessageDistributor>()
-            .AddHostedService(x => x.GetRequiredService<MqttMessageDistributor>());
-    }
+    public static IServiceCollection AddMqttMessageReceiverService(this IServiceCollection services) => services.AddSingleton<MqttMessageDistributor>();
 
     public static IServiceCollection AddMqttMessageReceiver<TReceiver>(this IServiceCollection services, Func<IServiceProvider, TReceiver> factory = null) where TReceiver : class, IMqttMessageReceiver
     {
         if (factory != null)
-            return services.AddSingleton<IMqttMessageReceiver, TReceiver>();
+            return services.AddSingleton<IMqttMessageReceiver>(factory);
 
-        return services.AddSingleton<IMqttMessageReceiver>(x => x.GetRequiredService<TReceiver>());
+        return services.AddSingleton<IMqttMessageReceiver>(provider => provider.GetRequiredService<TReceiver>());
     }
 
     public static IServiceCollection AddHassMqttManager(this IServiceCollection services, Action<HassMqttManagerConfiguration> configure = null)
     {
         services.AddSingleton<HassMqttManager>();
+        services.AddSingleton<IMqttEventReceiver>(provider => provider.GetRequiredService<HassMqttManager>());
 
         if (configure != null)
             services.Configure(configure);
