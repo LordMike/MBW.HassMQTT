@@ -205,6 +205,7 @@ public class DiscoveryModelCapabilityTests
     {
         var model = new MqttValve("homeassistant/valve/example/config", "valve-example")
         {
+            DeviceClass = HassValveDeviceClass.Water,
             CommandTopic = "example/valve/set",
             StateTopic = "example/valve/state",
             ReportsPosition = true,
@@ -218,9 +219,15 @@ public class DiscoveryModelCapabilityTests
 
         JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
         Assert.True(json.Value<bool>("reports_position"));
+        Assert.Equal("water", json.Value<string>("device_class"));
         Assert.Equal(0, json.Value<int>("position_closed"));
         Assert.Equal(100, json.Value<int>("position_open"));
         Assert.Equal("example/valve/state", json.Value<string>("state_topic"));
+
+        model.PayloadOpen = "OPEN";
+        ValidationResult invalid = MqttValve.Validator.Validate(model);
+        Assert.False(invalid.IsValid);
+        Assert.Contains(invalid.Errors, error => error.PropertyName == nameof(MqttValve.PayloadOpen));
     }
 
     [Fact]

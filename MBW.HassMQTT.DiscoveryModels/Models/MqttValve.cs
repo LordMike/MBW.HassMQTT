@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -22,7 +23,7 @@ public class MqttValve : MqttSensorDiscoveryBase<MqttValve, MqttValve.MqttValveV
     public string? CommandTemplate { get; set; }
     public string? CommandTopic { get; set; }
     /// <summary>The valve device class used by Home Assistant.</summary>
-    public string? DeviceClass { get; set; }
+    public HassValveDeviceClass? DeviceClass { get; set; }
     public string? PayloadClose { get; set; }
     public string? PayloadOpen { get; set; }
     public string? PayloadStop { get; set; }
@@ -37,27 +38,49 @@ public class MqttValve : MqttSensorDiscoveryBase<MqttValve, MqttValve.MqttValveV
     public string? StateTopic { get; set; }
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
     public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
     public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
     public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
     public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
+    /// <inheritdoc />
     public string? EntityPicture { get; set; }
+    /// <inheritdoc />
     public IList<string>? Group { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
+    /// <inheritdoc />
     public bool? Optimistic { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public bool? VisibleByDefault { get; set; }
 
     public class MqttValveValidator : MqttSensorDiscoveryBaseValidator<MqttValve>
@@ -66,6 +89,14 @@ public class MqttValve : MqttSensorDiscoveryBase<MqttValve, MqttValve.MqttValveV
         {
             TopicAndTemplate(x => x.CommandTopic, x => x.CommandTemplate);
             TopicAndTemplate(x => x.StateTopic, x => x.ValueTemplate);
+
+            When(x => x.ReportsPosition == true, () =>
+            {
+                RuleFor(x => x.PayloadClose).Null();
+                RuleFor(x => x.PayloadOpen).Null();
+                RuleFor(x => x.StateClosed).Null();
+                RuleFor(x => x.StateOpen).Null();
+            });
         }
     }
 }
