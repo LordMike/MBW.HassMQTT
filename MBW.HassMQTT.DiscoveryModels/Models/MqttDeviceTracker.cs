@@ -58,6 +58,7 @@ public class MqttDeviceTracker :
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
     /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
@@ -71,9 +72,13 @@ public class MqttDeviceTracker :
     public string? PayloadAvailable { get; set; }
     /// <inheritdoc />
     public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
     /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
@@ -81,6 +86,7 @@ public class MqttDeviceTracker :
     public bool? VisibleByDefault { get; set; }
     /// <inheritdoc />
     public IList<string>? Group { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttDeviceTrackerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTracker>

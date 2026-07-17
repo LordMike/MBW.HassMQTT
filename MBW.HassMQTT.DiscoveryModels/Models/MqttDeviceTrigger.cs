@@ -85,6 +85,7 @@ public class
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
 
     public class MqttDeviceTriggerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTrigger>

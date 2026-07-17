@@ -18,29 +18,29 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 public class MqttLawnMower : MqttSensorDiscoveryBase<MqttLawnMower, MqttLawnMower.MqttLawnMowerValidator>,
     IHasAvailability, IHasDefaultEntityId, IHasEnabledByDefault, IHasEncoding, IHasEntityCategory,
     IHasEntityPicture, IHasIcon, IHasJsonAttributes, IHasMessageExpiryInterval, IHasName, IHasQos,
-    IHasRetain, IHasUniqueId, IHasVisibleByDefault
+    IHasOptimistic, IHasRetain, IHasUniqueId, IHasVisibleByDefault
 {
     public MqttLawnMower(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
     }
 
-    /// <summary>The MQTT topic subscribed to for activity-state updates.</summary>
+    /// <summary>The MQTT topic subscribed to receive activity-state updates.</summary>
     public string? ActivityStateTopic { get; set; }
-    /// <summary>Defines a template used to extract the activity state.</summary>
+    /// <summary>A template used to extract the activity state from messages received on <see cref="ActivityStateTopic" />.</summary>
     public string? ActivityValueTemplate { get; set; }
-    /// <summary>Defines the payload published for a dock command.</summary>
+    /// <summary>A template used to render the dock command published to <see cref="DockCommandTopic" />.</summary>
     public string? DockCommandTemplate { get; set; }
-    /// <summary>The MQTT topic on which dock commands are published.</summary>
+    /// <summary>The MQTT topic to which dock commands are published.</summary>
     public string? DockCommandTopic { get; set; }
-    /// <summary>Whether activity state is assumed immediately after a command.</summary>
+    /// <inheritdoc />
     public bool? Optimistic { get; set; }
-    /// <summary>Defines the payload published for a pause command.</summary>
+    /// <summary>A template used to render the pause command published to <see cref="PauseCommandTopic" />.</summary>
     public string? PauseCommandTemplate { get; set; }
-    /// <summary>The MQTT topic on which pause commands are published.</summary>
+    /// <summary>The MQTT topic to which pause commands are published.</summary>
     public string? PauseCommandTopic { get; set; }
-    /// <summary>Defines the payload published for a start-mowing command.</summary>
+    /// <summary>A template used to render the start-mowing command published to <see cref="StartMowingCommandTopic" />.</summary>
     public string? StartMowingTemplate { get; set; }
-    /// <summary>The MQTT topic on which start-mowing commands are published.</summary>
+    /// <summary>The MQTT topic to which start-mowing commands are published.</summary>
     public string? StartMowingCommandTopic { get; set; }
 
     /// <inheritdoc />

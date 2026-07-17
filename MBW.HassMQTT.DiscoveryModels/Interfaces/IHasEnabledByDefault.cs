@@ -3,7 +3,8 @@
 public interface IHasEnabledByDefault
 {
     /// <summary>
-    /// Flag which defines if the entity should be enabled when first added.
+    /// Controls whether the entity is enabled when first added.
     /// </summary>
+    /// <remarks>The Home Assistant default is <see langword="true" />.</remarks>
     public bool? EnabledByDefault { get; set; }
 }

@@ -83,6 +83,8 @@ Maintain the working checklist in the agent's native task/plan state. Categorize
 - Put behavior and data shared by every discovery document in `MqttSensorDiscoveryBase` or another appropriate shared base type.
 - Represent capabilities shared by some, but not all, entity families through interfaces. Consumers must be able to test for a capability without knowing the concrete entity type.
 - Keep canonical property names, types, and XML documentation on capability interfaces or shared value types. Concrete implementations should use `<inheritdoc />` instead of duplicating the documentation.
+- Every public discovery configuration property must have XML documentation that accurately reflects the corresponding Home Assistant configuration entry, including documented defaults, allowed values, relationships, and constraints where applicable. This requirement applies to entity-specific properties as well as shared properties.
+- During a documentation sync, audit XML-documentation coverage for every discovery model in scope. Do not treat successful compilation or inherited class-level documentation as evidence that its public properties are documented.
 - Reuse existing capability interfaces before adding new ones. Extend an interface when the documentation expands the same capability.
 - Keep complex repeated structures, such as device and availability data, in shared model types.
 - Centralize documented shared validation in the base validator by detecting the corresponding capability interface. Entity validators should contain only entity-specific rules.

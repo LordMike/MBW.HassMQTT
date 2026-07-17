@@ -90,7 +90,7 @@ public class MqttDeviceDocument : INotifyPropertyChanged
     public ObservableCollection<string> Identifiers { get; }
 
     /// <summary>
-    /// A link to the webpage that can manage the configuration of this device. Can be either an HTTP or HTTPS link.
+    /// A link to the webpage that manages this device. Supported schemes are <c>http</c>, <c>https</c>, and <c>homeassistant</c>.
     /// </summary>
     public string? ConfigurationUrl { get; set; }
 

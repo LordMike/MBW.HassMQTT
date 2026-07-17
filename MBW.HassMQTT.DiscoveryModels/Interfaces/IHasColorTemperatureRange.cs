@@ -8,17 +8,17 @@ namespace MBW.HassMQTT.DiscoveryModels.Interfaces;
 public interface IHasColorTemperatureRange
 {
     /// <summary>
-    /// Whether color-temperature commands and state values use Kelvin instead of mireds.
+    /// Whether color-temperature commands and state values use Kelvin instead of mireds. The documented default is <see langword="false" />.
     /// </summary>
     bool? ColorTempKelvin { get; set; }
 
-    /// <summary>The maximum supported color temperature in Kelvin.</summary>
+    /// <summary>The maximum supported color temperature in Kelvin. The documented default is 6535 K.</summary>
     int? MaxKelvin { get; set; }
 
     /// <summary>The maximum supported color temperature in mireds.</summary>
     int? MaxMireds { get; set; }
 
-    /// <summary>The minimum supported color temperature in Kelvin.</summary>
+    /// <summary>The minimum supported color temperature in Kelvin. The documented default is 2000 K.</summary>
     int? MinKelvin { get; set; }
 
     /// <summary>The minimum supported color temperature in mireds.</summary>

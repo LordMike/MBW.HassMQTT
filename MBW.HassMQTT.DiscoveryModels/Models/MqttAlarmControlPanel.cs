@@ -124,6 +124,7 @@ public class MqttAlarmControlPanel :
     /// <remarks>Default value: 'TRIGGER'</remarks>
     public string? PayloadTrigger { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
     /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
@@ -137,12 +138,19 @@ public class MqttAlarmControlPanel :
     public string? PayloadAvailable { get; set; }
     /// <inheritdoc />
     public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
     /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
@@ -152,7 +160,9 @@ public class MqttAlarmControlPanel :
     public bool? VisibleByDefault { get; set; }
     /// <inheritdoc />
     public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttAlarmControlPanelValidator : MqttSensorDiscoveryBaseValidator<MqttAlarmControlPanel>

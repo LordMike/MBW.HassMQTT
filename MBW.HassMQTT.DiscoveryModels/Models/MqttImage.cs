@@ -58,11 +58,17 @@ public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageV
     public string? AvailabilityTemplate { get; set; }
     /// <inheritdoc />
     public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
     /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
@@ -70,7 +76,9 @@ public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageV
     public string? EntityPicture { get; set; }
     /// <inheritdoc />
     public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttImageValidator : MqttSensorDiscoveryBaseValidator<MqttImage>

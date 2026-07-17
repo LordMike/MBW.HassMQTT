@@ -74,7 +74,9 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
     /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
@@ -88,10 +90,15 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     public string? PayloadAvailable { get; set; }
     /// <inheritdoc />
     public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
     /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
@@ -101,7 +108,9 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     public bool? VisibleByDefault { get; set; }
     /// <inheritdoc />
     public IList<string>? Group { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttSensorValidator : MqttSensorDiscoveryBaseValidator<MqttSensor>

@@ -40,6 +40,7 @@ public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCam
     /// </summary>
     public string? Encoding { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
     /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
@@ -49,10 +50,15 @@ public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCam
     public string? AvailabilityTemplate { get; set; }
     /// <inheritdoc />
     public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
     /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
@@ -60,6 +66,7 @@ public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCam
     public string? EntityPicture { get; set; }
     /// <inheritdoc />
     public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttCameraValidator : MqttSensorDiscoveryBaseValidator<MqttCamera>

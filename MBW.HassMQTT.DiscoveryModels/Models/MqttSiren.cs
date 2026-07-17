@@ -103,6 +103,7 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
     /// </summary>
     public bool? SupportVolumeSet { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
     /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
@@ -112,12 +113,19 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
     public string? AvailabilityTemplate { get; set; }
     /// <inheritdoc />
     public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
     /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
@@ -129,8 +137,11 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
     public IList<string>? Group { get; set; }
     /// <inheritdoc />
     public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
+    /// <inheritdoc />
     public bool? Optimistic { get; set; }
 
     public class MqttSirenValidator : MqttSensorDiscoveryBaseValidator<MqttSiren>

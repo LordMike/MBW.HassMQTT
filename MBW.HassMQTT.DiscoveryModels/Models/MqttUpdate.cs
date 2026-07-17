@@ -96,6 +96,7 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
     /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
@@ -105,10 +106,15 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     public string? AvailabilityTemplate { get; set; }
     /// <inheritdoc />
     public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
     /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
@@ -116,9 +122,13 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     public bool? VisibleByDefault { get; set; }
     /// <inheritdoc />
     public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttUpdateValidator : MqttSensorDiscoveryBaseValidator<MqttUpdate>

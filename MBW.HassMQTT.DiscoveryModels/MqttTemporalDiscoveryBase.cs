@@ -28,12 +28,12 @@ public abstract class MqttTemporalDiscoveryBase<T, TValidator> : MqttSensorDisco
     public string? CommandTemplate { get; set; }
 
     /// <summary>
-    /// The MQTT topic to which the selected temporal value is published.
+    /// The required MQTT topic to which the selected date, date/time, or time value is published.
     /// </summary>
     public string CommandTopic { get; set; }
 
     /// <summary>
-    /// The MQTT topic subscribed to receive state updates.
+    /// The MQTT topic subscribed to receive a parsable date, date/time, or time state matching the concrete entity type.
     /// </summary>
     public string? StateTopic { get; set; }
 
