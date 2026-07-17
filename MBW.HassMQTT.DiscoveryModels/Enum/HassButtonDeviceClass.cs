@@ -8,6 +8,11 @@ public enum HassButtonDeviceClass
     None,
 
     /// <summary>
+    /// The button identifies its device.
+    /// </summary>
+    Identify,
+
+    /// <summary>
     /// The button restarts the device.
     /// </summary>
     Restart,

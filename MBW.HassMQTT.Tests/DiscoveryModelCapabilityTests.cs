@@ -443,4 +443,39 @@ public class DiscoveryModelCapabilityTests
         Assert.Equal(new[] { "start", "return_home", "clean_spot" }, json["supported_features"]!.Values<string>());
         Assert.Null(typeof(MqttVacuum).GetProperty("Schema"));
     }
+
+    [Fact]
+    public void ExpandedDeviceClassesSerializeToCurrentWireValues()
+    {
+        var binarySensor = new MqttBinarySensor("homeassistant/binary_sensor/example/config", "binary-example")
+        {
+            StateTopic = "example/binary/state",
+            DeviceClass = HassBinarySensorDeviceClass.Tamper,
+        };
+        var button = new MqttButton("homeassistant/button/example/config", "button-example")
+        {
+            DeviceClass = HassButtonDeviceClass.Identify,
+        };
+        var mqttEvent = new MqttEvent("homeassistant/event/example/config", "event-example")
+        {
+            DeviceClass = HassEventDeviceClass.Doorbell,
+        };
+        var number = new MqttNumber("homeassistant/number/example/config", "number-example")
+        {
+            DeviceClass = HassNumberDeviceClass.BloodGlucoseConcentration,
+        };
+        var sensor = new MqttSensor("homeassistant/sensor/example/config", "sensor-example")
+        {
+            StateTopic = "example/sensor/state",
+            DeviceClass = HassSensorDeviceClass.VolumeFlowRate,
+        };
+
+        Assert.Equal("tamper", JObject.FromObject(binarySensor, CustomJsonSerializer.Serializer).Value<string>("device_class"));
+        Assert.Equal("identify", JObject.FromObject(button, CustomJsonSerializer.Serializer).Value<string>("device_class"));
+        Assert.Equal("doorbell", JObject.FromObject(mqttEvent, CustomJsonSerializer.Serializer).Value<string>("device_class"));
+        Assert.Equal("blood_glucose_concentration", JObject.FromObject(number, CustomJsonSerializer.Serializer).Value<string>("device_class"));
+        Assert.Equal("volume_flow_rate", JObject.FromObject(sensor, CustomJsonSerializer.Serializer).Value<string>("device_class"));
+        Assert.DoesNotContain("Null", System.Enum.GetNames(typeof(HassEventDeviceClass)));
+        Assert.DoesNotContain("DeviceClass", System.Enum.GetNames(typeof(HassEventDeviceClass)));
+    }
 }
