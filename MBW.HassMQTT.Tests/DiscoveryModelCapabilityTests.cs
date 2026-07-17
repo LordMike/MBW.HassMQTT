@@ -263,4 +263,26 @@ public class DiscoveryModelCapabilityTests
             new[] { "arm_home", "arm_custom_bypass", "trigger" },
             json["supported_features"]!.Values<string>());
     }
+
+    [Fact]
+    public void ClimateUsesHorizontalSwingSchemaAndRemovesAuxiliaryHeatSchema()
+    {
+        var model = new MqttClimate("homeassistant/climate/example/config", "climate-example")
+        {
+            SwingHorizontalModeCommandTopic = "example/climate/swing-horizontal/set",
+            SwingHorizontalModeCommandTemplate = "{{ value }}",
+            SwingHorizontalModeStateTopic = "example/climate/swing-horizontal/state",
+            SwingHorizontalModeStateTemplate = "{{ value_json.swing_horizontal }}",
+            SwingHorizontalModes = new List<string> { "on", "off" },
+        };
+
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+
+        Assert.Equal("example/climate/swing-horizontal/set", json.Value<string>("swing_horizontal_mode_command_topic"));
+        Assert.Equal("{{ value_json.swing_horizontal }}", json.Value<string>("swing_horizontal_mode_state_template"));
+        Assert.Equal(new[] { "on", "off" }, json["swing_horizontal_modes"]!.Values<string>());
+        Assert.Null(typeof(MqttClimate).GetProperty("AuxCommandTopic"));
+        Assert.Null(typeof(MqttClimate).GetProperty("AuxStateTemplate"));
+        Assert.Null(typeof(MqttClimate).GetProperty("AuxStateTopic"));
+    }
 }
