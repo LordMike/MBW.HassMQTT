@@ -170,4 +170,27 @@ public class DiscoveryModelCapabilityTests
         Assert.Equal("ready", json.Value<string>("payload_available"));
         Assert.Equal(30, json["message_expiry_interval"]!.Value<int>("seconds"));
     }
+
+    [Fact]
+    public void LawnMowerSerializesActivityAndActionTopics()
+    {
+        var model = new MqttLawnMower("homeassistant/lawn_mower/example/config", "mower-example")
+        {
+            ActivityStateTopic = "example/mower/activity",
+            ActivityValueTemplate = "{{ value_json.activity }}",
+            DockCommandTopic = "example/mower/dock",
+            PauseCommandTopic = "example/mower/pause",
+            StartMowingCommandTopic = "example/mower/start",
+            Optimistic = false,
+        };
+
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+
+        Assert.Equal("example/mower/activity", json.Value<string>("activity_state_topic"));
+        Assert.Equal("{{ value_json.activity }}", json.Value<string>("activity_value_template"));
+        Assert.Equal("example/mower/dock", json.Value<string>("dock_command_topic"));
+        Assert.Equal("example/mower/pause", json.Value<string>("pause_command_topic"));
+        Assert.Equal("example/mower/start", json.Value<string>("start_mowing_command_topic"));
+        Assert.False(json.Value<bool>("optimistic"));
+    }
 }
