@@ -95,4 +95,7 @@ public enum HassDeviceType
 
     [EnumMember(Value = "valve")]
     Valve,
+
+    [EnumMember(Value = "water_heater")]
+    WaterHeater,
 }

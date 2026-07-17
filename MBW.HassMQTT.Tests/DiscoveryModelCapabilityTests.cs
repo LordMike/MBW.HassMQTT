@@ -216,4 +216,28 @@ public class DiscoveryModelCapabilityTests
         Assert.Equal(100, json.Value<int>("position_open"));
         Assert.Equal("example/valve/state", json.Value<string>("state_topic"));
     }
+
+    [Fact]
+    public void WaterHeaterSerializesTemperatureAndModeSchema()
+    {
+        var model = new MqttWaterHeater("homeassistant/water_heater/example/config", "heater-example")
+        {
+            CurrentTemperatureTopic = "example/heater/current",
+            TemperatureCommandTopic = "example/heater/temperature/set",
+            TemperatureStateTopic = "example/heater/temperature/state",
+            ModeCommandTopic = "example/heater/mode/set",
+            Modes = new List<string> { "off", "eco", "electric" },
+            MinTemp = 40,
+            MaxTemp = 65,
+            Precision = 0.5f,
+            TemperatureUnit = MBW.HassMQTT.DiscoveryModels.Enum.HassTemperatureUnit.Celcius,
+        };
+
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+        Assert.Equal("example/heater/current", json.Value<string>("current_temperature_topic"));
+        Assert.Equal("example/heater/temperature/set", json.Value<string>("temperature_command_topic"));
+        Assert.Equal(new[] { "off", "eco", "electric" }, json["modes"]!.Values<string>());
+        Assert.Equal(0.5f, json.Value<float>("precision"));
+        Assert.Equal("C", json.Value<string>("temperature_unit"));
+    }
 }
