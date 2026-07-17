@@ -84,13 +84,13 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// <summary>
     /// Set the initial target temperature. The default value depends on the temperature unit and will be 21° or 69.8°F.
     /// </summary>
-    public int? Initial { get; set; }
+    public float? Initial { get; set; }
 
     /// <summary>
     /// The minimum target humidity percentage that can be set.
     /// </summary>
     /// <remarks>Default value: 99</remarks>
-    public int? MaxHumidity { get; set; }
+    public float? MaxHumidity { get; set; }
 
     /// <summary>
     /// Maximum set point available. The default value depends on the temperature unit, and will be 35°C or 95°F.
@@ -101,7 +101,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// min_humidity
     /// </summary>
     /// <remarks>Default value: 30</remarks>
-    public int? MinHumidity { get; set; }
+    public float? MinHumidity { get; set; }
 
     /// <summary>
     /// Minimum set point available. The default value depends on the temperature unit, and will be 7°C or 44.6°F.

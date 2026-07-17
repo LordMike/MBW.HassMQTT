@@ -77,12 +77,12 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
     /// <summary>
     /// The minimum target humidity percentage that can be set.
     /// </summary>
-    public int? MaxHumidity { get; set; }
+    public float? MaxHumidity { get; set; }
 
     /// <summary>
     /// The maximum target humidity percentage that can be set.
     /// </summary>
-    public int? MinHumidity { get; set; }
+    public float? MinHumidity { get; set; }
 
     /// <summary>
     /// The payload that represents the stop state.

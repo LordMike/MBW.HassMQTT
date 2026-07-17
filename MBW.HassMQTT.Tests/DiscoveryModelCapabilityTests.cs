@@ -236,7 +236,7 @@ public class DiscoveryModelCapabilityTests
             MinTemp = 40,
             MaxTemp = 65,
             Precision = 0.5f,
-            TemperatureUnit = MBW.HassMQTT.DiscoveryModels.Enum.HassTemperatureUnit.Celcius,
+            TemperatureUnit = MBW.HassMQTT.DiscoveryModels.Enum.HassTemperatureUnit.Celsius,
         };
 
         JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
@@ -279,6 +279,9 @@ public class DiscoveryModelCapabilityTests
             SwingHorizontalModeStateTopic = "example/climate/swing-horizontal/state",
             SwingHorizontalModeStateTemplate = "{{ value_json.swing_horizontal }}",
             SwingHorizontalModes = new List<string> { "on", "off" },
+            Initial = 21.5f,
+            MinHumidity = 30.5f,
+            MaxHumidity = 98.5f,
         };
 
         JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
@@ -286,6 +289,9 @@ public class DiscoveryModelCapabilityTests
         Assert.Equal("example/climate/swing-horizontal/set", json.Value<string>("swing_horizontal_mode_command_topic"));
         Assert.Equal("{{ value_json.swing_horizontal }}", json.Value<string>("swing_horizontal_mode_state_template"));
         Assert.Equal(new[] { "on", "off" }, json["swing_horizontal_modes"]!.Values<string>());
+        Assert.Equal(21.5f, json.Value<float>("initial"));
+        Assert.Equal(30.5f, json.Value<float>("min_humidity"));
+        Assert.Equal(98.5f, json.Value<float>("max_humidity"));
         Assert.Null(typeof(MqttClimate).GetProperty("AuxCommandTopic"));
         Assert.Null(typeof(MqttClimate).GetProperty("AuxStateTemplate"));
         Assert.Null(typeof(MqttClimate).GetProperty("AuxStateTopic"));
