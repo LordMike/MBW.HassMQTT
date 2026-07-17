@@ -109,6 +109,11 @@ public class MqttAlarmControlPanel :
     public string StateTopic { get; set; }
 
     /// <summary>
+    /// The features supported by the alarm control panel.
+    /// </summary>
+    public IList<HassAlarmControlPanelFeature>? SupportedFeatures { get; set; }
+
+    /// <summary>
     /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value.
     /// </summary>
     public string? ValueTemplate { get; set; }

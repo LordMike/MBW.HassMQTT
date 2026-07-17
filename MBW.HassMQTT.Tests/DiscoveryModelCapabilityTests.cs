@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentValidation.Results;
 using MBW.HassMQTT.DiscoveryModels.Availability;
+using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 using MBW.HassMQTT.DiscoveryModels.Models;
@@ -239,5 +240,27 @@ public class DiscoveryModelCapabilityTests
         Assert.Equal(new[] { "off", "eco", "electric" }, json["modes"]!.Values<string>());
         Assert.Equal(0.5f, json.Value<float>("precision"));
         Assert.Equal("C", json.Value<string>("temperature_unit"));
+    }
+
+    [Fact]
+    public void AlarmControlPanelSerializesSupportedFeaturesAsDocumentedValues()
+    {
+        var model = new MqttAlarmControlPanel("homeassistant/alarm_control_panel/example/config", "alarm-example")
+        {
+            CommandTopic = "example/alarm/set",
+            StateTopic = "example/alarm/state",
+            SupportedFeatures = new List<HassAlarmControlPanelFeature>
+            {
+                HassAlarmControlPanelFeature.ArmHome,
+                HassAlarmControlPanelFeature.ArmCustomBypass,
+                HassAlarmControlPanelFeature.Trigger,
+            },
+        };
+
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+
+        Assert.Equal(
+            new[] { "arm_home", "arm_custom_bypass", "trigger" },
+            json["supported_features"]!.Values<string>());
     }
 }
