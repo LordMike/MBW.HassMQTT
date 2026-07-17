@@ -148,4 +148,26 @@ public class DiscoveryModelCapabilityTests
 
         Assert.Contains(result.Errors, failure => failure.PropertyName == nameof(MqttDate.CommandTopic));
     }
+
+    [Fact]
+    public void NotifyUsesSharedCapabilitiesAndSerializesCommandSchema()
+    {
+        var model = new MqttNotify("homeassistant/notify/example/config", "notify-example")
+        {
+            CommandTopic = "example/notify/send",
+            CommandTemplate = "{{ message }}",
+            PayloadAvailable = "ready",
+            MessageExpiryInterval = new MessageExpiryInterval { Seconds = 30 },
+        };
+
+        Assert.IsAssignableFrom<IHasAvailabilityPayloads>(model);
+        Assert.IsAssignableFrom<IHasMessageExpiryInterval>(model);
+
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+
+        Assert.Equal("example/notify/send", json.Value<string>("command_topic"));
+        Assert.Equal("{{ message }}", json.Value<string>("command_template"));
+        Assert.Equal("ready", json.Value<string>("payload_available"));
+        Assert.Equal(30, json["message_expiry_interval"]!.Value<int>("seconds"));
+    }
 }

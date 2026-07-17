@@ -86,4 +86,7 @@ public enum HassDeviceType
 
     [EnumMember(Value = "time")]
     Time,
+
+    [EnumMember(Value = "notify")]
+    Notify,
 }
