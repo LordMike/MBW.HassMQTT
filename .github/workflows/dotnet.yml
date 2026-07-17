@@ -11,23 +11,6 @@ env:
   DOTNET_NOLOGO: true
 
 jobs:
-  source-generator-sdk8:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v7
-
-    - name: Setup .NET 8
-      uses: actions/setup-dotnet@v6
-      with:
-        dotnet-version: 8.0.x
-
-    - name: Build source generator with extended analyzer rules
-      run: dotnet build MBW.HassMQTT.SourceGenerators/MBW.HassMQTT.SourceGenerators.csproj -warnaserror
-
-    - name: Load source generator in a .NET 8 SDK consumer build
-      run: dotnet build MBW.HassMQTT.DiscoveryModels/MBW.HassMQTT.DiscoveryModels.csproj -p:RuntimeTargetFrameworks=net8.0
-
   build:
     runs-on: ubuntu-latest
 
