@@ -399,4 +399,48 @@ public class DiscoveryModelCapabilityTests
         Assert.Contains(result.Errors, failure => failure.PropertyName.Contains(nameof(IHasColorTemperatureRange.MinKelvin)));
         Assert.Contains(result.Errors, failure => failure.PropertyName.Contains(nameof(IHasColorTemperatureRange.MaxKelvin)));
     }
+
+    [Fact]
+    public void UpdateSerializesDirectVersionAndProgressFields()
+    {
+        var model = new MqttUpdate("homeassistant/update/example/config", "update-example")
+        {
+            DisplayPrecision = 1,
+            InstalledVersion = "1.0.0",
+            LatestVersion = "1.1.0",
+            InProgress = true,
+            UpdatePercentage = 42.5f,
+        };
+
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+        Assert.Equal(1, json.Value<int>("display_precision"));
+        Assert.Equal("1.0.0", json.Value<string>("installed_version"));
+        Assert.Equal("1.1.0", json.Value<string>("latest_version"));
+        Assert.True(json.Value<bool>("in_progress"));
+        Assert.Equal(42.5f, json.Value<float>("update_percentage"));
+    }
+
+    [Fact]
+    public void VacuumUsesCurrentSegmentAndFeatureSchema()
+    {
+        var model = new MqttVacuum("homeassistant/vacuum/example/config", "vacuum-example")
+        {
+            CleanSegmentsCommandTopic = "example/vacuum/segments/set",
+            CleanSegmentsCommandTemplate = "{{ value | to_json }}",
+            Encoding = "utf-8",
+            SupportedFeatures = new List<HassVacuumFeature>
+            {
+                HassVacuumFeature.Start,
+                HassVacuumFeature.ReturnHome,
+                HassVacuumFeature.CleanSpot,
+            },
+        };
+
+        Assert.IsAssignableFrom<IHasEncoding>(model);
+        JObject json = JObject.FromObject(model, CustomJsonSerializer.Serializer);
+        Assert.Equal("example/vacuum/segments/set", json.Value<string>("clean_segments_command_topic"));
+        Assert.Equal("{{ value | to_json }}", json.Value<string>("clean_segments_command_template"));
+        Assert.Equal(new[] { "start", "return_home", "clean_spot" }, json["supported_features"]!.Values<string>());
+        Assert.Null(typeof(MqttVacuum).GetProperty("Schema"));
+    }
 }

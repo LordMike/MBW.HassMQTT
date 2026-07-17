@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -37,6 +38,9 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// <remarks>Default value: 'None'</remarks>
     public HassUpdateDeviceClass? DeviceClass { get; set; }
 
+    /// <summary>Number of decimal digits used to display update progress.</summary>
+    public int? DisplayPrecision { get; set; }
+
     /// <inheritdoc />
     public string? EntityPicture { get; set; }
 
@@ -49,6 +53,15 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// The MQTT topic subscribed to receive an update of the latest version.
     /// </summary>
     public string? LatestVersionTopic { get; set; }
+
+    /// <summary>Whether an update is currently in progress.</summary>
+    public bool? InProgress { get; set; }
+
+    /// <summary>The currently installed software or firmware version.</summary>
+    public string? InstalledVersion { get; set; }
+
+    /// <summary>The latest software or firmware version available.</summary>
+    public string? LatestVersion { get; set; }
 
     /// <summary>
     /// The MQTT payload to start installing process.
@@ -74,6 +87,9 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// Title of the software, or firmware update. This helps to differentiate between the device or entity name versus the title of the software installed.
     /// </summary>
     public string? Title { get; set; }
+
+    /// <summary>The update progress percentage, from 0 through 100.</summary>
+    public float? UpdatePercentage { get; set; }
 
     /// <summary>
     /// Defines a template to extract the `installed_version` state value or to render to a valid JSON payload on from the payload received on `state_topic`.
@@ -111,6 +127,9 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
         {
             TopicAndTemplate(x => x.LatestVersionTopic, x => x.LatestVersionTemplate);
             TopicAndTemplate(x => x.StateTopic, x => x.ValueTemplate);
+
+            RuleFor(x => x.DisplayPrecision).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.UpdatePercentage).InclusiveBetween(0, 100);
         }
     }
 }
