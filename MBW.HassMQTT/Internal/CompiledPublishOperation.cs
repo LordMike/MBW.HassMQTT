@@ -5,12 +5,6 @@ using MBW.HassMQTT.Abstracts.Interfaces;
 
 namespace MBW.HassMQTT.Internal;
 
-internal enum PublishOperationKind
-{
-    Value,
-    Attributes
-}
-
 internal sealed class CompiledPublishOperation
 {
     private readonly IReadOnlyList<IMqttValueContainer> _sources;

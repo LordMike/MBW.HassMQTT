@@ -7,7 +7,6 @@ using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Helpers;
 using MBW.HassMQTT.Interfaces;
-using MBW.HassMQTT.Services;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;

@@ -1,14 +1,5 @@
 namespace MBW.HassMQTT;
 
-public enum MqttFlushStatus
-{
-    Completed,
-    Busy,
-    Disconnected,
-    Interrupted,
-    BrokerRejected
-}
-
 public sealed record MqttFlushResult(
     MqttFlushStatus Status,
     int DiscoveryDocuments = 0,

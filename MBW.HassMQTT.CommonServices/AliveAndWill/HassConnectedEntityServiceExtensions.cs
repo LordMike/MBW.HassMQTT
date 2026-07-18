@@ -1,6 +1,5 @@
 using System;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
-using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;

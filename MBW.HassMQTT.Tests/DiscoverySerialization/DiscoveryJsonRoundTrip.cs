@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using MBW.HassMQTT.Serialization;
 using Newtonsoft.Json.Linq;
-using Xunit;
 
 namespace MBW.HassMQTT.Tests.DiscoverySerialization;
 
