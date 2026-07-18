@@ -60,6 +60,11 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     public HassStateClass? StateClass { get; set; }
 
     /// <summary>
+    /// The number of decimals which should be used in the sensor's state after rounding.
+    /// </summary>
+    public int? SuggestedDisplayPrecision { get; set; }
+
+    /// <summary>
     /// The MQTT topic subscribed to receive sensor values.
     /// </summary>
     public string StateTopic { get; set; }
@@ -123,6 +128,9 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
             RuleFor(s => s.StateClass).IsInEnum().NotEqual(HassStateClass.Unknown);
 
             RuleFor(s => s.ExpireAfter)
+                .GreaterThanOrEqualTo(0);
+
+            RuleFor(s => s.SuggestedDisplayPrecision)
                 .GreaterThanOrEqualTo(0);
 
             RuleFor(s => s.Options)
