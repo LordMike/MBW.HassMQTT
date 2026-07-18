@@ -13,7 +13,6 @@ public class LawnMowerDiscoveryExamples
             typeof(MqttLawnMower),
             """
             {
-              "command_topic": "topic",
               "name": "Test Lawn Mower"
             }
             """,
