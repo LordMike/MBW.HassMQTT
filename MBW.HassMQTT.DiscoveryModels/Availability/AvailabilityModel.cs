@@ -25,7 +25,7 @@ public class AvailabilityModel
     public string? PayloadNotAvailable { get; set; }
 
     /// <summary>
-    /// Defines a template to extract device’s availability from the topic. To determine the devices’s availability result of this template will be compared to `payload_available` and `payload_not_available`.
+    /// A template used to extract availability from messages received on <see cref="Topic" />. Its result is compared with <see cref="PayloadAvailable" /> and <see cref="PayloadNotAvailable" />.
     /// </summary>
     public string? ValueTemplate { get; set; }
 

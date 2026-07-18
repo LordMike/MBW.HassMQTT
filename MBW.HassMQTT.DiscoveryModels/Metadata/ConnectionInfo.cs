@@ -6,7 +6,9 @@ public class ConnectionInfo
 {
     public static ConnectionInfoValidator Validator { get; } = new ConnectionInfoValidator();
 
+    /// <summary>The connection type, such as <c>mac</c>.</summary>
     public string Type { get; set; }
+    /// <summary>The connection identifier associated with <see cref="Type" />.</summary>
     public string Value { get; set; }
         
     public ConnectionInfo()

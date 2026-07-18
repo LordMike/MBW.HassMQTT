@@ -24,12 +24,20 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Vacuum)]
 [PublicAPI]
 public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVacuumValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasName
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasDefaultEntityId, IHasName, IHasVisibleByDefault, IHasMessageExpiryInterval, IHasEncoding
 {
     public MqttVacuum(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
     }
+
+    /// <summary>
+    /// Defines a template used to generate the payload sent to <see cref="CleanSegmentsCommandTopic"/>.
+    /// </summary>
+    public string? CleanSegmentsCommandTemplate { get; set; }
+
+    /// <summary>The MQTT topic used to publish a JSON list of segment IDs to clean.</summary>
+    public string? CleanSegmentsCommandTopic { get; set; }
 
     /// <summary>
     /// The MQTT topic to publish commands to control the vacuum.
@@ -72,11 +80,6 @@ public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVac
     public string? PayloadStop { get; set; }
 
     /// <summary>
-    /// The schema to use. Must be `state`.
-    /// </summary>
-    public string? Schema { get; set; } = "state";
-
-    /// <summary>
     /// The MQTT topic to publish custom commands to the vacuum.
     /// </summary>
     public string? SendCommandTopic { get; set; }
@@ -104,25 +107,53 @@ public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVac
     /// - fan_speed
     /// - send_command
     /// </summary>
-    public IList<string>? SupportedFeatures { get; set; }
+    public IList<HassVacuumFeature>? SupportedFeatures { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
+    /// <inheritdoc />
+    public string? Encoding { get; set; }
 
     public class MqttVacuumValidator : MqttSensorDiscoveryBaseValidator<MqttVacuum>
     {
         public MqttVacuumValidator()
         {
+            TopicAndTemplate(s => s.CleanSegmentsCommandTopic, s => s.CleanSegmentsCommandTemplate);
+
             RuleFor(s => s.FanSpeedList)
                 .NotEmpty()
                 .When(s => s.FanSpeedList != null);

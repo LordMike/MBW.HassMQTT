@@ -21,6 +21,10 @@ public enum HassBinarySensorDeviceClass
     [EnumMember(Value = "battery_charging")]
     BatteryCharging,
 
+    /// <summary>Carbon monoxide detected versus clear.</summary>
+    [EnumMember(Value = "carbon_monoxide")]
+    CarbonMonoxide,
+
     /// <summary>
     /// on means cold, off means normal
     ///</summary>
@@ -123,6 +127,10 @@ public enum HassBinarySensorDeviceClass
     [EnumMember(Value = "problem")]
     Problem,
 
+    /// <summary>Running versus stopped.</summary>
+    [EnumMember(Value = "running")]
+    Running,
+
     /// <summary>
     /// on means unsafe, off means safe
     ///</summary>
@@ -140,6 +148,10 @@ public enum HassBinarySensorDeviceClass
     ///</summary>
     [EnumMember(Value = "sound")]
     Sound,
+
+    /// <summary>Tampering detected versus clear.</summary>
+    [EnumMember(Value = "tamper")]
+    Tamper,
 
     /// <summary>
     /// on means update available, off means up-to-date

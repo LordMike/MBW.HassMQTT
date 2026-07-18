@@ -13,6 +13,7 @@ using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Validation;
+using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.DiscoveryModels;
 
@@ -22,6 +23,7 @@ namespace MBW.HassMQTT.DiscoveryModels;
 /// </summary>
 public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDocument, INotifyPropertyChanged where T : IHassDiscoveryDocument where TValidator : AbstractValidator<T>, new()
 {
+    private MqttDeviceDocument _device = null!;
     public event PropertyChangedEventHandler PropertyChanged;
 
     public static TValidator Validator { get; } = new TValidator();
@@ -38,7 +40,12 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
     /// Device details for this entity, usually this is duplicated between multiple entities to let HA link them together.
     /// At least one of identifiers or connections must be present to identify the device.
     /// </summary>
-    public MqttDeviceDocument Device { get; }
+    [JsonProperty]
+    public MqttDeviceDocument Device
+    {
+        get => _device;
+        private set => _device = value ?? new MqttDeviceDocument();
+    }
 
     public MqttSensorDiscoveryBase(string discoveryTopic, string uniqueId)
     {
@@ -90,12 +97,28 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 
             if (typeof(IHasAvailability).IsAssignableFrom(type))
             {
+#pragma warning disable 618
                 RuleForEach(s => ((IHasAvailability)s).Availability)
                     .SetValidator(AvailabilityModel.Validator);
 
                 RuleFor(s => ((IHasAvailability)s).AvailabilityMode)
                     .IsInEnum()
                     .When(s => ((IHasAvailability)s).AvailabilityMode.HasValue);
+
+                TopicAndTemplate(
+                    s => ((IHasAvailability)s).AvailabilityTopic,
+                    s => ((IHasAvailability)s).AvailabilityTemplate);
+
+                RuleFor(s => ((IHasAvailability)s).Availability)
+                    .Empty()
+                    .When(s => ((IHasAvailability)s).AvailabilityTopic != null)
+                    .WithMessage("Availability and AvailabilityTopic cannot be used together");
+
+                RuleFor(s => ((IHasAvailability)s).AvailabilityTopic)
+                    .Null()
+                    .When(s => ((IHasAvailability)s).Availability?.Any() == true)
+                    .WithMessage("AvailabilityTopic and Availability cannot be used together");
+#pragma warning restore 618
             }
 
             if (typeof(IHasQos).IsAssignableFrom(type))
@@ -103,6 +126,20 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 
             if (typeof(IHasJsonAttributes).IsAssignableFrom(type))
                 TopicAndTemplate(s => ((IHasJsonAttributes)s).JsonAttributesTopic, s => ((IHasJsonAttributes)s).JsonAttributesTemplate);
+
+            if (typeof(IHasColorTemperatureRange).IsAssignableFrom(type))
+            {
+                MinMax(
+                    s => ((IHasColorTemperatureRange)s).MinKelvin,
+                    s => ((IHasColorTemperatureRange)s).MaxKelvin,
+                    2000,
+                    6535);
+                MinMax(
+                    s => ((IHasColorTemperatureRange)s).MinMireds,
+                    s => ((IHasColorTemperatureRange)s).MaxMireds,
+                    153,
+                    500);
+            }
 
             // Enums
             IEnumerable<PropertyInfo> enumProps = type.GetProperties()

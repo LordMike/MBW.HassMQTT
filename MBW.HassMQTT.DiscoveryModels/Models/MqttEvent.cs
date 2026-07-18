@@ -16,8 +16,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [PublicAPI]
 [DeviceType(HassDeviceType.Event)]
-public class MqttEvent : MqttSensorDiscoveryBase<MqttEvent, MqttEvent.MqttEventValidator>, IHasAvailability,
-    IHasEnabledByDefault, IHasEncoding, IHasEntityCategory, IHasIcon, IHasJsonAttributes, IHasName, IHasObjectId,
+public class MqttEvent : MqttSensorDiscoveryBase<MqttEvent, MqttEvent.MqttEventValidator>, IHasAvailability, IHasAvailabilityPayloads,
+    IHasEnabledByDefault, IHasEncoding, IHasEntityCategory, IHasIcon, IHasJsonAttributes, IHasName, IHasDefaultEntityId, IHasEntityPicture, IHasVisibleByDefault,
     IHasQos, IHasUniqueId
 {
     public MqttEvent(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
@@ -44,17 +44,41 @@ public class MqttEvent : MqttSensorDiscoveryBase<MqttEvent, MqttEvent.MqttEventV
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
 
     public class MqttEventValidator : MqttSensorDiscoveryBaseValidator<MqttEvent>

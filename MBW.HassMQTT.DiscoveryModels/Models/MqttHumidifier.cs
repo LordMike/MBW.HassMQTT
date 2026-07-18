@@ -32,8 +32,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Humidifier)]
 [PublicAPI]
 public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidifier.MqttHumidifierValidator>,
-    IHasUniqueId, IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain,
-    IHasEntityCategory, IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
+    IHasUniqueId, IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain,
+    IHasEntityCategory, IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasMessageExpiryInterval
 {
     public MqttHumidifier(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -75,14 +75,14 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
     public HumidifierDeviceClass? DeviceClass { get; set; }
 
     /// <summary>
-    /// The minimum target humidity percentage that can be set.
+    /// The maximum target humidity percentage that can be set. The documented default is 100%.
     /// </summary>
-    public int? MaxHumidity { get; set; }
+    public float? MaxHumidity { get; set; }
 
     /// <summary>
-    /// The maximum target humidity percentage that can be set.
+    /// The minimum target humidity percentage that can be set. The documented default is 0%.
     /// </summary>
-    public int? MinHumidity { get; set; }
+    public float? MinHumidity { get; set; }
 
     /// <summary>
     /// The payload that represents the stop state.
@@ -162,19 +162,47 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
     /// </summary>
     public string? StateValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
+    /// <inheritdoc />
     public bool? Optimistic { get; set; }
 
     public class MqttHumidifierValidator : MqttSensorDiscoveryBaseValidator<MqttHumidifier>

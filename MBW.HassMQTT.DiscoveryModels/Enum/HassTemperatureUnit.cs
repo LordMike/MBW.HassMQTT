@@ -7,7 +7,7 @@ public enum HassTemperatureUnit
     None,
 
     [EnumMember(Value = "C")]
-    Celcius,
+    Celsius,
 
     [EnumMember(Value = "F")]
     Fahrenheit

@@ -10,6 +10,99 @@ public enum HassSensorDeviceClass
     None,
 
     /// <summary>
+    /// A sensor whose state is restricted to a configured list of values.
+    /// </summary>
+    [EnumMember(Value = "enum")]
+    Enum,
+
+    [EnumMember(Value = "absolute_humidity")]
+    AbsoluteHumidity,
+
+    [EnumMember(Value = "area")]
+    Area,
+
+    [EnumMember(Value = "atmospheric_pressure")]
+    AtmosphericPressure,
+
+    [EnumMember(Value = "blood_glucose_concentration")]
+    BloodGlucoseConcentration,
+
+    [EnumMember(Value = "conductivity")]
+    Conductivity,
+
+    [EnumMember(Value = "data_rate")]
+    DataRate,
+
+    [EnumMember(Value = "data_size")]
+    DataSize,
+
+    [EnumMember(Value = "distance")]
+    Distance,
+
+    [EnumMember(Value = "energy_distance")]
+    EnergyDistance,
+
+    [EnumMember(Value = "energy_storage")]
+    EnergyStorage,
+
+    [EnumMember(Value = "irradiance")]
+    Irradiance,
+
+    [EnumMember(Value = "moisture")]
+    Moisture,
+
+    [EnumMember(Value = "ph")]
+    Ph,
+
+    [EnumMember(Value = "pm4")]
+    Pm4,
+
+    [EnumMember(Value = "precipitation")]
+    Precipitation,
+
+    [EnumMember(Value = "precipitation_intensity")]
+    PrecipitationIntensity,
+
+    [EnumMember(Value = "reactive_energy")]
+    ReactiveEnergy,
+
+    [EnumMember(Value = "sound_pressure")]
+    SoundPressure,
+
+    [EnumMember(Value = "speed")]
+    Speed,
+
+    [EnumMember(Value = "temperature_delta")]
+    TemperatureDelta,
+
+    [EnumMember(Value = "uptime")]
+    Uptime,
+
+    [EnumMember(Value = "volatile_organic_compounds_parts")]
+    VolatileOrganicCompoundsParts,
+
+    [EnumMember(Value = "volume")]
+    Volume,
+
+    [EnumMember(Value = "volume_flow_rate")]
+    VolumeFlowRate,
+
+    [EnumMember(Value = "volume_storage")]
+    VolumeStorage,
+
+    [EnumMember(Value = "water")]
+    Water,
+
+    [EnumMember(Value = "weight")]
+    Weight,
+
+    [EnumMember(Value = "wind_direction")]
+    WindDirection,
+
+    [EnumMember(Value = "wind_speed")]
+    WindSpeed,
+
+    /// <summary>
     /// Apparent power in VA
     ///</summary>
     [EnumMember(Value = "apparent_power")]

@@ -5,9 +5,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Interfaces;
 public interface IHasEntityCategory
 {
     /// <summary>
-    /// The category of the entity.
-    ///
-    /// See https://developers.home-assistant.io/docs/core/entity#generic-properties.
+    /// The Home Assistant category of the entity, such as configuration or diagnostic.
     /// </summary>
     public EntityCategory? EntityCategory { get; set; }
 }

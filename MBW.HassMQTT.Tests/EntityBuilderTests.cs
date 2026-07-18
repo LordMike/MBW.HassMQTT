@@ -84,8 +84,7 @@ public class EntityBuilderTests
         Assert.Equal("°C", (string)celsiusPayload["unit_of_measurement"]);
         Assert.Equal("Fahrenheit", (string)fahrenheitPayload["name"]);
         Assert.Equal("°F", (string)fahrenheitPayload["unit_of_measurement"]);
-        Assert.Equal("weather-hardware", (string)celsiusPayload["device"]?["identifiers"]?[0]);
-        Assert.Single(celsiusPayload["device"]?["identifiers"] ?? throw new InvalidOperationException());
+        Assert.Equal("weather-hardware", (string)celsiusPayload["device"]?["identifiers"]);
     }
 
     [Fact]

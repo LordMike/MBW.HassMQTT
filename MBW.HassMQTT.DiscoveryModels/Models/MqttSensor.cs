@@ -19,7 +19,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Sensor)]
 [PublicAPI]
 public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSensorValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasObjectId,
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasEntityCategory, IHasDefaultEntityId, IHasEntityPicture, IHasVisibleByDefault, IHasGroup,
     IHasEncoding, IHasName
 {
     public MqttSensor(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
@@ -49,10 +49,20 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     public string? LastResetValueTemplate { get; set; }
 
     /// <summary>
+    /// The allowed state values for an enum sensor. Cannot be empty or be used with a state class or unit.
+    /// </summary>
+    public IList<string>? Options { get; set; }
+
+    /// <summary>
     /// The state_class of the sensor.
     /// See https://developers.home-assistant.io/docs/core/entity/sensor/#available-state-classes
     /// </summary>
     public HassStateClass? StateClass { get; set; }
+
+    /// <summary>
+    /// The number of decimals which should be used in the sensor's state after rounding.
+    /// </summary>
+    public int? SuggestedDisplayPrecision { get; set; }
 
     /// <summary>
     /// The MQTT topic subscribed to receive sensor values.
@@ -69,17 +79,43 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public IList<string>? Group { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttSensorValidator : MqttSensorDiscoveryBaseValidator<MqttSensor>
@@ -93,6 +129,28 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
 
             RuleFor(s => s.ExpireAfter)
                 .GreaterThanOrEqualTo(0);
+
+            RuleFor(s => s.SuggestedDisplayPrecision)
+                .GreaterThanOrEqualTo(0);
+
+            RuleFor(s => s.Options)
+                .NotEmpty()
+                .When(s => s.Options != null);
+
+            RuleFor(s => s.DeviceClass)
+                .Equal(HassSensorDeviceClass.Enum)
+                .When(s => s.Options != null)
+                .WithMessage("DeviceClass must be Enum when Options is configured");
+
+            RuleFor(s => s.StateClass)
+                .Null()
+                .When(s => s.Options != null)
+                .WithMessage("StateClass cannot be used together with Options");
+
+            RuleFor(s => s.UnitOfMeasurement)
+                .Null()
+                .When(s => s.Options != null)
+                .WithMessage("UnitOfMeasurement cannot be used together with Options");
         }
     }
 }

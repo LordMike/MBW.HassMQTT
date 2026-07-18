@@ -1,14 +1,65 @@
-﻿namespace MBW.HassMQTT.DiscoveryModels.Enum;
+using System.Runtime.Serialization;
 
+namespace MBW.HassMQTT.DiscoveryModels.Enum;
+
+/// <summary>Device classes supported by Home Assistant number entities.</summary>
 public enum HassNumberDeviceClass
 {
-    /// <summary>
-    /// Generic number. This is the default and doesn’t need to be set.
-    ///</summary>
     None,
-
-    /// <summary>
-    /// Temperature in °C or °F
-    /// </summary>
-    Temperature
+    [EnumMember(Value = "absolute_humidity")] AbsoluteHumidity,
+    [EnumMember(Value = "apparent_power")] ApparentPower,
+    [EnumMember(Value = "aqi")] AirQualityIndex,
+    [EnumMember(Value = "area")] Area,
+    [EnumMember(Value = "atmospheric_pressure")] AtmosphericPressure,
+    [EnumMember(Value = "battery")] Battery,
+    [EnumMember(Value = "blood_glucose_concentration")] BloodGlucoseConcentration,
+    [EnumMember(Value = "carbon_dioxide")] CarbonDioxide,
+    [EnumMember(Value = "carbon_monoxide")] CarbonMonoxide,
+    [EnumMember(Value = "current")] Current,
+    [EnumMember(Value = "data_rate")] DataRate,
+    [EnumMember(Value = "data_size")] DataSize,
+    [EnumMember(Value = "distance")] Distance,
+    [EnumMember(Value = "duration")] Duration,
+    [EnumMember(Value = "energy")] Energy,
+    [EnumMember(Value = "energy_distance")] EnergyDistance,
+    [EnumMember(Value = "energy_storage")] EnergyStorage,
+    [EnumMember(Value = "frequency")] Frequency,
+    [EnumMember(Value = "gas")] Gas,
+    [EnumMember(Value = "humidity")] Humidity,
+    [EnumMember(Value = "illuminance")] Illuminance,
+    [EnumMember(Value = "irradiance")] Irradiance,
+    [EnumMember(Value = "moisture")] Moisture,
+    [EnumMember(Value = "monetary")] Monetary,
+    [EnumMember(Value = "nitrogen_dioxide")] NitrogenDioxide,
+    [EnumMember(Value = "nitrogen_monoxide")] NitrogenMonoxide,
+    [EnumMember(Value = "nitrous_oxide")] NitrousOxide,
+    [EnumMember(Value = "ozone")] Ozone,
+    [EnumMember(Value = "ph")] Ph,
+    [EnumMember(Value = "pm1")] Pm1,
+    [EnumMember(Value = "pm10")] Pm10,
+    [EnumMember(Value = "pm25")] Pm25,
+    [EnumMember(Value = "pm4")] Pm4,
+    [EnumMember(Value = "power_factor")] PowerFactor,
+    [EnumMember(Value = "power")] Power,
+    [EnumMember(Value = "precipitation")] Precipitation,
+    [EnumMember(Value = "precipitation_intensity")] PrecipitationIntensity,
+    [EnumMember(Value = "pressure")] Pressure,
+    [EnumMember(Value = "reactive_energy")] ReactiveEnergy,
+    [EnumMember(Value = "reactive_power")] ReactivePower,
+    [EnumMember(Value = "signal_strength")] SignalStrength,
+    [EnumMember(Value = "sound_pressure")] SoundPressure,
+    [EnumMember(Value = "speed")] Speed,
+    [EnumMember(Value = "sulphur_dioxide")] SulphurDioxide,
+    [EnumMember(Value = "temperature")] Temperature,
+    [EnumMember(Value = "temperature_delta")] TemperatureDelta,
+    [EnumMember(Value = "volatile_organic_compounds")] VolatileOrganicCompounds,
+    [EnumMember(Value = "volatile_organic_compounds_parts")] VolatileOrganicCompoundsParts,
+    [EnumMember(Value = "voltage")] Voltage,
+    [EnumMember(Value = "volume")] Volume,
+    [EnumMember(Value = "volume_flow_rate")] VolumeFlowRate,
+    [EnumMember(Value = "volume_storage")] VolumeStorage,
+    [EnumMember(Value = "water")] Water,
+    [EnumMember(Value = "weight")] Weight,
+    [EnumMember(Value = "wind_direction")] WindDirection,
+    [EnumMember(Value = "wind_speed")] WindSpeed,
 }

@@ -25,4 +25,16 @@ public interface IHasAvailability
     /// </summary>
     /// <remarks>Default is Latest</remarks>
     AvailabilityMode? AvailabilityMode { get; set; }
+
+    /// <summary>
+    /// Defines a template used to extract the device availability from messages received on
+    /// <see cref="AvailabilityTopic"/>.
+    /// </summary>
+    string? AvailabilityTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic subscribed to receive availability updates. Must not be used together with
+    /// <see cref="Availability"/>.
+    /// </summary>
+    string? AvailabilityTopic { get; set; }
 }

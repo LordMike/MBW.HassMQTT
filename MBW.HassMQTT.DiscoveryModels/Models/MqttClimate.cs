@@ -18,8 +18,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Climate)]
 [PublicAPI]
 public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.MqttClimateValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval
 {
     public MqttClimate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -35,22 +35,6 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// uses the value received as data source. Valid values: `off`, `heating`, `cooling`, `drying`, `idle`, `fan`.
     /// </summary>
     public string? ActionTopic { get; set; }
-
-    /// <summary>
-    /// The MQTT topic to publish commands to switch auxiliary heat.
-    /// </summary>
-    public string? AuxCommandTopic { get; set; }
-
-    /// <summary>
-    /// A template to render the value received on the `aux_state_topic` with.
-    /// </summary>
-    public string? AuxStateTemplate { get; set; }
-
-    /// <summary>
-    /// The MQTT topic to subscribe for changes of the auxiliary heat mode. If this is not set, the auxiliary
-    /// heat mode works in optimistic mode (see below).
-    /// </summary>
-    public string? AuxStateTopic { get; set; }
 
     /// <summary>
     /// A template with which the value received on `current_humidity_topic` will be rendered.
@@ -100,13 +84,13 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// <summary>
     /// Set the initial target temperature. The default value depends on the temperature unit and will be 21° or 69.8°F.
     /// </summary>
-    public int? Initial { get; set; }
+    public float? Initial { get; set; }
 
     /// <summary>
-    /// The minimum target humidity percentage that can be set.
+    /// The maximum target humidity percentage that can be set.
     /// </summary>
     /// <remarks>Default value: 99</remarks>
-    public int? MaxHumidity { get; set; }
+    public float? MaxHumidity { get; set; }
 
     /// <summary>
     /// Maximum set point available. The default value depends on the temperature unit, and will be 35°C or 95°F.
@@ -114,10 +98,10 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public float? MaxTemp { get; set; }
 
     /// <summary>
-    /// min_humidity
+    /// The minimum target humidity percentage that can be set.
     /// </summary>
     /// <remarks>Default value: 30</remarks>
-    public int? MinHumidity { get; set; }
+    public float? MinHumidity { get; set; }
 
     /// <summary>
     /// Minimum set point available. The default value depends on the temperature unit, and will be 7°C or 44.6°F.
@@ -150,7 +134,7 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     public IList<string>? Modes { get; set; }
 
     /// <summary>
-    /// The MQTT topic to publish commands to change the HVAC operation mode. Use `power_command_topic` if you only want to publish the power state.
+    /// The payload sent to turn the climate device off. Use the power command topic when only the power state should be changed.
     /// </summary>
     public string? PayloadOff { get; set; }
 
@@ -198,6 +182,31 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// List of preset modes this climate is supporting. Common examples include `eco`, `away`, `boost`, `comfort`, `home`, `sleep` and `activity`.
     /// </summary>
     public IList<string>? PresetModes { get; set; }
+
+    /// <summary>
+    /// A template to render the value sent to the <see cref="SwingHorizontalModeCommandTopic"/> with.
+    /// </summary>
+    public string? SwingHorizontalModeCommandTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic to publish commands to change the horizontal swing mode.
+    /// </summary>
+    public string? SwingHorizontalModeCommandTopic { get; set; }
+
+    /// <summary>
+    /// A template to render the value received on the <see cref="SwingHorizontalModeStateTopic"/> with.
+    /// </summary>
+    public string? SwingHorizontalModeStateTemplate { get; set; }
+
+    /// <summary>
+    /// The MQTT topic subscribed to for changes of the horizontal swing mode.
+    /// </summary>
+    public string? SwingHorizontalModeStateTopic { get; set; }
+
+    /// <summary>
+    /// The supported horizontal swing modes.
+    /// </summary>
+    public IList<string>? SwingHorizontalModes { get; set; }
 
     /// <summary>
     /// A template to render the value sent to the `swing_mode_command_topic` with.
@@ -319,19 +328,49 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public IList<string>? Group { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
+    /// <inheritdoc />
     public bool? Optimistic { get; set; }
 
     public class MqttClimateValidator : MqttSensorDiscoveryBaseValidator<MqttClimate>
@@ -339,7 +378,6 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
         public MqttClimateValidator()
         {
             TopicAndTemplate(s => s.ActionTopic, s => s.ActionTemplate);
-            TopicAndTemplate(s => s.AuxStateTopic, s => s.AuxStateTemplate);
             TopicAndTemplate(s => s.PresetModeCommandTopic, s => s.PresetModeCommandTemplate);
             TopicAndTemplate(s => s.PresetModeStateTopic, s => s.PresetModeValueTemplate);
             TopicAndTemplate(s => s.CurrentTemperatureTopic, s => s.CurrentTemperatureTemplate);
@@ -347,6 +385,8 @@ public class MqttClimate : MqttSensorDiscoveryBase<MqttClimate, MqttClimate.Mqtt
             TopicAndTemplate(s => s.FanModeStateTopic, s => s.FanModeStateTemplate);
             TopicAndTemplate(s => s.ModeCommandTopic, s => s.ModeCommandTemplate);
             TopicAndTemplate(s => s.ModeStateTopic, s => s.ModeStateTemplate);
+            TopicAndTemplate(s => s.SwingHorizontalModeCommandTopic, s => s.SwingHorizontalModeCommandTemplate);
+            TopicAndTemplate(s => s.SwingHorizontalModeStateTopic, s => s.SwingHorizontalModeStateTemplate);
             TopicAndTemplate(s => s.SwingModeCommandTopic, s => s.SwingModeCommandTemplate);
             TopicAndTemplate(s => s.SwingModeStateTopic, s => s.SwingModeStateTemplate);
             TopicAndTemplate(s => s.TemperatureCommandTopic, s => s.TemperatureCommandTemplate);

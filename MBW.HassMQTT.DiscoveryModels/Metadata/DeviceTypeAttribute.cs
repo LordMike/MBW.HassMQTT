@@ -8,6 +8,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Metadata;
 [AttributeUsage(AttributeTargets.Class)]
 public class DeviceTypeAttribute : Attribute
 {
+    /// <summary>The MQTT discovery component type represented by the decorated model.</summary>
     public HassDeviceType DeviceType { get; }
 
     public DeviceTypeAttribute(HassDeviceType deviceType)

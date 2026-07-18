@@ -76,5 +76,26 @@ public enum HassDeviceType
     Image,
     
     [EnumMember(Value = "event")]
-    Event
+    Event,
+
+    [EnumMember(Value = "date")]
+    Date,
+
+    [EnumMember(Value = "datetime")]
+    DateTime,
+
+    [EnumMember(Value = "time")]
+    Time,
+
+    [EnumMember(Value = "notify")]
+    Notify,
+
+    [EnumMember(Value = "lawn_mower")]
+    LawnMower,
+
+    [EnumMember(Value = "valve")]
+    Valve,
+
+    [EnumMember(Value = "water_heater")]
+    WaterHeater,
 }
