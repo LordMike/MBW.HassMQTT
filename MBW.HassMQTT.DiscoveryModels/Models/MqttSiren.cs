@@ -40,7 +40,7 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
     /// <summary>
     /// A list of available tones the siren supports. When configured, this enables the support for setting a `tone` and enables the `tone` state attribute.
     /// </summary>
-    public string? AvailableTones { get; set; }
+    public IList<string>? AvailableTones { get; set; }
 
     /// <summary>
     /// Defines a template to generate the payload to send to `command_topic`. The variable `value` will be assigned with the configured `payload_on` or `payload_off` setting. The siren turn on service parameters `tone`, `volume_level` or `duration` can be used as variables in the template. When operation in optimistic mode the corresponding state attributes will be set. Turn parameters will be filtered if a device misses the support.
