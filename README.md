@@ -22,6 +22,39 @@ Applications upgrading from version 3 should note these API changes:
 
 No package is provided for .NET versions older than .NET 8.
 
+# Entity builders (next major)
+
+Entity discovery is configured through an immutable builder and is registered only
+when `Build` succeeds. Device and entity identifiers are supplied at build time, so
+one configured template can be reused safely:
+
+```csharp
+var temperature = manager
+    .CreateEntity<MqttSensor>()
+    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+    .ConfigureDevice(device =>
+    {
+        device.Name = "Weather station";
+        device.Identifiers.Add("weather");
+    })
+    .ConfigureDiscovery(discovery =>
+    {
+        discovery.Name = "Outside temperature";
+        discovery.UnitOfMeasurement = "°C";
+    });
+
+IHassMqttEntity outside = temperature.Build("weather", "outside");
+outside.SetValue(HassTopicKind.State, 21.4);
+outside.SetAttribute("quality", "good");
+```
+
+`CreateEntity` does not modify the manager. `Build` resolves missing requested
+topics, validates and snapshots discovery, compiles publishing operations, and then
+registers the finished entity atomically. The built entity never exposes the mutable
+discovery draft. Building the same device/entity identity twice is rejected. This
+replaces the previous `ConfigureSensor` flow, and discovery validation can no longer
+be deferred to `FlushAll` or disabled through manager configuration.
+
 # Features
 
 * Complete models for each of the Home Assistant MQTT entities

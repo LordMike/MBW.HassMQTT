@@ -6,6 +6,8 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.CommonServices;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Services;
 using MBW.HassMQTT.Topics;
@@ -37,7 +39,7 @@ public class MqttReconnectIntegrationTests
         ConcurrentQueue<string> availability = new ConcurrentQueue<string>();
         server.InterceptingPublishAsync += args =>
         {
-            if (args.ApplicationMessage.Topic == "test/reconnect")
+            if (args.ApplicationMessage.Topic == "test/reconnect/value/state")
                 payloads.Enqueue(args.ApplicationMessage.ConvertPayloadToString());
             if (args.ApplicationMessage.Topic == "test/ReconnectTest/status/state")
                 availability.Enqueue(args.ApplicationMessage.ConvertPayloadToString());
@@ -90,7 +92,11 @@ public class MqttReconnectIntegrationTests
         await firstConnection.Task.WaitAsync(TimeSpan.FromSeconds(10));
 
         HassMqttManager manager = host.Services.GetRequiredService<HassMqttManager>();
-        MqttStateValueTopic state = manager.GetValueSender("test/reconnect");
+        IHassMqttEntity entity = manager.CreateEntity<MqttSensor>()
+            .ConfigureTopics(HassTopicKind.State)
+            .ConfigureDevice(device => device.Identifiers.Add("reconnect-hardware"))
+            .Build("reconnect", "value");
+        MqttStateValueTopic state = entity.GetValueSender(HassTopicKind.State);
         state.Value = "first";
         Assert.Equal(MqttFlushStatus.Completed, (await manager.FlushAll()).Status);
         await WaitUntil(() => payloads.Contains("first"), TimeSpan.FromSeconds(5));
