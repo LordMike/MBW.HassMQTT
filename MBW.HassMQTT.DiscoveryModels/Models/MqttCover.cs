@@ -116,7 +116,7 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     /// <summary>
     /// The MQTT topic to publish position commands to. You need to set position_topic as well if you want to use position topic. Use template if position topic wants different values than within range `position_closed` - `position_open`. If template is not defined and `position_closed != 100` and `position_open != 0` then proper position value is calculated from percentage position.
     /// </summary>
-    public string? SetpositionTopic { get; set; }
+    public string? SetPositionTopic { get; set; }
 
     /// <summary>
     /// The payload that represents the closed state.
@@ -248,13 +248,13 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
         public MqttCoverValidator()
         {
             TopicAndTemplate(s => s.PositionTopic, s => s.PositionTemplate);
-            TopicAndTemplate(s => s.SetpositionTopic, s => s.SetPositionTemplate);
+            TopicAndTemplate(s => s.SetPositionTopic, s => s.SetPositionTemplate);
             TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
             TopicAndTemplate(s => s.TiltCommandTopic, s => s.TiltCommandTemplate);
             TopicAndTemplate(s => s.TiltStatusTopic, s => s.TiltStatusTemplate);
 
-            RuleFor(s => s.SetpositionTopic).NotNull().Unless(s => s.PositionTopic == null);
-            RuleFor(s => s.PositionTopic).NotNull().Unless(s => s.SetpositionTopic == null);
+            RuleFor(s => s.SetPositionTopic).NotNull().Unless(s => s.PositionTopic == null);
+            RuleFor(s => s.PositionTopic).NotNull().Unless(s => s.SetPositionTopic == null);
 
             MinMax(s => s.TiltMin, s => s.TiltMax, 0, 100,
                 (s => s.TiltOpenedValue, 0),
