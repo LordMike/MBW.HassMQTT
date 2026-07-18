@@ -89,6 +89,8 @@ var outsideTemperature = manager
 outsideTemperature.SetValue(HassTopicKind.State, 21.4);
 outsideTemperature.SetAttribute("quality", "good");
 
+// FlushAll attempts delivery immediately. Pending data remains queued while
+// disconnected, so keep the application running to allow reconnect delivery.
 await manager.FlushAll();
 ```
 
