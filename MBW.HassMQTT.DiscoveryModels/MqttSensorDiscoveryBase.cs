@@ -5,17 +5,14 @@ using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
 using FluentValidation;
 using JetBrains.Annotations;
-using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Device;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Validation;
-using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.DiscoveryModels;
 
@@ -23,11 +20,8 @@ namespace MBW.HassMQTT.DiscoveryModels;
 /// All MQTT discovery types are documented here:
 /// https://www.home-assistant.io/docs/mqtt/discovery/
 /// </summary>
-public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDocument, IMqttValueContainer, INotifyPropertyChanged where T : IHassDiscoveryDocument where TValidator : AbstractValidator<T>, new()
+public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDocument, INotifyPropertyChanged where T : IHassDiscoveryDocument where TValidator : AbstractValidator<T>, new()
 {
-    private long _revision;
-    private long _publishedRevision;
-
     public event PropertyChangedEventHandler PropertyChanged;
 
     public static TValidator Validator { get; } = new TValidator();
@@ -38,21 +32,7 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
     protected virtual void OnPropertyChanged(string propertyName, object before, object after)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        if (nameof(Dirty) != propertyName)
-            MarkDirty();
     }
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public bool Dirty => Revision != Interlocked.Read(ref _publishedRevision);
-
-    [JsonIgnore]
-    public long Revision => Interlocked.Read(ref _revision);
-
-    /// <inheritdoc />
-    [JsonIgnore]
-    public string PublishTopic { get; }
 
     /// <summary>
     /// Device details for this entity, usually this is duplicated between multiple entities to let HA link them together.
@@ -62,7 +42,9 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 
     public MqttSensorDiscoveryBase(string discoveryTopic, string uniqueId)
     {
-        PublishTopic = discoveryTopic;
+        // Kept in the constructor for discovery-model compatibility. Runtime
+        // publishing owns the discovery topic after the entity is built.
+        _ = discoveryTopic;
 
         if (this is IHasUniqueId asHasUniqueId)
             asHasUniqueId.UniqueId = uniqueId;
@@ -73,22 +55,6 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 #pragma warning restore 618
 
         Device = new MqttDeviceDocument();
-        Device.PropertyChanged += (_, _) => MarkDirty();
-    }
-
-    public void MarkDirty()
-    {
-        Interlocked.Increment(ref _revision);
-    }
-
-    public void MarkPublished(long revision)
-    {
-        Interlocked.Exchange(ref _publishedRevision, revision);
-    }
-
-    public object GetSerializedValue()
-    {
-        return this;
     }
 
     public void SetTopic(HassTopicKind topicKind, string topic)

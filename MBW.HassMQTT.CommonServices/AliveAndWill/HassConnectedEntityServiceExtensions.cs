@@ -44,7 +44,7 @@ public static class HassConnectedEntityServiceExtensions
             .WithWillQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce);
     }
 
-    public static IDiscoveryDocumentBuilder<TEntity> ConfigureAliveService<TEntity>(this IDiscoveryDocumentBuilder<TEntity> builder) where TEntity : IHassDiscoveryDocument, IHasAvailability
+    public static IEntityBuilder<TEntity> ConfigureAliveService<TEntity>(this IEntityBuilder<TEntity> builder) where TEntity : IHassDiscoveryDocument, IHasAvailability
     {
         AvailabilityDecoratorService decorator = builder.HassMqttManager.GetService<AvailabilityDecoratorService>();
         if (decorator == null)

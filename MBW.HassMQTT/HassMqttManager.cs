@@ -1,42 +1,36 @@
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.Results;
-using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
-using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Internal;
 using MBW.HassMQTT.Serialization;
 using MBW.HassMQTT.Topics;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Exceptions;
 using MQTTnet.Protocol;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace MBW.HassMQTT;
 
 public class HassMqttManager : IMqttEventReceiver
 {
     private readonly SemaphoreSlim _flushLock = new SemaphoreSlim(1, 1);
-    private readonly IServiceProvider _serviceProvider;
     private readonly HassMqttManagerConfiguration _config;
     private readonly IHassMqttClient _mqttClient;
     private readonly ILogger<HassMqttManager> _logger;
-    private readonly ConcurrentDictionary<string, IDiscoveryDocumentBuilder> _discoveryDocuments;
+    private readonly object _entityRegistryLock = new object();
+    private readonly ConcurrentDictionary<string, HassMqttEntity> _entities;
     private readonly ConcurrentDictionary<string, MqttStateValueTopic> _values;
     private readonly ConcurrentDictionary<string, MqttAttributesTopic> _attributes;
     private readonly ConcurrentDictionary<string, byte> _removeTopics;
 
+    internal IServiceProvider ServiceProvider { get; }
     internal HassMqttTopicBuilder TopicBuilder { get; }
 
     public HassMqttManager(
@@ -46,48 +40,35 @@ public class HassMqttManager : IMqttEventReceiver
         HassMqttTopicBuilder topicBuilder,
         ILogger<HassMqttManager> logger)
     {
-        _serviceProvider = serviceProvider;
+        ServiceProvider = serviceProvider;
         _config = config.Value;
         _mqttClient = mqttClient;
         TopicBuilder = topicBuilder;
         _logger = logger;
-        _discoveryDocuments = new ConcurrentDictionary<string, IDiscoveryDocumentBuilder>(StringComparer.OrdinalIgnoreCase);
+        _entities = new ConcurrentDictionary<string, HassMqttEntity>(StringComparer.OrdinalIgnoreCase);
         _values = new ConcurrentDictionary<string, MqttStateValueTopic>(StringComparer.OrdinalIgnoreCase);
         _attributes = new ConcurrentDictionary<string, MqttAttributesTopic>(StringComparer.OrdinalIgnoreCase);
         _removeTopics = new ConcurrentDictionary<string, byte>(StringComparer.OrdinalIgnoreCase);
     }
 
-    public void RemoveSensor<TEntity>(string deviceId, string entityId) where TEntity : IHassDiscoveryDocument =>
-        _removeTopics.TryAdd(TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId), 0);
+    /// <summary>Creates an unregistered, reusable entity builder.</summary>
+    public IEntityBuilder<TEntity> CreateEntity<TEntity>() where TEntity : IHassDiscoveryDocument =>
+        new EntityBuilder<TEntity>(this, _config.AutoConfigureAttributesTopics);
 
-    public IDiscoveryDocumentBuilder<TEntity> ConfigureSensor<TEntity>(string deviceId, string entityId, string uniqueId = null) where TEntity : IHassDiscoveryDocument
+    public void RemoveEntity<TEntity>(string deviceId, string entityId) where TEntity : IHassDiscoveryDocument
     {
-        uniqueId ??= $"{deviceId}_{entityId}".ToLower();
-
-        IDiscoveryDocumentBuilder builder = _discoveryDocuments.GetOrAdd(uniqueId, _ =>
+        lock (_entityRegistryLock)
         {
-            string discoveryTopic = TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId);
-            DiscoveryDocumentBuilder<TEntity> newBuilder = new DiscoveryDocumentBuilder<TEntity>(this)
-            {
-                Discovery = ActivatorUtilities.CreateInstance<TEntity>(_serviceProvider, discoveryTopic, uniqueId),
-                DeviceId = deviceId,
-                EntityId = entityId
-            };
-
-            if (_config.AutoConfigureAttributesTopics && newBuilder.Discovery is IHasJsonAttributes)
-                newBuilder.ConfigureTopics(HassTopicKind.JsonAttributes);
-
-            return newBuilder;
-        });
-
-        return (IDiscoveryDocumentBuilder<TEntity>)builder;
+            _entities.TryRemove(GetEntityKey(deviceId, entityId), out _);
+            _removeTopics.TryAdd(TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId), 0);
+        }
     }
 
-    public bool TryGetSensor(string deviceId, string entityId, out ISensorContainer sensor)
+    public bool TryGetEntity(string deviceId, string entityId, out IHassMqttEntity entity)
     {
-        _discoveryDocuments.TryGetValue($"{deviceId}_{entityId}", out IDiscoveryDocumentBuilder builder);
-        sensor = builder as ISensorContainer;
-        return sensor != null;
+        bool found = _entities.TryGetValue(GetEntityKey(deviceId, entityId), out HassMqttEntity builtEntity);
+        entity = builtEntity;
+        return found;
     }
 
     public MqttAttributesTopic GetAttributesSender(string topic)
@@ -106,8 +87,8 @@ public class HassMqttManager : IMqttEventReceiver
 
     public void MarkAllValuesDirty()
     {
-        foreach (IDiscoveryDocumentBuilder value in _discoveryDocuments.Values)
-            value.DiscoveryUntyped.MarkDirty();
+        foreach (HassMqttEntity entity in _entities.Values)
+            entity.MarkDirty();
         foreach (MqttStateValueTopic value in _values.Values)
             value.MarkDirty();
         foreach (MqttAttributesTopic value in _attributes.Values)
@@ -125,28 +106,25 @@ public class HassMqttManager : IMqttEventReceiver
             if (!_mqttClient.IsConnected)
                 return Result(MqttFlushStatus.Disconnected);
 
-            foreach (IDiscoveryDocumentBuilder builder in _discoveryDocuments.Values.Where(value => value.DiscoveryUntyped.Dirty))
+            foreach (HassMqttEntity entity in _entities.Values)
             {
-                IHassDiscoveryDocument discovery = builder.DiscoveryUntyped;
-                string uniqueId = (discovery as IHasUniqueId)?.UniqueId ?? builder.ToString();
+                DiscoveryPublishOperation discovery = entity.Discovery;
+                if (!discovery.Dirty)
+                    continue;
 
+                long revision = discovery.Revision;
                 if (!_config.SendDiscoveryDocuments)
                 {
-                    discovery.MarkPublished(discovery.Revision);
+                    discovery.MarkPublished(revision);
                     continue;
                 }
 
-                if (_config.ValidateDiscoveryDocuments)
-                {
-                    ValidationResult validation = await discovery.Validator.ValidateAsync(new ValidationContext<IHassDiscoveryDocument>(discovery), token);
-                    if (!validation.IsValid)
-                        throw new ValidationException(validation.Errors);
-                }
-
-                _logger.LogDebug("Publishing discovery document for {Identifier}", uniqueId);
-                MqttFlushStatus status = await Publish(discovery, token);
+                _logger.LogDebug("Publishing discovery document for {Identifier}", entity.UniqueId);
+                MqttFlushStatus status = await Publish(discovery.Topic, discovery.Payload, token);
                 if (status != MqttFlushStatus.Completed)
                     return Result(status);
+
+                discovery.MarkPublished(revision);
                 discoveryDocuments++;
             }
 
@@ -159,19 +137,50 @@ public class HassMqttManager : IMqttEventReceiver
                 removedTopics++;
             }
 
-            foreach (MqttStateValueTopic value in _values.Values.Where(value => value.Dirty))
+            foreach (HassMqttEntity entity in _entities.Values)
             {
-                MqttFlushStatus status = await Publish(value, token);
+                foreach (CompiledPublishOperation operation in entity.PublishingPlan)
+                {
+                    if (!operation.TryCapture(out CompiledPublishOperation.CompiledPublishAttempt attempt))
+                        continue;
+
+                    MqttFlushStatus status = await Publish(attempt.Topic, PayloadSerializer.Serialize(attempt.Payload), token);
+                    if (status != MqttFlushStatus.Completed)
+                        return Result(status);
+
+                    attempt.Acknowledge();
+                    if (attempt.Kind == PublishOperationKind.Attributes)
+                        attributes++;
+                    else
+                        values++;
+                }
+            }
+
+            foreach (MqttStateValueTopic value in _values.Values)
+            {
+                if (!value.Dirty)
+                    continue;
+
+                long revision = value.Revision;
+                object payload = value.GetSerializedValue();
+                MqttFlushStatus status = await Publish(value.PublishTopic, PayloadSerializer.Serialize(payload), token);
                 if (status != MqttFlushStatus.Completed)
                     return Result(status);
+                value.MarkPublished(revision);
                 values++;
             }
 
-            foreach (MqttAttributesTopic value in _attributes.Values.Where(value => value.Dirty))
+            foreach (MqttAttributesTopic value in _attributes.Values)
             {
-                MqttFlushStatus status = await Publish(value, token);
+                if (!value.Dirty)
+                    continue;
+
+                long revision = value.Revision;
+                object payload = value.GetSerializedValue();
+                MqttFlushStatus status = await Publish(value.PublishTopic, PayloadSerializer.Serialize(payload), token);
                 if (status != MqttFlushStatus.Completed)
                     return Result(status);
+                value.MarkPublished(revision);
                 attributes++;
             }
 
@@ -190,16 +199,6 @@ public class HassMqttManager : IMqttEventReceiver
         }
 
         MqttFlushResult Result(MqttFlushStatus status) => new(status, discoveryDocuments, removedTopics, values, attributes);
-    }
-
-    private async Task<MqttFlushStatus> Publish(IMqttValueContainer container, CancellationToken token)
-    {
-        long revision = container.Revision;
-        byte[] payload = Serialize(container.GetSerializedValue());
-        MqttFlushStatus status = await Publish(container.PublishTopic, payload, token);
-        if (status == MqttFlushStatus.Completed)
-            container.MarkPublished(revision);
-        return status;
     }
 
     private async Task<MqttFlushStatus> Publish(string topic, byte[] payload, CancellationToken token)
@@ -238,16 +237,28 @@ public class HassMqttManager : IMqttEventReceiver
         }
     }
 
-    private static byte[] Serialize(object value)
+    internal void Register(HassMqttEntity entity)
     {
-        if (value is string text)
-            return Encoding.UTF8.GetBytes(text);
-        if (value == null)
-            return Array.Empty<byte>();
-
-        JToken converted = JToken.FromObject(value, CustomJsonSerializer.Serializer);
-        return Encoding.UTF8.GetBytes(converted.ToString(Formatting.None));
+        lock (_entityRegistryLock)
+        {
+            if (_removeTopics.ContainsKey(entity.Discovery.Topic))
+                throw new InvalidOperationException($"Entity {entity.DeviceId}/{entity.EntityId} has a pending removal");
+            if (!_entities.TryAdd(GetEntityKey(entity.DeviceId, entity.EntityId), entity))
+                throw new InvalidOperationException($"An entity is already registered for {entity.DeviceId}/{entity.EntityId}");
+        }
     }
+
+    internal void LogValidationFailure(ValidationFailure failure)
+    {
+        if (failure.Severity == Severity.Warning)
+            _logger.LogWarning("Discovery validation warning for {Property}: {Message}", failure.PropertyName, failure.ErrorMessage);
+        else
+            _logger.LogInformation("Discovery validation information for {Property}: {Message}", failure.PropertyName, failure.ErrorMessage);
+    }
+
+    internal T GetService<T>() => ServiceProvider.GetService(typeof(T)) is T service ? service : default;
+
+    private static string GetEntityKey(string deviceId, string entityId) => $"{deviceId}\u001f{entityId}";
 
     async Task IMqttEventReceiver.OnConnect(MqttClientConnectedEventArgs args, CancellationToken token)
     {
@@ -256,6 +267,4 @@ public class HassMqttManager : IMqttEventReceiver
     }
 
     Task IMqttEventReceiver.OnDisconnect(MqttClientDisconnectedEventArgs args, CancellationToken token) => Task.CompletedTask;
-
-    internal T GetService<T>() => _serviceProvider.GetService<T>();
 }

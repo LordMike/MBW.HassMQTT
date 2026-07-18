@@ -12,6 +12,7 @@ public class MqttAttributesTopic : IMqttValueContainer
     private readonly Dictionary<string, object> _attributes = new Dictionary<string, object>();
     private long _revision;
     private long _publishedRevision;
+    private bool _initialized;
 
     public string PublishTopic { get; }
     public bool Dirty => Revision != Interlocked.Read(ref _publishedRevision);
@@ -56,6 +57,7 @@ public class MqttAttributesTopic : IMqttValueContainer
             }
 
             _attributes[name] = value;
+            _initialized = true;
             Interlocked.Increment(ref _revision);
         }
     }
@@ -72,7 +74,14 @@ public class MqttAttributesTopic : IMqttValueContainer
         }
     }
 
-    public void MarkDirty() => Interlocked.Increment(ref _revision);
+    public void MarkDirty()
+    {
+        lock (_syncRoot)
+        {
+            if (_initialized)
+                Interlocked.Increment(ref _revision);
+        }
+    }
 
     public void MarkPublished(long revision) => Interlocked.Exchange(ref _publishedRevision, revision);
 

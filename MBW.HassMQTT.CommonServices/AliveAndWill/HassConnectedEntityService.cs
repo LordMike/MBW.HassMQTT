@@ -44,7 +44,7 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
 
     private void CreateSystemEntities()
     {
-        _hassMqttManager.ConfigureSensor<MqttBinarySensor>(_config.DeviceId, _config.EntityId)
+        _hassMqttManager.CreateEntity<MqttBinarySensor>()
             .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
             .ConfigureDevice(device =>
             {
@@ -62,12 +62,13 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
 
                 discovery.PayloadOn = ProblemMessage;
                 discovery.PayloadOff = OkMessage;
-            });
+            })
+            .Build(_config.DeviceId, _config.EntityId);
     }
 
     public void SetAttribute(string name, object value)
     {
-        ISensorContainer sensor = _hassMqttManager.GetSensor(_config.DeviceId, _config.EntityId);
+        IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
 
         sensor.SetAttribute(name, value);
     }
@@ -100,7 +101,7 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
         CreateSystemEntities();
 
         // Push starting values
-        ISensorContainer sensor = _hassMqttManager.GetSensor(_config.DeviceId, _config.EntityId);
+        IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
         MqttAttributesTopic attributes = sensor.GetAttributesSender();
 
         Assembly entryAssembly = Assembly.GetEntryAssembly();
