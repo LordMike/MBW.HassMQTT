@@ -39,7 +39,6 @@ using MBW.HassMQTT.CommonServices;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Extensions;
-using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -68,10 +67,6 @@ await using ServiceProvider provider = new ServiceCollection()
 // example starts the MQTT client service explicitly.
 var mqttClientService = provider.GetRequiredService<IHostedService>();
 await mqttClientService.StartAsync(default);
-
-var mqttClient = provider.GetRequiredService<IHassMqttClient>();
-while (!mqttClient.IsConnected)
-    await Task.Delay(100);
 
 var manager = provider.GetRequiredService<HassMqttManager>();
 var outsideTemperature = manager
