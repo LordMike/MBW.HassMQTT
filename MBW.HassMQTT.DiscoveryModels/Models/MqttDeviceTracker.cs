@@ -19,7 +19,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [PublicAPI]
 public class MqttDeviceTracker :
     MqttSensorDiscoveryBase<MqttDeviceTracker, MqttDeviceTracker.MqttDeviceTrackerValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasObjectId, IHasName
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasDefaultEntityId, IHasName, IHasVisibleByDefault, IHasGroup
 {
     public MqttDeviceTracker(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -58,14 +58,35 @@ public class MqttDeviceTracker :
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public IList<string>? Group { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttDeviceTrackerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTracker>

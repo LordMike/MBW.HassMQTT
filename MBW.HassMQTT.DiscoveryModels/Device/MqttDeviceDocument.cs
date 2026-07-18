@@ -8,6 +8,7 @@ using System.Linq;
 using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
+using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.DiscoveryModels.Device;
 
@@ -87,10 +88,11 @@ public class MqttDeviceDocument : INotifyPropertyChanged
     /// <summary>
     /// A list of IDs that uniquely identify the device. For example a serial number.
     /// </summary>
+    [JsonConverter(typeof(IdentifierCollectionConverter))]
     public ObservableCollection<string> Identifiers { get; }
 
     /// <summary>
-    /// A link to the webpage that can manage the configuration of this device. Can be either an HTTP or HTTPS link.
+    /// A link to the webpage that manages this device. Supported schemes are <c>http</c>, <c>https</c>, and <c>homeassistant</c>.
     /// </summary>
     public string? ConfigurationUrl { get; set; }
 
@@ -105,9 +107,19 @@ public class MqttDeviceDocument : INotifyPropertyChanged
     public string? Model { get; set; }
 
     /// <summary>
+    /// The model identifier of the device.
+    /// </summary>
+    public string? ModelId { get; set; }
+
+    /// <summary>
     /// The name of the device.
     /// </summary>
     public string? Name { get; set; }
+
+    /// <summary>
+    /// The serial number of the device.
+    /// </summary>
+    public string? SerialNumber { get; set; }
 
     /// <summary>
     /// Suggest an area if the device isn’t in one yet.

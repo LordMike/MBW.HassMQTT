@@ -16,7 +16,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Scene)]
 [PublicAPI]
 public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasObjectId, IHasName
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory, IHasDefaultEntityId, IHasName, IHasEntityPicture, IHasVisibleByDefault, IHasMessageExpiryInterval
 {
     public MqttScene(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -32,15 +32,39 @@ public class MqttScene : MqttSensorDiscoveryBase<MqttScene, MqttScene.MqttSceneV
     /// </summary>
     public string? PayloadOn { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttSceneValidator : MqttSensorDiscoveryBaseValidator<MqttScene>

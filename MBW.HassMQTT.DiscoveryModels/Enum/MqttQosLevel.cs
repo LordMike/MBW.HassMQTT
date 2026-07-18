@@ -2,7 +2,7 @@
 
 public enum MqttQosLevel : byte
 {
-    AtLeastOnce = 0,
-    AtMostOnce = 1,
+    AtMostOnce = 0,
+    AtLeastOnce = 1,
     ExactlyOnce = 2
 }

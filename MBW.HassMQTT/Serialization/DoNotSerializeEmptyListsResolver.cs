@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using MBW.HassMQTT.DiscoveryModels.Device;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -30,8 +31,32 @@ internal class DoNotSerializeEmptyListsResolver : DefaultContractResolver
                 return ((ICollection)lst).Count > 0;
             };
         }
+        else if (jsonProperty.PropertyType == typeof(MqttDeviceDocument))
+        {
+            jsonProperty.ShouldSerialize = instance =>
+            {
+                MqttDeviceDocument? device = jsonProperty.ValueProvider!.GetValue(instance) as MqttDeviceDocument;
+                return device != null && !IsEmpty(device);
+            };
+        }
 
         return jsonProperty;
+    }
+
+    private static bool IsEmpty(MqttDeviceDocument device)
+    {
+        return device.Connections.Count == 0 &&
+               device.Identifiers.Count == 0 &&
+               device.ConfigurationUrl == null &&
+               device.Manufacturer == null &&
+               device.Model == null &&
+               device.ModelId == null &&
+               device.Name == null &&
+               device.SerialNumber == null &&
+               device.SuggestedArea == null &&
+               device.SwVersion == null &&
+               device.HwVersion == null &&
+               device.ViaDevice == null;
     }
 
     private bool IsICollection(Type type)

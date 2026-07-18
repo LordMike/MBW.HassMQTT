@@ -3,7 +3,8 @@
 public interface IHasRetain
 {
     /// <summary>
-    /// If the published message should have the retain flag on or not.
+    /// Controls whether published command messages have the MQTT retain flag set.
     /// </summary>
+    /// <remarks>The Home Assistant default is <see langword="false" />.</remarks>
     public bool? Retain { get; set; }
 }

@@ -25,6 +25,7 @@ namespace MBW.HassMQTT.DiscoveryModels;
 /// </summary>
 public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDocument, IMqttValueContainer, INotifyPropertyChanged where T : IHassDiscoveryDocument where TValidator : AbstractValidator<T>, new()
 {
+    private MqttDeviceDocument _device = null!;
     private long _revision;
     private long _publishedRevision;
 
@@ -58,7 +59,19 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
     /// Device details for this entity, usually this is duplicated between multiple entities to let HA link them together.
     /// At least one of identifiers or connections must be present to identify the device.
     /// </summary>
-    public MqttDeviceDocument Device { get; }
+    [JsonProperty]
+    public MqttDeviceDocument Device
+    {
+        get => _device;
+        private set
+        {
+            if (_device != null)
+                _device.PropertyChanged -= DeviceOnPropertyChanged;
+
+            _device = value ?? new MqttDeviceDocument();
+            _device.PropertyChanged += DeviceOnPropertyChanged;
+        }
+    }
 
     public MqttSensorDiscoveryBase(string discoveryTopic, string uniqueId)
     {
@@ -73,7 +86,11 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 #pragma warning restore 618
 
         Device = new MqttDeviceDocument();
-        Device.PropertyChanged += (_, _) => MarkDirty();
+    }
+
+    private void DeviceOnPropertyChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        MarkDirty();
     }
 
     public void MarkDirty()
@@ -124,12 +141,28 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 
             if (typeof(IHasAvailability).IsAssignableFrom(type))
             {
+#pragma warning disable 618
                 RuleForEach(s => ((IHasAvailability)s).Availability)
                     .SetValidator(AvailabilityModel.Validator);
 
                 RuleFor(s => ((IHasAvailability)s).AvailabilityMode)
                     .IsInEnum()
                     .When(s => ((IHasAvailability)s).AvailabilityMode.HasValue);
+
+                TopicAndTemplate(
+                    s => ((IHasAvailability)s).AvailabilityTopic,
+                    s => ((IHasAvailability)s).AvailabilityTemplate);
+
+                RuleFor(s => ((IHasAvailability)s).Availability)
+                    .Empty()
+                    .When(s => ((IHasAvailability)s).AvailabilityTopic != null)
+                    .WithMessage("Availability and AvailabilityTopic cannot be used together");
+
+                RuleFor(s => ((IHasAvailability)s).AvailabilityTopic)
+                    .Null()
+                    .When(s => ((IHasAvailability)s).Availability?.Any() == true)
+                    .WithMessage("AvailabilityTopic and Availability cannot be used together");
+#pragma warning restore 618
             }
 
             if (typeof(IHasQos).IsAssignableFrom(type))
@@ -137,6 +170,20 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
 
             if (typeof(IHasJsonAttributes).IsAssignableFrom(type))
                 TopicAndTemplate(s => ((IHasJsonAttributes)s).JsonAttributesTopic, s => ((IHasJsonAttributes)s).JsonAttributesTemplate);
+
+            if (typeof(IHasColorTemperatureRange).IsAssignableFrom(type))
+            {
+                MinMax(
+                    s => ((IHasColorTemperatureRange)s).MinKelvin,
+                    s => ((IHasColorTemperatureRange)s).MaxKelvin,
+                    2000,
+                    6535);
+                MinMax(
+                    s => ((IHasColorTemperatureRange)s).MinMireds,
+                    s => ((IHasColorTemperatureRange)s).MaxMireds,
+                    153,
+                    500);
+            }
 
             // Enums
             IEnumerable<PropertyInfo> enumProps = type.GetProperties()

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -18,7 +19,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Update)]
 [PublicAPI]
 public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpdateValidator>, IHasUniqueId,
-    IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasObjectId, IHasQos, IHasEntityCategory,
+    IHasAvailability, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasDefaultEntityId, IHasQos, IHasEntityCategory, IHasEntityPicture, IHasVisibleByDefault, IHasMessageExpiryInterval,
     IHasEncoding, IHasRetain, IHasName
 {
     public MqttUpdate(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
@@ -37,9 +38,10 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// <remarks>Default value: 'None'</remarks>
     public HassUpdateDeviceClass? DeviceClass { get; set; }
 
-    /// <summary>
-    /// Picture URL for the entity.
-    /// </summary>
+    /// <summary>Number of decimal digits used to display update progress.</summary>
+    public int? DisplayPrecision { get; set; }
+
+    /// <inheritdoc />
     public string? EntityPicture { get; set; }
 
     /// <summary>
@@ -51,6 +53,15 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// The MQTT topic subscribed to receive an update of the latest version.
     /// </summary>
     public string? LatestVersionTopic { get; set; }
+
+    /// <summary>Whether an update is currently in progress.</summary>
+    public bool? InProgress { get; set; }
+
+    /// <summary>The currently installed software or firmware version.</summary>
+    public string? InstalledVersion { get; set; }
+
+    /// <summary>The latest software or firmware version available.</summary>
+    public string? LatestVersion { get; set; }
 
     /// <summary>
     /// The MQTT payload to start installing process.
@@ -77,23 +88,47 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// </summary>
     public string? Title { get; set; }
 
+    /// <summary>The update progress percentage, from 0 through 100.</summary>
+    public float? UpdatePercentage { get; set; }
+
     /// <summary>
     /// Defines a template to extract the `installed_version` state value or to render to a valid JSON payload on from the payload received on `state_topic`.
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttUpdateValidator : MqttSensorDiscoveryBaseValidator<MqttUpdate>
@@ -102,6 +137,9 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
         {
             TopicAndTemplate(x => x.LatestVersionTopic, x => x.LatestVersionTemplate);
             TopicAndTemplate(x => x.StateTopic, x => x.ValueTemplate);
+
+            RuleFor(x => x.DisplayPrecision).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.UpdatePercentage).InclusiveBetween(0, 100);
         }
     }
 }

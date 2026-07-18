@@ -18,7 +18,7 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Image)]
 [PublicAPI]
 public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageValidator>, IHasAvailability,
-    IHasEnabledByDefault, IHasEncoding, IHasEntityCategory, IHasIcon, IHasJsonAttributes, IHasObjectId, IHasUniqueId,
+    IHasEnabledByDefault, IHasEncoding, IHasEntityCategory, IHasIcon, IHasJsonAttributes, IHasDefaultEntityId, IHasUniqueId, IHasEntityPicture, IHasVisibleByDefault,
     IHasName
 {
     public MqttImage(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
@@ -50,16 +50,35 @@ public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageV
     /// </summary>
     public string? UrlTopic { get; set; }
 
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
 
     public class MqttImageValidator : MqttSensorDiscoveryBaseValidator<MqttImage>

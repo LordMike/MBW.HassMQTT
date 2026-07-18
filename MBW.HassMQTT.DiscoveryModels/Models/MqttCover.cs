@@ -51,8 +51,8 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 [DeviceType(HassDeviceType.Cover)]
 [PublicAPI]
 public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverValidator>, IHasUniqueId,
-    IHasAvailability, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
-    IHasObjectId, IHasEncoding, IHasName, IHasOptimistic
+    IHasAvailability, IHasAvailabilityPayloads, IHasQos, IHasJsonAttributes, IHasIcon, IHasEnabledByDefault, IHasRetain, IHasEntityCategory,
+    IHasDefaultEntityId, IHasEncoding, IHasName, IHasOptimistic, IHasEntityPicture, IHasVisibleByDefault, IHasGroup, IHasMessageExpiryInterval
 {
     public MqttCover(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
@@ -84,6 +84,11 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     public string? PayloadStop { get; set; }
 
     /// <summary>
+    /// The command payload that stops the tilt.
+    /// </summary>
+    public string? PayloadStopTilt { get; set; }
+
+    /// <summary>
     /// Number which represents closed position.
     /// </summary>
     public int? PositionClosed { get; set; }
@@ -111,7 +116,7 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     /// <summary>
     /// The MQTT topic to publish position commands to. You need to set position_topic as well if you want to use position topic. Use template if position topic wants different values than within range `position_closed` - `position_open`. If template is not defined and `position_closed != 100` and `position_open != 0` then proper position value is calculated from percentage position.
     /// </summary>
-    public string? SetpositionTopic { get; set; }
+    public string? SetPositionTopic { get; set; }
 
     /// <summary>
     /// The payload that represents the closed state.
@@ -193,19 +198,49 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     /// </summary>
     public string? ValueTemplate { get; set; }
 
+    /// <inheritdoc />
     public string? UniqueId { get; set; }
+    /// <inheritdoc />
     public IList<AvailabilityModel>? Availability { get; set; }
+    /// <inheritdoc />
     public AvailabilityMode? AvailabilityMode { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTemplate { get; set; }
+    /// <inheritdoc />
+    public string? AvailabilityTopic { get; set; }
+    /// <inheritdoc />
+    public string? PayloadAvailable { get; set; }
+    /// <inheritdoc />
+    public string? PayloadNotAvailable { get; set; }
+    /// <inheritdoc />
     public MqttQosLevel? Qos { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
+    /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
+    /// <inheritdoc />
     public string? Icon { get; set; }
+    /// <inheritdoc />
     public bool? EnabledByDefault { get; set; }
+    /// <inheritdoc />
     public bool? Retain { get; set; }
+    /// <inheritdoc />
     public EntityCategory? EntityCategory { get; set; }
-    public string? ObjectId { get; set; }
+    /// <inheritdoc />
+    public string? DefaultEntityId { get; set; }
+    /// <inheritdoc />
+    public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public bool? VisibleByDefault { get; set; }
+    /// <inheritdoc />
+    public IList<string>? Group { get; set; }
+    /// <inheritdoc />
+    public MessageExpiryInterval? MessageExpiryInterval { get; set; }
+    /// <inheritdoc />
     public string? Encoding { get; set; }
+    /// <inheritdoc />
     public string? Name { get; set; }
+    /// <inheritdoc />
     public bool? Optimistic { get; set; }
 
     public class MqttCoverValidator : MqttSensorDiscoveryBaseValidator<MqttCover>
@@ -213,13 +248,13 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
         public MqttCoverValidator()
         {
             TopicAndTemplate(s => s.PositionTopic, s => s.PositionTemplate);
-            TopicAndTemplate(s => s.SetpositionTopic, s => s.SetPositionTemplate);
+            TopicAndTemplate(s => s.SetPositionTopic, s => s.SetPositionTemplate);
             TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
             TopicAndTemplate(s => s.TiltCommandTopic, s => s.TiltCommandTemplate);
             TopicAndTemplate(s => s.TiltStatusTopic, s => s.TiltStatusTemplate);
 
-            RuleFor(s => s.SetpositionTopic).NotNull().Unless(s => s.PositionTopic == null);
-            RuleFor(s => s.PositionTopic).NotNull().Unless(s => s.SetpositionTopic == null);
+            RuleFor(s => s.SetPositionTopic).NotNull().Unless(s => s.PositionTopic == null);
+            RuleFor(s => s.PositionTopic).NotNull().Unless(s => s.SetPositionTopic == null);
 
             MinMax(s => s.TiltMin, s => s.TiltMax, 0, 100,
                 (s => s.TiltOpenedValue, 0),
