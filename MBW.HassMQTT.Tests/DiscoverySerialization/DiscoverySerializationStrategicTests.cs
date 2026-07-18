@@ -50,7 +50,7 @@ public class DiscoverySerializationStrategicTests
                 }
               ],
               "device": {
-                "identifiers": ["serial-1"],
+                "identifiers": ["serial-1", "serial-2"],
                 "connections": [["mac", "02:5b:26:a8:dc:12"]],
                 "manufacturer": "Example",
                 "model": "Synthetic"

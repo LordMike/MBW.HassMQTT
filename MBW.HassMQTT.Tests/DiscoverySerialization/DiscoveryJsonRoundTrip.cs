@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Globalization;
 using System.Linq;
 using MBW.HassMQTT.Serialization;
 using Newtonsoft.Json.Linq;
@@ -66,9 +67,27 @@ internal static class DiscoveryJsonRoundTrip
             JObject obj => new JObject(
                 obj.Properties()
                     .OrderBy(property => property.Name, StringComparer.Ordinal)
-                    .Select(property => new JProperty(property.Name, Canonicalize(property.Value)))),
+                    .Select(property => new JProperty(property.Name, CanonicalizeProperty(property)))),
             JArray array => new JArray(array.Select(Canonicalize)),
+            JValue value when value.Type is JTokenType.Integer or JTokenType.Float => CanonicalizeNumber(value),
             _ => token.DeepClone()
         };
+    }
+
+    private static JToken CanonicalizeProperty(JProperty property)
+    {
+        // Device identifiers use Home Assistant's minimal scalar-or-list form on serialization.
+        if (property.Name == "identifiers" && property.Value is JArray { Count: 1 } identifiers)
+            return Canonicalize(identifiers[0]);
+
+        return Canonicalize(property.Value);
+    }
+
+    private static JToken CanonicalizeNumber(JValue value)
+    {
+        string? text = Convert.ToString(value.Value, CultureInfo.InvariantCulture);
+        return decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal number)
+            ? new JValue(number)
+            : value.DeepClone();
     }
 }
