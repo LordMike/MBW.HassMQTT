@@ -34,7 +34,7 @@ public class
     /// <summary>
     /// The type of automation, must be 'trigger'.
     /// </summary>
-    public string AutomationType { get; set; } = "trigger";
+    public string AutomationType { get; set; }
 
     /// <summary>
     /// Optional payload to match the payload being sent over the topic.

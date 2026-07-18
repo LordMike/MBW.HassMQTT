@@ -98,7 +98,7 @@ public class MqttLightJson : MqttSensorDiscoveryBase<MqttLightJson, MqttLightJso
     /// <summary>
     /// The schema to use. Must be `json` to select the JSON schema.
     /// </summary>
-    public string? Schema { get; set; } = "json";
+    public string? Schema { get; set; }
 
     /// <summary>
     /// The MQTT topic subscribed to receive state updates.

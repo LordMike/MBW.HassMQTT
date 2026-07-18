@@ -241,7 +241,7 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
     /// <summary>
     /// The schema to use. Must be `default` or omitted to select the default schema.
     /// </summary>
-    public string Schema { get; set; } = "default";
+    public string? Schema { get; set; }
 
     /// <summary>
     /// The MQTT topic subscribed to receive state updates.
@@ -351,7 +351,9 @@ public class MqttLightDefault : MqttSensorDiscoveryBase<MqttLightDefault, MqttLi
             TopicAndTemplate(s => s.HsCommandTopic, s => s.HsCommandTemplate);
             TopicAndTemplate(s => s.XyCommandTopic, s => s.XyCommandTemplate);
 
-            RuleFor(s => s.Schema).Equal("default");
+            RuleFor(s => s.Schema)
+                .Equal("default")
+                .When(s => s.Schema != null);
         }
     }
 }

@@ -110,7 +110,7 @@ public class MqttLightTemplate :
     /// <summary>
     /// The schema to use. Must be `template` to select the template schema.
     /// </summary>
-    public string? Schema { get; set; } = "template";
+    public string? Schema { get; set; }
 
     /// <summary>
     /// [Template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract state from the state payload value.
