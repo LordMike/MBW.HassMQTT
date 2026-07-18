@@ -24,29 +24,94 @@ No package is provided for .NET versions older than .NET 8.
 
 # Example usage
 
-Create a discovery entity, set its state and attributes, and flush the pending
-messages to MQTT:
+This example configures the library with Microsoft.Extensions.DependencyInjection,
+connects to an MQTT broker, publishes a sensor, and shuts down cleanly:
+
+```shell
+dotnet add package MBW.HassMQTT.CommonServices
+dotnet add package Microsoft.Extensions.DependencyInjection
+dotnet add package Microsoft.Extensions.Logging.Console
+```
 
 ```csharp
-var temperature = manager
-    .CreateEntity<MqttSensor>()
-    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
-    .ConfigureDevice(device =>
-    {
-        device.Name = "Weather station";
-        device.Identifiers.Add("weather");
-    })
-    .ConfigureDiscovery(discovery =>
-    {
-        discovery.Name = "Outside temperature";
-        discovery.UnitOfMeasurement = "°C";
-    });
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using MBW.HassMQTT;
+using MBW.HassMQTT.CommonServices;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Models;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Interfaces;
+using MBW.HassMQTT.Topics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
-IHassMqttEntity outside = temperature.Build("weather", "outside");
-outside.SetValue(HassTopicKind.State, 21.4);
-outside.SetAttribute("quality", "good");
+ServiceCollection services = new ServiceCollection();
 
-MqttFlushResult result = await manager.FlushAll();
+services.AddLogging(logging => logging.AddConsole());
+services.Configure<HassConfiguration>(configuration =>
+{
+    configuration.DiscoveryPrefix = "homeassistant";
+    configuration.TopicPrefix = "weather";
+});
+services.Configure<CommonMqttConfiguration>(configuration =>
+{
+    configuration.Server = "localhost";
+    configuration.Port = 1883;
+    configuration.ClientId = "weather-sample";
+});
+services.AddSingleton(provider => new HassMqttTopicBuilder(
+    provider.GetRequiredService<IOptions<HassConfiguration>>().Value));
+services.AddAndConfigureMqtt("WeatherSample");
+
+await using ServiceProvider provider = services.BuildServiceProvider();
+IHostedService[] hostedServices = provider.GetServices<IHostedService>().ToArray();
+
+foreach (IHostedService hostedService in hostedServices)
+    await hostedService.StartAsync(CancellationToken.None);
+
+try
+{
+    IHassMqttClient mqttClient = provider.GetRequiredService<IHassMqttClient>();
+    using CancellationTokenSource connectTimeout = new(TimeSpan.FromSeconds(10));
+    while (!mqttClient.IsConnected)
+        await Task.Delay(TimeSpan.FromMilliseconds(100), connectTimeout.Token);
+
+    HassMqttManager manager = provider.GetRequiredService<HassMqttManager>();
+    IHassMqttEntity outsideTemperature = manager
+        .CreateEntity<MqttSensor>()
+        .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+        .ConfigureDevice(device =>
+        {
+            device.Name = "Weather station";
+            device.Identifiers.Add("weather-station");
+        })
+        .ConfigureDiscovery(discovery =>
+        {
+            discovery.Name = "Outside temperature";
+            discovery.DeviceClass = HassSensorDeviceClass.Temperature;
+            discovery.UnitOfMeasurement = "°C";
+            discovery.StateClass = HassStateClass.Measurement;
+        })
+        .Build("weather-station", "outside-temperature");
+
+    outsideTemperature.SetValue(HassTopicKind.State, 21.4);
+    outsideTemperature.SetAttribute("quality", "good");
+
+    MqttFlushResult result = await manager.FlushAll();
+    Console.WriteLine($"MQTT flush completed with status {result.Status}");
+}
+finally
+{
+    for (int i = hostedServices.Length - 1; i >= 0; i--)
+    {
+        await hostedServices[i].StopAsync(CancellationToken.None);
+    }
+}
 ```
 
 # Features
