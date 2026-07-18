@@ -89,6 +89,7 @@ Maintain the working checklist in the agent's native task/plan state. Categorize
 - Keep complex repeated structures, such as device and availability data, in shared model types.
 - Centralize documented shared validation in the base validator by detecting the corresponding capability interface. Entity validators should contain only entity-specific rules.
 - Optional documentation properties should normally remain nullable so omitted JSON lets Home Assistant apply its default. Required properties must be non-nullable and validated.
+- Treat a discovery model as a 1:1 representation of its serialized discovery document. Do not inject Home Assistant defaults through property initializers: a property absent from the document must remain absent when the model is serialized again.
 - Use enums for finite documented wire values. Verify their snake-case or explicit `EnumMember` serialization.
 - The `platform` configuration entry belongs to MQTT device-discovery component envelopes. Do not serialize it in standalone component discovery payloads merely because it appears in an entity document.
 - When removing or renaming a public property to match the documentation, search all projects and tests for consumers and account for the breaking API change deliberately.
