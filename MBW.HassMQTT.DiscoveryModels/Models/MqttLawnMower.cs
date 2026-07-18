@@ -39,7 +39,7 @@ public class MqttLawnMower : MqttSensorDiscoveryBase<MqttLawnMower, MqttLawnMowe
     /// <summary>The MQTT topic to which pause commands are published.</summary>
     public string? PauseCommandTopic { get; set; }
     /// <summary>A template used to render the start-mowing command published to <see cref="StartMowingCommandTopic" />.</summary>
-    public string? StartMowingTemplate { get; set; }
+    public string? StartMowingCommandTemplate { get; set; }
     /// <summary>The MQTT topic to which start-mowing commands are published.</summary>
     public string? StartMowingCommandTopic { get; set; }
 
@@ -87,7 +87,7 @@ public class MqttLawnMower : MqttSensorDiscoveryBase<MqttLawnMower, MqttLawnMowe
             TopicAndTemplate(x => x.ActivityStateTopic, x => x.ActivityValueTemplate);
             TopicAndTemplate(x => x.DockCommandTopic, x => x.DockCommandTemplate);
             TopicAndTemplate(x => x.PauseCommandTopic, x => x.PauseCommandTemplate);
-            TopicAndTemplate(x => x.StartMowingCommandTopic, x => x.StartMowingTemplate);
+            TopicAndTemplate(x => x.StartMowingCommandTopic, x => x.StartMowingCommandTemplate);
         }
     }
 }
