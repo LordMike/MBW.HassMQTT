@@ -22,6 +22,78 @@ Applications upgrading from version 3 should note these API changes:
 
 No package is provided for .NET versions older than .NET 8.
 
+# Example usage
+
+This example configures the library with Microsoft.Extensions.DependencyInjection,
+connects to an MQTT broker, and publishes a sensor:
+
+```shell
+dotnet add package MBW.HassMQTT.CommonServices
+dotnet add package Microsoft.Extensions.DependencyInjection
+dotnet add package Microsoft.Extensions.Logging.Console
+```
+
+```csharp
+using MBW.HassMQTT;
+using MBW.HassMQTT.CommonServices;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Models;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Topics;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+await using ServiceProvider provider = new ServiceCollection()
+    .AddLogging(logging => logging.AddConsole())
+    .Configure<HassConfiguration>(configuration =>
+    {
+        configuration.DiscoveryPrefix = "homeassistant";
+        configuration.TopicPrefix = "weather";
+    })
+    .Configure<CommonMqttConfiguration>(configuration =>
+    {
+        configuration.Server = "localhost";
+        configuration.Port = 1883;
+        configuration.ClientId = "weather-sample";
+    })
+    .AddSingleton(provider => new HassMqttTopicBuilder(
+        provider.GetRequiredService<IOptions<HassConfiguration>>().Value))
+    .AddAndConfigureMqtt("WeatherSample")
+    .BuildServiceProvider();
+
+// An IHost starts its IHostedService registrations automatically. This standalone
+// example starts the MQTT client service explicitly.
+var mqttClientService = provider.GetRequiredService<IHostedService>();
+await mqttClientService.StartAsync(default);
+
+var manager = provider.GetRequiredService<HassMqttManager>();
+var outsideTemperature = manager
+    .CreateEntity<MqttSensor>()
+    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+    .ConfigureDevice(device =>
+    {
+        device.Name = "Weather station";
+        device.Identifiers.Add("weather-station");
+    })
+    .ConfigureDiscovery(discovery =>
+    {
+        discovery.Name = "Outside temperature";
+        discovery.DeviceClass = HassSensorDeviceClass.Temperature;
+        discovery.UnitOfMeasurement = "°C";
+        discovery.StateClass = HassStateClass.Measurement;
+    })
+    .Build("weather-station", "outside-temperature");
+
+outsideTemperature.SetValue(HassTopicKind.State, 21.4);
+outsideTemperature.SetAttribute("quality", "good");
+
+// FlushAll attempts delivery immediately. Pending data remains queued while
+// disconnected, so keep the application running to allow reconnect delivery.
+await manager.FlushAll();
+```
+
 # Features
 
 * Complete models for each of the Home Assistant MQTT entities

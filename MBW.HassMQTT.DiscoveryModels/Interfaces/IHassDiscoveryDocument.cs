@@ -1,11 +1,10 @@
 using FluentValidation;
-using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Device;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 
 namespace MBW.HassMQTT.DiscoveryModels.Interfaces;
 
-public interface IHassDiscoveryDocument : IMqttValueContainer
+public interface IHassDiscoveryDocument
 {
     /// <summary>
     /// Device details for this entity, usually this is duplicated between multiple entities to let HA link them together.
