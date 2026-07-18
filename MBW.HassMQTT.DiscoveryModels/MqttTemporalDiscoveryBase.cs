@@ -14,7 +14,7 @@ namespace MBW.HassMQTT.DiscoveryModels;
 /// </summary>
 public abstract class MqttTemporalDiscoveryBase<T, TValidator> : MqttSensorDiscoveryBase<T, TValidator>,
     IHasAvailability, IHasDefaultEntityId, IHasEnabledByDefault, IHasEncoding, IHasEntityCategory,
-    IHasEntityPicture, IHasJsonAttributes, IHasMessageExpiryInterval, IHasName, IHasQos, IHasRetain, IHasUniqueId
+    IHasEntityPicture, IHasIcon, IHasJsonAttributes, IHasMessageExpiryInterval, IHasName, IHasQos, IHasRetain, IHasUniqueId
     where T : IHassDiscoveryDocument
     where TValidator : AbstractValidator<T>, new()
 {
@@ -60,6 +60,8 @@ public abstract class MqttTemporalDiscoveryBase<T, TValidator> : MqttSensorDisco
     public EntityCategory? EntityCategory { get; set; }
     /// <inheritdoc />
     public string? EntityPicture { get; set; }
+    /// <inheritdoc />
+    public string? Icon { get; set; }
     /// <inheritdoc />
     public string? JsonAttributesTemplate { get; set; }
     /// <inheritdoc />

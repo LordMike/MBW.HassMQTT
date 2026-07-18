@@ -3,7 +3,6 @@
 using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Enum;
-using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models;
@@ -13,14 +12,11 @@ namespace MBW.HassMQTT.DiscoveryModels.Models;
 /// </summary>
 [DeviceType(HassDeviceType.Time)]
 [PublicAPI]
-public class MqttTime : MqttTemporalDiscoveryBase<MqttTime, MqttTime.MqttTimeValidator>, IHasIcon
+public class MqttTime : MqttTemporalDiscoveryBase<MqttTime, MqttTime.MqttTimeValidator>
 {
     public MqttTime(string discoveryTopic, string uniqueId) : base(discoveryTopic, uniqueId)
     {
     }
-
-    /// <inheritdoc />
-    public string? Icon { get; set; }
 
     public class MqttTimeValidator : MqttSensorDiscoveryBaseValidator<MqttTime>
     {
