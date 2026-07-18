@@ -25,7 +25,7 @@ No package is provided for .NET versions older than .NET 8.
 # Example usage
 
 This example configures the library with Microsoft.Extensions.DependencyInjection,
-connects to an MQTT broker, publishes a sensor, and shuts down cleanly:
+connects to an MQTT broker, and publishes a sensor:
 
 ```shell
 dotnet add package MBW.HassMQTT.CommonServices
@@ -34,10 +34,6 @@ dotnet add package Microsoft.Extensions.Logging.Console
 ```
 
 ```csharp
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -50,68 +46,55 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-ServiceCollection services = new ServiceCollection();
-
-services.AddLogging(logging => logging.AddConsole());
-services.Configure<HassConfiguration>(configuration =>
-{
-    configuration.DiscoveryPrefix = "homeassistant";
-    configuration.TopicPrefix = "weather";
-});
-services.Configure<CommonMqttConfiguration>(configuration =>
-{
-    configuration.Server = "localhost";
-    configuration.Port = 1883;
-    configuration.ClientId = "weather-sample";
-});
-services.AddSingleton(provider => new HassMqttTopicBuilder(
-    provider.GetRequiredService<IOptions<HassConfiguration>>().Value));
-services.AddAndConfigureMqtt("WeatherSample");
-
-await using ServiceProvider provider = services.BuildServiceProvider();
-IHostedService[] hostedServices = provider.GetServices<IHostedService>().ToArray();
-
-foreach (IHostedService hostedService in hostedServices)
-    await hostedService.StartAsync(CancellationToken.None);
-
-try
-{
-    IHassMqttClient mqttClient = provider.GetRequiredService<IHassMqttClient>();
-    using CancellationTokenSource connectTimeout = new(TimeSpan.FromSeconds(10));
-    while (!mqttClient.IsConnected)
-        await Task.Delay(TimeSpan.FromMilliseconds(100), connectTimeout.Token);
-
-    HassMqttManager manager = provider.GetRequiredService<HassMqttManager>();
-    IHassMqttEntity outsideTemperature = manager
-        .CreateEntity<MqttSensor>()
-        .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
-        .ConfigureDevice(device =>
-        {
-            device.Name = "Weather station";
-            device.Identifiers.Add("weather-station");
-        })
-        .ConfigureDiscovery(discovery =>
-        {
-            discovery.Name = "Outside temperature";
-            discovery.DeviceClass = HassSensorDeviceClass.Temperature;
-            discovery.UnitOfMeasurement = "°C";
-            discovery.StateClass = HassStateClass.Measurement;
-        })
-        .Build("weather-station", "outside-temperature");
-
-    outsideTemperature.SetValue(HassTopicKind.State, 21.4);
-    outsideTemperature.SetAttribute("quality", "good");
-
-    MqttFlushResult result = await manager.FlushAll();
-    Console.WriteLine($"MQTT flush completed with status {result.Status}");
-}
-finally
-{
-    for (int i = hostedServices.Length - 1; i >= 0; i--)
+await using ServiceProvider provider = new ServiceCollection()
+    .AddLogging(logging => logging.AddConsole())
+    .Configure<HassConfiguration>(configuration =>
     {
-        await hostedServices[i].StopAsync(CancellationToken.None);
-    }
-}
+        configuration.DiscoveryPrefix = "homeassistant";
+        configuration.TopicPrefix = "weather";
+    })
+    .Configure<CommonMqttConfiguration>(configuration =>
+    {
+        configuration.Server = "localhost";
+        configuration.Port = 1883;
+        configuration.ClientId = "weather-sample";
+    })
+    .AddSingleton(provider => new HassMqttTopicBuilder(
+        provider.GetRequiredService<IOptions<HassConfiguration>>().Value))
+    .AddAndConfigureMqtt("WeatherSample")
+    .BuildServiceProvider();
+
+// An IHost starts its IHostedService registrations automatically. This standalone
+// example starts the MQTT client service explicitly.
+var mqttClientService = provider.GetRequiredService<IHostedService>();
+await mqttClientService.StartAsync(default);
+
+var mqttClient = provider.GetRequiredService<IHassMqttClient>();
+while (!mqttClient.IsConnected)
+    await Task.Delay(100);
+
+var manager = provider.GetRequiredService<HassMqttManager>();
+var outsideTemperature = manager
+    .CreateEntity<MqttSensor>()
+    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+    .ConfigureDevice(device =>
+    {
+        device.Name = "Weather station";
+        device.Identifiers.Add("weather-station");
+    })
+    .ConfigureDiscovery(discovery =>
+    {
+        discovery.Name = "Outside temperature";
+        discovery.DeviceClass = HassSensorDeviceClass.Temperature;
+        discovery.UnitOfMeasurement = "°C";
+        discovery.StateClass = HassStateClass.Measurement;
+    })
+    .Build("weather-station", "outside-temperature");
+
+outsideTemperature.SetValue(HassTopicKind.State, 21.4);
+outsideTemperature.SetAttribute("quality", "good");
+
+await manager.FlushAll();
 ```
 
 # Features
