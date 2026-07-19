@@ -39,6 +39,7 @@ public class DiscoveryModelCapabilityTests
             (typeof(MqttEvent), nameof(MqttEvent.DeviceClass), typeof(Optional<HassEventDeviceClass?>)),
             (typeof(MqttHumidifier), nameof(MqttHumidifier.DeviceClass), typeof(Optional<HumidifierDeviceClass?>)),
             (typeof(MqttNumber), nameof(MqttNumber.DeviceClass), typeof(Optional<HassNumberDeviceClass?>)),
+            (typeof(MqttNumber), nameof(MqttNumber.UnitOfMeasurement), typeof(Optional<string>)),
             (typeof(MqttSensor), nameof(MqttSensor.DeviceClass), typeof(Optional<HassSensorDeviceClass?>)),
             (typeof(MqttSensor), nameof(MqttSensor.UnitOfMeasurement), typeof(Optional<string>)),
             (typeof(MqttSwitch), nameof(MqttSwitch.DeviceClass), typeof(Optional<HassSwitchDeviceClass?>)),

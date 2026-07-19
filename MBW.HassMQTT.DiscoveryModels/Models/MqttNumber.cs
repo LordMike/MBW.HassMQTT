@@ -64,6 +64,12 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     public float? Step { get; set; }
 
     /// <summary>
+    /// Defines the unit of measurement, if any. Leave unset to omit the property, or explicitly set
+    /// <see langword="null" /> to clear the unit.
+    /// </summary>
+    public Optional<string?> UnitOfMeasurement { get; set; }
+
+    /// <summary>
     /// Defines a template to extract the value.
     /// </summary>
     public string? ValueTemplate { get; set; }

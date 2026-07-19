@@ -106,6 +106,25 @@ public class OptionalSerializationTests
     }
 
     [Fact]
+    public void Number_unit_distinguishes_missing_null_and_value()
+    {
+        MqttNumber missing = DeserializeNumber("{}");
+        MqttNumber explicitNull = DeserializeNumber("""{ "unit_of_measurement": null }""");
+        MqttNumber value = DeserializeNumber("""{ "unit_of_measurement": "°C" }""");
+
+        Assert.False(missing.UnitOfMeasurement.IsSet);
+        Assert.Null(Serialize(missing).Property("unit_of_measurement"));
+
+        Assert.True(explicitNull.UnitOfMeasurement.IsSet);
+        Assert.Null(explicitNull.UnitOfMeasurement.Value);
+        Assert.Equal(JTokenType.Null, Serialize(explicitNull)["unit_of_measurement"]!.Type);
+
+        Assert.True(value.UnitOfMeasurement.IsSet);
+        Assert.Equal("°C", value.UnitOfMeasurement.Value);
+        Assert.Equal("°C", (string?)Serialize(value)["unit_of_measurement"]);
+    }
+
+    [Fact]
     public void Explicit_null_is_rejected_for_non_nullable_optional_value()
     {
         Assert.Throws<JsonSerializationException>(() =>
@@ -117,6 +136,9 @@ public class OptionalSerializationTests
 
     private static MqttCover DeserializeCover(string json) =>
         JObject.Parse(json).ToObject<MqttCover>(CustomJsonSerializer.Serializer)!;
+
+    private static MqttNumber DeserializeNumber(string json) =>
+        JObject.Parse(json).ToObject<MqttNumber>(CustomJsonSerializer.Serializer)!;
 
     private sealed class NonNullableOptionalDocument
     {
