@@ -10,6 +10,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using MBW.HassMQTT.DiscoveryModels.Device;
+using MBW.HassMQTT.DiscoveryModels.Metadata;
 using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Internal;
 
@@ -95,6 +96,15 @@ internal static class HassJson
                 identifiers.Set = (instance, value) => ReplaceCollection(
                     ((MqttDeviceDocument)instance).Identifiers,
                     (ObservableCollection<string>)value!);
+            }
+
+            JsonPropertyInfo? connections = typeInfo.Properties.FirstOrDefault(property => property.Name == "connections");
+            if (connections != null)
+            {
+                connections.ObjectCreationHandling = JsonObjectCreationHandling.Replace;
+                connections.Set = (instance, value) => ReplaceCollection(
+                    ((MqttDeviceDocument)instance).Connections,
+                    (ObservableCollection<ConnectionInfo>)value!);
             }
         }
 
