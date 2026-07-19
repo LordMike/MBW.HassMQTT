@@ -36,7 +36,7 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// See https://www.home-assistant.io/integrations/update/#device-classes
     /// </summary>
     /// <remarks>Default value: 'None'</remarks>
-    public HassUpdateDeviceClass? DeviceClass { get; set; }
+    public Optional<HassUpdateDeviceClass?> DeviceClass { get; set; }
 
     /// <summary>Number of decimal digits used to display update progress.</summary>
     public int? DisplayPrecision { get; set; }
@@ -129,7 +129,7 @@ public class MqttUpdate : MqttSensorDiscoveryBase<MqttUpdate, MqttUpdate.MqttUpd
     /// <inheritdoc />
     public bool? Retain { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
 
     public class MqttUpdateValidator : MqttSensorDiscoveryBaseValidator<MqttUpdate>
     {

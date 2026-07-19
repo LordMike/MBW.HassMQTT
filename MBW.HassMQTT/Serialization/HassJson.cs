@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Device;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
 using MBW.HassMQTT.DiscoveryModels.Models;
@@ -66,8 +67,7 @@ internal static class HassJson
         options.Converters.Add(new QosLevelConverter());
         options.Converters.Add(new EnumMemberJsonConverterFactory());
         options.Converters.Add(new ConnectionInfoConverter());
-
-        // TODO #16: register the Optional<T> converter here once Optional<T> lands.
+        options.Converters.Add(new OptionalJsonConverterFactory());
         return options;
     }
 
@@ -131,7 +131,7 @@ internal static class HassJson
             }
         }
 
-        // TODO #16: customize Optional<T> property contracts here after its final API is known.
+        ConfigureOptionalProperties(typeInfo);
         if (!omitEmptyCollections || typeInfo.Kind != JsonTypeInfoKind.Object)
             return;
 
@@ -162,6 +162,7 @@ internal static class HassJson
         if (typeInfo.Kind != JsonTypeInfoKind.Object)
             return;
 
+        ConfigureOptionalProperties(typeInfo);
         foreach (JsonPropertyInfo property in typeInfo.Properties)
         {
             if (!IsCountedCollectionType(property.PropertyType))
@@ -170,6 +171,25 @@ internal static class HassJson
             Func<object, object?>? getter = property.Get;
             if (getter != null)
                 property.ShouldSerialize = (instance, _) => HasItems(getter(instance));
+        }
+    }
+
+    private static void ConfigureOptionalProperties(JsonTypeInfo typeInfo)
+    {
+        if (typeInfo.Kind != JsonTypeInfoKind.Object)
+            return;
+
+        foreach (JsonPropertyInfo property in typeInfo.Properties)
+        {
+            Type propertyType = property.PropertyType;
+            if (!propertyType.IsGenericType || propertyType.GetGenericTypeDefinition() != typeof(Optional<>))
+                continue;
+
+            PropertyInfo isSetProperty = propertyType.GetProperty(nameof(Optional<object>.IsSet))!;
+            Func<object, object?, bool>? existingShouldSerialize = property.ShouldSerialize;
+            property.ShouldSerialize = (instance, value) =>
+                (existingShouldSerialize?.Invoke(instance, value) ?? true) &&
+                value != null && (bool)isSetProperty.GetValue(value)!;
         }
     }
 

@@ -6,6 +6,7 @@ using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
+using MBW.HassMQTT.DiscoveryModels.Validation;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models;
 
@@ -30,7 +31,7 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     /// The [type/class](/integrations/sensor/#device-class) of the sensor to set the icon in the frontend.
     /// See https://www.home-assistant.io/integrations/sensor/#device-class
     /// </summary>
-    public HassSensorDeviceClass? DeviceClass { get; set; }
+    public Optional<HassSensorDeviceClass?> DeviceClass { get; set; }
 
     /// <summary>
     /// If set, it defines the number of seconds after the sensor's state expires, if it's not updated. After expiry, the sensor's state becomes `unavailable`. Default the sensors state never expires.
@@ -72,7 +73,7 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     /// <summary>
     /// Defines the units of measurement of the sensor, if any.
     /// </summary>
-    public string? UnitOfMeasurement { get; set; }
+    public Optional<string?> UnitOfMeasurement { get; set; }
 
     /// <summary>
     /// Defines a [template](/docs/configuration/templating/#using-templates-with-the-mqtt-integration) to extract the value. If the template throws an error, the current state will be used instead.
@@ -116,7 +117,7 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
     /// <inheritdoc />
     public string? Encoding { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
 
     public class MqttSensorValidator : MqttSensorDiscoveryBaseValidator<MqttSensor>
     {
@@ -124,7 +125,7 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
         {
             TopicAndTemplate(s => s.StateTopic, s => s.ValueTemplate);
 
-            RuleFor(s => s.DeviceClass).IsInEnum();
+            RuleFor(s => s.DeviceClass).IsInEnumWhenSet();
             RuleFor(s => s.StateClass).IsInEnum().NotEqual(HassStateClass.Unknown);
 
             RuleFor(s => s.ExpireAfter)
@@ -138,7 +139,7 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
                 .When(s => s.Options != null);
 
             RuleFor(s => s.DeviceClass)
-                .Equal(HassSensorDeviceClass.Enum)
+                .Must(optional => optional.IsSet && optional.Value == HassSensorDeviceClass.Enum)
                 .When(s => s.Options != null)
                 .WithMessage("DeviceClass must be Enum when Options is configured");
 
@@ -148,7 +149,7 @@ public class MqttSensor : MqttSensorDiscoveryBase<MqttSensor, MqttSensor.MqttSen
                 .WithMessage("StateClass cannot be used together with Options");
 
             RuleFor(s => s.UnitOfMeasurement)
-                .Null()
+                .Must(optional => !optional.IsSet || optional.Value == null)
                 .When(s => s.Options != null)
                 .WithMessage("UnitOfMeasurement cannot be used together with Options");
         }

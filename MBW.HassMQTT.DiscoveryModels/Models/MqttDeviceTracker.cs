@@ -87,7 +87,7 @@ public class MqttDeviceTracker :
     /// <inheritdoc />
     public IList<string>? Group { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
 
     public class MqttDeviceTrackerValidator : MqttSensorDiscoveryBaseValidator<MqttDeviceTracker>
     {

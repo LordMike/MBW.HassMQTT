@@ -79,7 +79,7 @@ public class MqttImage : MqttSensorDiscoveryBase<MqttImage, MqttImage.MqttImageV
     /// <inheritdoc />
     public string? UniqueId { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
 
     public class MqttImageValidator : MqttSensorDiscoveryBaseValidator<MqttImage>
     {

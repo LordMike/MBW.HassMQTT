@@ -10,10 +10,13 @@ namespace MBW.HassMQTT.Tests.DiscoverySerialization;
 
 internal static class DiscoveryJsonRoundTrip
 {
-    public static void Assert(Type modelType, string json, bool normalizeExplicitNulls = false) =>
-        Assert(modelType.Name, modelType, json, normalizeExplicitNulls);
+    public static void Assert(Type modelType, string json) =>
+        Assert(modelType.Name, modelType, json);
 
-    public static void Assert(string caseName, Type modelType, string json, bool normalizeExplicitNulls = false)
+    public static void Assert(Type modelType, string json, bool _) =>
+        Assert(modelType, json);
+
+    public static void Assert(string caseName, Type modelType, string json)
     {
         JsonNode source = JsonNode.Parse(json)!;
         object? document = DiscoveryJsonSerializer.Deserialize(JsonSerializer.SerializeToUtf8Bytes(source), modelType);
@@ -21,9 +24,6 @@ internal static class DiscoveryJsonRoundTrip
 
         JsonNode actual = JsonNode.Parse(DiscoveryJsonSerializer.Serialize(document))!;
         JsonNode expected = source.DeepClone();
-        if (normalizeExplicitNulls)
-            RemoveNullProperties(expected);
-
         JsonNode canonicalExpected = Canonicalize(expected);
         JsonNode canonicalActual = Canonicalize(actual);
         Xunit.Assert.True(
@@ -32,21 +32,8 @@ internal static class DiscoveryJsonRoundTrip
             $"Expected:{Environment.NewLine}{expected}{Environment.NewLine}Actual:{Environment.NewLine}{actual}");
     }
 
-    private static void RemoveNullProperties(JsonNode token)
-    {
-        if (token is JsonObject obj)
-        {
-            foreach (string name in obj.Where(property => property.Value is null).Select(property => property.Key).ToList())
-                obj.Remove(name);
-            foreach ((_, JsonNode? value) in obj)
-                if (value != null) RemoveNullProperties(value);
-        }
-        else if (token is JsonArray array)
-        {
-            foreach (JsonNode? item in array)
-                if (item != null) RemoveNullProperties(item);
-        }
-    }
+    public static void Assert(string caseName, Type modelType, string json, bool _) =>
+        Assert(caseName, modelType, json);
 
     private static JsonNode Canonicalize(JsonNode token)
     {
