@@ -55,7 +55,6 @@ namespace MBW.HassMQTT.Serialization;
 [JsonSerializable(typeof(AvailabilityModel))]
 [JsonSerializable(typeof(ConnectionInfo))]
 [JsonSerializable(typeof(MessageExpiryInterval))]
-[JsonSerializable(typeof(StateAndAttributesPayload))]
 [JsonSerializable(typeof(Dictionary<string, object>))]
 [JsonSerializable(typeof(object))]
 internal partial class HassJsonSerializerContext : JsonSerializerContext;

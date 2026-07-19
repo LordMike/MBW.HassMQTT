@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -123,57 +121,6 @@ public class SerializationInfrastructureTests
     }
 
     [Fact]
-    public void RuntimeObservableStringCollectionsRemainArrays()
-    {
-        ObservableCollection<string> values = new() { "only-value" };
-
-        JsonArray json = JsonNode.Parse(PayloadSerializer.Serialize(values))!.AsArray();
-
-        Assert.Equal("only-value", Assert.Single(json)!.GetValue<string>());
-    }
-
-    [Fact]
-    public void RuntimePayloadsIncludePublicFields()
-    {
-        PublicFieldPayload payload = new() { SampleValue = 42 };
-
-        JsonObject json = JsonNode.Parse(PayloadSerializer.Serialize(payload))!.AsObject();
-
-        Assert.Equal(42, json["sample_value"]!.GetValue<int>());
-    }
-
-    [Fact]
-    public void RuntimeEnumerablePropertiesRemainPresentWhenEmpty()
-    {
-        EnumerablePayload payload = new() { Values = Array.Empty<int>() };
-
-        JsonObject json = JsonNode.Parse(PayloadSerializer.Serialize(payload))!.AsObject();
-
-        Assert.True(json.ContainsKey("values"));
-        Assert.Empty(json["values"]!.AsArray());
-    }
-
-    [Fact]
-    public void RuntimeFlagEnumsAndEnumDictionaryKeysRoundTrip()
-    {
-        RuntimeEnumPayload payload = new()
-        {
-            Access = RuntimeAccess.Read | RuntimeAccess.Write,
-            Values = new Dictionary<RuntimeAccess, int> { [RuntimeAccess.Read] = 42 }
-        };
-
-        byte[] bytes = PayloadSerializer.Serialize(payload);
-        JsonObject json = JsonNode.Parse(bytes)!.AsObject();
-
-        Assert.Equal("read, write", json["access"]!.GetValue<string>());
-        Assert.Equal(42, json["values"]!["read"]!.GetValue<int>());
-
-        RuntimeEnumPayload restored = JsonSerializer.Deserialize<RuntimeEnumPayload>(bytes, HassJson.RuntimeOptions)!;
-        Assert.Equal(payload.Access, restored.Access);
-        Assert.Equal(42, restored.Values[RuntimeAccess.Read]);
-    }
-
-    [Fact]
     public void ShippingAssembliesDoNotReferenceNewtonsoftJson()
     {
         Assert.DoesNotContain(typeof(MqttSensor).Assembly.GetReferencedAssemblies(), IsNewtonsoft);
@@ -183,28 +130,4 @@ public class SerializationInfrastructureTests
     private static bool IsNewtonsoft(System.Reflection.AssemblyName reference) =>
         string.Equals(reference.Name, "Newtonsoft.Json", StringComparison.Ordinal);
 
-    private sealed class PublicFieldPayload
-    {
-        public int SampleValue;
-    }
-
-    private sealed class EnumerablePayload
-    {
-        public IEnumerable<int> Values { get; set; } = Array.Empty<int>();
-    }
-
-    private sealed class RuntimeEnumPayload
-    {
-        public RuntimeAccess Access { get; set; }
-        public Dictionary<RuntimeAccess, int> Values { get; set; } = new();
-    }
-
-    [Flags]
-    private enum RuntimeAccess
-    {
-        [EnumMember(Value = "read")]
-        Read = 1,
-        [EnumMember(Value = "write")]
-        Write = 2
-    }
 }

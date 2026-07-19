@@ -172,21 +172,6 @@ public class OptionalSerializationTests
         Assert.False(restored.PayloadStop.IsSet);
     }
 
-    [Fact]
-    public void Runtime_serializer_uses_optional_contract()
-    {
-        var payload = new OptionalPayload();
-        Assert.False(ParsePayload(payload).ContainsKey("value"));
-
-        payload.Value = null;
-        JsonObject explicitNull = ParsePayload(payload);
-        Assert.True(explicitNull.ContainsKey("value"));
-        Assert.Null(explicitNull["value"]);
-
-        payload.Value = "set";
-        Assert.Equal("set", ParsePayload(payload)["value"]!.GetValue<string>());
-    }
-
     private static JsonObject Serialize<T>(T value) =>
         JsonNode.Parse(DiscoveryJsonSerializer.Serialize(value))!.AsObject();
 
@@ -196,16 +181,9 @@ public class OptionalSerializationTests
     private static MqttNumber DeserializeNumber(string json) =>
         DiscoveryJsonSerializer.Deserialize<MqttNumber>(JsonSerializer.SerializeToUtf8Bytes(JsonNode.Parse(json)))!;
 
-    private static JsonObject ParsePayload(object value) =>
-        JsonNode.Parse(PayloadSerializer.Serialize(value))!.AsObject();
-
     private sealed class NonNullableOptionalDocument
     {
         public Optional<int> Value { get; set; }
     }
 
-    private sealed class OptionalPayload
-    {
-        public Optional<string?> Value { get; set; }
-    }
 }

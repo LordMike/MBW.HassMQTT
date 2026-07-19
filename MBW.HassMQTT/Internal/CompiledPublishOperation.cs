@@ -1,104 +1,103 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using MBW.HassMQTT.Abstracts.Interfaces;
+using MBW.HassMQTT.Serialization;
 
 namespace MBW.HassMQTT.Internal;
 
 internal sealed class CompiledPublishOperation
 {
-    private readonly IReadOnlyList<IMqttValueContainer> _sources;
-    private readonly Func<IReadOnlyList<object>, object> _transform;
-    private readonly Func<bool> _isReady;
+    private readonly Func<CompiledPublishAttempt> _capture;
 
     public string Topic { get; }
     public PublishOperationKind Kind { get; }
 
-    public CompiledPublishOperation(
+    private CompiledPublishOperation(
         string topic,
-        IReadOnlyList<IMqttValueContainer> sources,
-        Func<IReadOnlyList<object>, object> transform,
         PublishOperationKind kind,
-        Func<bool> isReady = null)
+        Func<CompiledPublishAttempt> capture)
     {
         Topic = topic;
-        _sources = sources;
-        _transform = transform;
         Kind = kind;
-        _isReady = isReady ?? (() => true);
+        _capture = capture;
     }
 
-    public static CompiledPublishOperation CreateTransform<TInput, TOutput>(
-        string topic,
-        IMqttValueContainer source,
-        Func<TInput, TOutput> transform,
-        PublishOperationKind kind) =>
-        new CompiledPublishOperation(
-            topic,
-            new[] { source },
-            values => transform((TInput)values[0]),
-            kind);
+    public static CompiledPublishOperation CreateState(MqttStateValueTopic source, PublishOperationKind kind) =>
+        new(source.PublishTopic, kind, () =>
+        {
+            if (!source.Dirty)
+                return null;
 
-    public static CompiledPublishOperation CreateComposition<TFirst, TSecond, TOutput>(
-        string topic,
-        IMqttValueContainer first,
-        IMqttValueContainer second,
-        Func<TFirst, TSecond, TOutput> compose,
-        PublishOperationKind kind,
-        Func<bool> isReady = null) =>
-        new CompiledPublishOperation(
-            topic,
-            new[] { first, second },
-            values => compose((TFirst)values[0], (TSecond)values[1]),
-            kind,
-            isReady);
+            MqttStateValueTopic.Snapshot snapshot = source.Capture();
+            return new CompiledPublishAttempt(
+                source.PublishTopic,
+                MqttValueSerializer.SerializeStandalone(snapshot.Value),
+                kind,
+                () => source.MarkPublished(snapshot.Revision));
+        });
+
+    public static CompiledPublishOperation CreateAttributes(MqttAttributesTopic source) =>
+        new(source.PublishTopic, PublishOperationKind.Attributes, () =>
+        {
+            if (!source.Dirty)
+                return null;
+
+            MqttAttributesTopic.Snapshot snapshot = source.Capture();
+            return new CompiledPublishAttempt(
+                source.PublishTopic,
+                MqttValueSerializer.SerializeAttributes(snapshot.Values),
+                PublishOperationKind.Attributes,
+                () => source.MarkPublished(snapshot.Revision));
+        });
+
+    public static CompiledPublishOperation CreateCombined(
+        MqttStateValueTopic state,
+        MqttAttributesTopic attributes) =>
+        new(state.PublishTopic, PublishOperationKind.Value, () =>
+        {
+            if (!state.Initialized || (!state.Dirty && !attributes.Dirty))
+                return null;
+
+            MqttStateValueTopic.Snapshot stateSnapshot = state.Capture();
+            if (!stateSnapshot.Initialized)
+                return null;
+            MqttAttributesTopic.Snapshot attributesSnapshot = attributes.Capture();
+
+            return new CompiledPublishAttempt(
+                state.PublishTopic,
+                MqttValueSerializer.SerializeCombined(stateSnapshot.Value, attributesSnapshot.Values),
+                PublishOperationKind.Value,
+                () =>
+                {
+                    state.MarkPublished(stateSnapshot.Revision);
+                    attributes.MarkPublished(attributesSnapshot.Revision);
+                });
+        });
 
     public bool TryCapture(out CompiledPublishAttempt attempt)
     {
-        if (!_isReady() || !_sources.Any(source => source.Dirty))
-        {
-            attempt = null;
-            return false;
-        }
-
-        SourceSnapshot[] snapshots = _sources
-            .Select(source => new SourceSnapshot(source, source.Revision, source.GetSerializedValue()))
-            .ToArray();
-
-        attempt = new CompiledPublishAttempt(
-            Topic,
-            _transform(snapshots.Select(snapshot => snapshot.Value).ToArray()),
-            snapshots,
-            Kind);
-        return true;
+        attempt = _capture();
+        return attempt != null;
     }
 
     internal sealed class CompiledPublishAttempt
     {
-        private readonly IReadOnlyList<SourceSnapshot> _snapshots;
+        private readonly Action _acknowledge;
 
         public string Topic { get; }
-        public object Payload { get; }
+        public byte[] Payload { get; }
         public PublishOperationKind Kind { get; }
 
         public CompiledPublishAttempt(
             string topic,
-            object payload,
-            IReadOnlyList<SourceSnapshot> snapshots,
-            PublishOperationKind kind)
+            byte[] payload,
+            PublishOperationKind kind,
+            Action acknowledge)
         {
             Topic = topic;
             Payload = payload;
-            _snapshots = snapshots;
             Kind = kind;
+            _acknowledge = acknowledge;
         }
 
-        public void Acknowledge()
-        {
-            foreach (SourceSnapshot snapshot in _snapshots)
-                snapshot.Source.MarkPublished(snapshot.Revision);
-        }
+        public void Acknowledge() => _acknowledge();
     }
-
-    internal sealed record SourceSnapshot(IMqttValueContainer Source, long Revision, object Value);
 }

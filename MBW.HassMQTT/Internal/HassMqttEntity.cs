@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.Interfaces;
 
@@ -9,7 +8,7 @@ namespace MBW.HassMQTT.Internal;
 internal sealed class HassMqttEntity : IHassMqttEntity
 {
     private readonly IReadOnlyDictionary<HassTopicKind, MqttStateValueTopic> _valueSenders;
-    private readonly IReadOnlyList<IMqttValueContainer> _sources;
+    private readonly IReadOnlyList<MqttStateValueTopic> _valueSources;
     private readonly MqttAttributesTopic _attributesSender;
 
     public string DeviceId { get; }
@@ -26,7 +25,7 @@ internal sealed class HassMqttEntity : IHassMqttEntity
         DiscoveryPublishOperation discovery,
         IReadOnlyDictionary<HassTopicKind, MqttStateValueTopic> valueSenders,
         MqttAttributesTopic attributesSender,
-        IReadOnlyList<IMqttValueContainer> sources,
+        IReadOnlyList<MqttStateValueTopic> valueSources,
         IReadOnlyList<CompiledPublishOperation> publishingPlan)
     {
         DeviceId = deviceId;
@@ -35,7 +34,7 @@ internal sealed class HassMqttEntity : IHassMqttEntity
         Discovery = discovery;
         _valueSenders = valueSenders;
         _attributesSender = attributesSender;
-        _sources = sources;
+        _valueSources = valueSources;
         PublishingPlan = publishingPlan;
     }
 
@@ -58,7 +57,8 @@ internal sealed class HassMqttEntity : IHassMqttEntity
     internal void MarkDirty()
     {
         Discovery.MarkDirty();
-        foreach (IMqttValueContainer source in _sources)
+        foreach (MqttStateValueTopic source in _valueSources)
             source.MarkDirty();
+        _attributesSender?.MarkDirty();
     }
 }

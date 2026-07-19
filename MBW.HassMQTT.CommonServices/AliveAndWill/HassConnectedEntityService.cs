@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Extensions;
-using MBW.HassMQTT.Helpers;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.Hosting;
@@ -65,7 +64,7 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
             .Build(_config.DeviceId, _config.EntityId);
     }
 
-    public void SetAttribute(string name, object value)
+    public void SetAttribute(string name, MqttValue value)
     {
         IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
 
@@ -80,7 +79,9 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
         if (token.IsCancellationRequested)
             return;
 
-        await _mqttClient.SendValueAsync(StateTopic, OkMessage, token);
+        IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
+        sensor.SetValue(HassTopicKind.State, OkMessage);
+        await _hassMqttManager.FlushAll(token);
     }
 
     Task IMqttEventReceiver.OnDisconnect(MqttClientDisconnectedEventArgs args, CancellationToken token)
@@ -92,7 +93,11 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
     async Task IMqttEventReceiver.OnStopping(CancellationToken token)
     {
         if (_mqttClient.IsConnected)
-            await _mqttClient.SendValueAsync(StateTopic, ProblemMessage, token);
+        {
+            IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
+            sensor.SetValue(HassTopicKind.State, ProblemMessage);
+            await _hassMqttManager.FlushAll(token);
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

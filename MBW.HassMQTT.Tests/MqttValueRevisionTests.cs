@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Xunit;
 
 namespace MBW.HassMQTT.Tests;
@@ -15,8 +14,8 @@ public class MqttValueRevisionTests
 
         topic.SetAttribute("value", 2);
 
-        Dictionary<string, object> snapshot = Assert.IsType<Dictionary<string, object>>(topic.GetSerializedValue());
-        Assert.Equal(2, snapshot["value"]);
+        MqttAttributesTopic.Snapshot snapshot = topic.Capture();
+        Assert.Equal(2, Assert.IsType<int>(snapshot.Values["value"].GetValue()));
         Assert.True(topic.Dirty);
 
         topic.MarkPublished(topic.Revision);
@@ -33,6 +32,18 @@ public class MqttValueRevisionTests
         topic.MarkPublished(firstRevision);
 
         Assert.True(topic.Dirty);
-        Assert.Equal("second", topic.GetSerializedValue());
+        Assert.Equal("second", topic.Capture().Value.GetValue());
+    }
+
+    [Fact]
+    public void Null_attribute_is_stored_until_explicitly_removed()
+    {
+        MqttAttributesTopic topic = new MqttAttributesTopic("test/attributes");
+
+        topic.SetAttribute("value", null);
+
+        Assert.True(topic.Capture().Values.ContainsKey("value"));
+        topic.RemoveAttribute("value");
+        Assert.False(topic.Capture().Values.ContainsKey("value"));
     }
 }

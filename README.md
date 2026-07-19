@@ -100,6 +100,13 @@ outsideTemperature.SetAttribute("quality", "good");
 await manager.FlushAll();
 ```
 
+Runtime state and attributes use `MqttValue`. Strings, booleans, numbers, dates,
+and `JsonElement` values convert implicitly. Use `MqttValue.FromEnum(...)` for enum
+wire names and `MqttValue.FromJson(...)` for structured or pre-serialized JSON.
+`MqttValue.Null` stores a null value; remove attributes explicitly with
+`RemoveAttribute(...)`. Arbitrary binary messages remain available through
+`IHassMqttClient.PublishAsync`.
+
 # Features
 
 * Complete models for each of the Home Assistant MQTT entities
@@ -112,6 +119,5 @@ await manager.FlushAll();
 | Name | Nuget | Note |
 |---|---|---|
 | MBW.HassMQTT | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT)](https://www.nuget.org/packages/MBW.HassMQTT/) | Core services such as value managers and senders |
-| MBW.HassMQTT.Abstracts | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.Abstracts)](https://www.nuget.org/packages/MBW.HassMQTT.Abstracts/) | Common interfaces |
 | MBW.HassMQTT.CommonServices | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.CommonServices)](https://www.nuget.org/packages/MBW.HassMQTT.CommonServices/) | Addon service such as notifying HASS of downtime with MQTT LWT |
 | MBW.HassMQTT.DiscoveryModels | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.DiscoveryModels)](https://www.nuget.org/packages/MBW.HassMQTT.DiscoveryModels/) | HASS MQTT discovery models |

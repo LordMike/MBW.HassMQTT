@@ -144,7 +144,7 @@ public class HassMqttManager : IMqttEventReceiver
                     if (!operation.TryCapture(out CompiledPublishOperation.CompiledPublishAttempt attempt))
                         continue;
 
-                    MqttFlushStatus status = await Publish(attempt.Topic, PayloadSerializer.Serialize(attempt.Payload), token);
+                    MqttFlushStatus status = await Publish(attempt.Topic, attempt.Payload, token);
                     if (status != MqttFlushStatus.Completed)
                         return Result(status);
 
@@ -161,12 +161,14 @@ public class HassMqttManager : IMqttEventReceiver
                 if (!value.Dirty)
                     continue;
 
-                long revision = value.Revision;
-                object payload = value.GetSerializedValue();
-                MqttFlushStatus status = await Publish(value.PublishTopic, PayloadSerializer.Serialize(payload), token);
+                MqttStateValueTopic.Snapshot snapshot = value.Capture();
+                MqttFlushStatus status = await Publish(
+                    value.PublishTopic,
+                    MqttValueSerializer.SerializeStandalone(snapshot.Value),
+                    token);
                 if (status != MqttFlushStatus.Completed)
                     return Result(status);
-                value.MarkPublished(revision);
+                value.MarkPublished(snapshot.Revision);
                 values++;
             }
 
@@ -175,12 +177,14 @@ public class HassMqttManager : IMqttEventReceiver
                 if (!value.Dirty)
                     continue;
 
-                long revision = value.Revision;
-                object payload = value.GetSerializedValue();
-                MqttFlushStatus status = await Publish(value.PublishTopic, PayloadSerializer.Serialize(payload), token);
+                MqttAttributesTopic.Snapshot snapshot = value.Capture();
+                MqttFlushStatus status = await Publish(
+                    value.PublishTopic,
+                    MqttValueSerializer.SerializeAttributes(snapshot.Values),
+                    token);
                 if (status != MqttFlushStatus.Completed)
                     return Result(status);
-                value.MarkPublished(revision);
+                value.MarkPublished(snapshot.Revision);
                 attributes++;
             }
 

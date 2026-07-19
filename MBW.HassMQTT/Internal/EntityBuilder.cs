@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using EnumsNET;
 using FluentValidation;
 using FluentValidation.Results;
-using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Device;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
@@ -151,7 +151,6 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
 
         Dictionary<HassTopicKind, MqttStateValueTopic> valueSenders = new Dictionary<HassTopicKind, MqttStateValueTopic>();
         Dictionary<string, MqttStateValueTopic> valueSendersByTopic = new Dictionary<string, MqttStateValueTopic>(StringComparer.OrdinalIgnoreCase);
-        List<IMqttValueContainer> sources = new List<IMqttValueContainer>();
         List<CompiledPublishOperation> publishingPlan = new List<CompiledPublishOperation>();
         MqttAttributesTopic attributesSender = null;
 
@@ -161,8 +160,6 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
             if (topicKind == HassTopicKind.JsonAttributes)
             {
                 attributesSender ??= new MqttAttributesTopic(topic);
-                if (!sources.Contains(attributesSender))
-                    sources.Add(attributesSender);
                 continue;
             }
 
@@ -170,7 +167,6 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
             {
                 sender = new MqttStateValueTopic(topic);
                 valueSendersByTopic.Add(topic, sender);
-                sources.Add(sender);
             }
 
             valueSenders.Add(topicKind, sender);
@@ -188,11 +184,7 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
             {
                 if (!_publishStateAndAttributesTogether)
                 {
-                    publishingPlan.Add(CompiledPublishOperation.CreateTransform<object, object>(
-                        attributesSender.PublishTopic,
-                        attributesSender,
-                        value => value,
-                        PublishOperationKind.Attributes));
+                    publishingPlan.Add(CompiledPublishOperation.CreateAttributes(attributesSender));
                 }
                 continue;
             }
@@ -202,13 +194,7 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
             {
                 if (!combinedOperationAdded)
                 {
-                    publishingPlan.Add(CompiledPublishOperation.CreateComposition<object, Dictionary<string, object>, StateAndAttributesPayload>(
-                        combinedStateSender.PublishTopic,
-                        combinedStateSender,
-                        attributesSender,
-                        (state, attributes) => new StateAndAttributesPayload(state, attributes),
-                        PublishOperationKind.Value,
-                        () => combinedStateSender.Initialized));
+                    publishingPlan.Add(CompiledPublishOperation.CreateCombined(combinedStateSender, attributesSender));
                     combinedOperationAdded = true;
                 }
 
@@ -218,11 +204,7 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
 
             if (compiledValueSenders.Add(sender))
             {
-                publishingPlan.Add(CompiledPublishOperation.CreateTransform<object, object>(
-                    sender.PublishTopic,
-                    sender,
-                    value => value,
-                    PublishOperationKind.Value));
+                publishingPlan.Add(CompiledPublishOperation.CreateState(sender, PublishOperationKind.Value));
             }
         }
 
@@ -234,7 +216,7 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
             new DiscoveryPublishOperation(discoveryTopic, discoveryPayload),
             valueSenders,
             attributesSender,
-            sources,
+            valueSendersByTopic.Values.ToArray(),
             publishingPlan);
 
         _hassMqttManager.Register(entity);
