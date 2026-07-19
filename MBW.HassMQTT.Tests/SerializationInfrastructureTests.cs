@@ -115,6 +115,16 @@ public class SerializationInfrastructureTests
     }
 
     [Fact]
+    public void RuntimePayloadsIncludePublicFields()
+    {
+        PublicFieldPayload payload = new() { SampleValue = 42 };
+
+        JsonObject json = JsonNode.Parse(PayloadSerializer.Serialize(payload))!.AsObject();
+
+        Assert.Equal(42, json["sample_value"]!.GetValue<int>());
+    }
+
+    [Fact]
     public void ShippingAssembliesDoNotReferenceNewtonsoftJson()
     {
         Assert.DoesNotContain(typeof(MqttSensor).Assembly.GetReferencedAssemblies(), IsNewtonsoft);
@@ -123,4 +133,9 @@ public class SerializationInfrastructureTests
 
     private static bool IsNewtonsoft(System.Reflection.AssemblyName reference) =>
         string.Equals(reference.Name, "Newtonsoft.Json", StringComparison.Ordinal);
+
+    private sealed class PublicFieldPayload
+    {
+        public int SampleValue;
+    }
 }

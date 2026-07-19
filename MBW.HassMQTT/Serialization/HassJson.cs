@@ -49,6 +49,7 @@ internal static class HassJson
         {
             PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
             PropertyNameCaseInsensitive = true,
+            IncludeFields = true,
             DefaultIgnoreCondition = ignoreCondition,
             PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate,
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
