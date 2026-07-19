@@ -51,7 +51,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-await using ServiceProvider provider = new ServiceCollection()
+HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+
+builder.Services
     .AddLogging(logging => logging.AddConsole())
     .Configure<HassConfiguration>(configuration =>
     {
@@ -66,15 +68,11 @@ await using ServiceProvider provider = new ServiceCollection()
     })
     .AddSingleton(provider => new HassMqttTopicBuilder(
         provider.GetRequiredService<IOptions<HassConfiguration>>().Value))
-    .AddAndConfigureMqtt("WeatherSample")
-    .BuildServiceProvider();
+    .AddAndConfigureMqtt("WeatherSample");
 
-// An IHost starts its IHostedService registrations automatically. This standalone
-// example starts the MQTT client service explicitly.
-var mqttClientService = provider.GetRequiredService<IHostedService>();
-await mqttClientService.StartAsync(default);
+using IHost host = builder.Build();
 
-var manager = provider.GetRequiredService<HassMqttManager>();
+var manager = host.Services.GetRequiredService<HassMqttManager>();
 var outsideTemperature = manager
     .CreateEntity<MqttSensor>()
     .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
@@ -95,9 +93,16 @@ var outsideTemperature = manager
 outsideTemperature.SetValue(HassTopicKind.State, 21.4);
 outsideTemperature.SetAttribute("quality", "good");
 
+// Starting the host starts every registered IHostedService in order, including
+// the connected-status entity and the MQTT client lifetime service.
+await host.StartAsync();
+
 // FlushAll attempts delivery immediately. Pending data remains queued while
 // disconnected, so keep the application running to allow reconnect delivery.
 await manager.FlushAll();
+
+// Wait for Ctrl+C/SIGTERM and stop every hosted service cleanly.
+await host.WaitForShutdownAsync();
 ```
 
 Runtime state and attributes use `MqttValue`. Strings, booleans, numbers, dates,
