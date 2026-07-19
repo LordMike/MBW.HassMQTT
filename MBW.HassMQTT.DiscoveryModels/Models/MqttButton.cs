@@ -41,7 +41,7 @@ public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttBut
     /// See https://www.home-assistant.io/integrations/button/#device-class
     /// </summary>
     /// <remarks>Default value: 'None'</remarks>
-    public HassButtonDeviceClass? DeviceClass { get; set; }
+    public Optional<HassButtonDeviceClass?> DeviceClass { get; set; }
 
     /// <summary>
     /// The payload to send to trigger the button.
@@ -88,7 +88,7 @@ public class MqttButton : MqttSensorDiscoveryBase<MqttButton, MqttButton.MqttBut
     /// <inheritdoc />
     public string? Encoding { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
 
     public class MqttButtonValidator : MqttSensorDiscoveryBaseValidator<MqttButton>
     {

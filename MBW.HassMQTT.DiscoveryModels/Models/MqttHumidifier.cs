@@ -6,6 +6,7 @@ using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
+using MBW.HassMQTT.DiscoveryModels.Validation;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models;
 
@@ -72,7 +73,7 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
     /// <summary>
     /// The device class of the MQTT device. Must be either `humidifier`, `dehumidifier` or `null`.
     /// </summary>
-    public HumidifierDeviceClass? DeviceClass { get; set; }
+    public Optional<HumidifierDeviceClass?> DeviceClass { get; set; }
 
     /// <summary>
     /// The maximum target humidity percentage that can be set. The documented default is 100%.
@@ -201,7 +202,7 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
     /// <inheritdoc />
     public string? Encoding { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
     /// <inheritdoc />
     public bool? Optimistic { get; set; }
 
@@ -218,10 +219,9 @@ public class MqttHumidifier : MqttSensorDiscoveryBase<MqttHumidifier, MqttHumidi
             TopicAndTemplate(s => s.ActionTopic, s => s.ActionTemplate);
             TopicAndTemplate(s => s.CurrentHumidityTopic, s => s.CurrentHumidityTemplate);
 
+            RuleFor(s => s.DeviceClass).IsInEnumWhenSet();
             RuleFor(s => s.DeviceClass)
-                .IsInEnum()
-                .Must(s => s!.Value != HumidifierDeviceClass.Unknown)
-                .When(s => s.DeviceClass.HasValue);
+                .MustWhenSet(value => value != HumidifierDeviceClass.Unknown);
         }
     }
 }

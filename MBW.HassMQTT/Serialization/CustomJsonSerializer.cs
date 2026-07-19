@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MBW.HassMQTT.DiscoveryModels.Serialization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
@@ -19,6 +20,7 @@ public static class CustomJsonSerializer
             ContractResolver = new DoNotSerializeEmptyListsResolver { NamingStrategy = namingStrategy }
         };
 
+        settings.Converters.Add(new OptionalJsonConverter());
         settings.Converters.Add(new QosLevelConverter());
         settings.Converters.Add(new StringEnumConverter(namingStrategy));
         settings.Converters.Add(new ConnectionInfoConverter());

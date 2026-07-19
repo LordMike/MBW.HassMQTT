@@ -4,12 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using MBW.HassMQTT.DiscoveryModels.Device;
+using MBW.HassMQTT.DiscoveryModels.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace MBW.HassMQTT.Serialization;
 
-internal class DoNotSerializeEmptyListsResolver : DefaultContractResolver
+internal class DoNotSerializeEmptyListsResolver : OptionalAwareContractResolver
 {
     private static readonly Type GenericCollectionType = typeof(ICollection<>);
 

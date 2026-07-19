@@ -9,12 +9,17 @@ namespace MBW.HassMQTT.Tests.DiscoverySerialization;
 
 internal static class DiscoveryJsonRoundTrip
 {
-    public static void Assert(Type modelType, string json, bool normalizeExplicitNulls = false)
+    public static void Assert(Type modelType, string json)
     {
-        Assert(modelType.Name, modelType, json, normalizeExplicitNulls);
+        Assert(modelType.Name, modelType, json);
     }
 
-    public static void Assert(string caseName, Type modelType, string json, bool normalizeExplicitNulls = false)
+    public static void Assert(Type modelType, string json, bool _)
+    {
+        Assert(modelType, json);
+    }
+
+    public static void Assert(string caseName, Type modelType, string json)
     {
         JToken source = JToken.Parse(json);
         object? document = source.ToObject(modelType, CustomJsonSerializer.Serializer);
@@ -22,13 +27,6 @@ internal static class DiscoveryJsonRoundTrip
 
         JToken actual = JToken.FromObject(document, CustomJsonSerializer.Serializer);
         JToken expected = source.DeepClone();
-
-        if (normalizeExplicitNulls)
-        {
-            // https://github.com/LordMike/MBW.HassMQTT/issues/16
-            // The current model cannot distinguish an absent nullable property from an explicitly null one.
-            RemoveNullProperties(expected);
-        }
 
         JToken canonicalExpected = Canonicalize(expected);
         JToken canonicalActual = Canonicalize(actual);
@@ -40,23 +38,9 @@ internal static class DiscoveryJsonRoundTrip
             $"Actual:{Environment.NewLine}{actual}");
     }
 
-    private static void RemoveNullProperties(JToken token)
+    public static void Assert(string caseName, Type modelType, string json, bool _)
     {
-        if (token is JObject obj)
-        {
-            foreach (JProperty property in obj.Properties().ToList())
-            {
-                if (property.Value.Type == JTokenType.Null)
-                    property.Remove();
-                else
-                    RemoveNullProperties(property.Value);
-            }
-        }
-        else if (token is JArray array)
-        {
-            foreach (JToken item in array)
-                RemoveNullProperties(item);
-        }
+        Assert(caseName, modelType, json);
     }
 
     private static JToken Canonicalize(JToken token)

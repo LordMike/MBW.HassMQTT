@@ -6,6 +6,7 @@ using MBW.HassMQTT.DiscoveryModels.Availability;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
+using MBW.HassMQTT.DiscoveryModels.Validation;
 
 namespace MBW.HassMQTT.DiscoveryModels.Models;
 
@@ -46,7 +47,7 @@ public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBi
     /// Sets the [class of the device](/integrations/binary_sensor/#device-class), changing the device state and icon that is displayed on the frontend.
     /// See https://www.home-assistant.io/integrations/binary_sensor/#device-class
     /// </summary>
-    public HassBinarySensorDeviceClass? DeviceClass { get; set; }
+    public Optional<HassBinarySensorDeviceClass?> DeviceClass { get; set; }
 
     /// <summary>
     /// If set, it defines the number of seconds after the sensor's state expires, if it's not updated. After expiry, the sensor's state becomes `unavailable`. Default the sensors state never expires.
@@ -120,7 +121,7 @@ public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBi
     /// <inheritdoc />
     public string? Encoding { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
 
     public class MqttBinarySensorValidator : MqttSensorDiscoveryBaseValidator<MqttBinarySensor>
     {
@@ -130,7 +131,7 @@ public class MqttBinarySensor : MqttSensorDiscoveryBase<MqttBinarySensor, MqttBi
 
             RuleFor(s => s.ExpireAfter).GreaterThanOrEqualTo(0);
 
-            RuleFor(s => s.DeviceClass).IsInEnum();
+            RuleFor(s => s.DeviceClass).IsInEnumWhenSet();
         }
     }
 }

@@ -51,7 +51,7 @@ public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwi
     /// See https://www.home-assistant.io/integrations/switch/#device-class
     /// </summary>
     /// <remarks>Default value: 'None'</remarks>
-    public HassSwitchDeviceClass? DeviceClass { get; set; }
+    public Optional<HassSwitchDeviceClass?> DeviceClass { get; set; }
 
     /// <summary>
     /// The payload that represents `off` state. If specified, will be used for both comparing to the value in the `state_topic` (see `value_template` and `state_off` for details) and sending as `off` command to the `command_topic`.
@@ -124,7 +124,7 @@ public class MqttSwitch : MqttSensorDiscoveryBase<MqttSwitch, MqttSwitch.MqttSwi
     /// <inheritdoc />
     public string? Encoding { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
     /// <inheritdoc />
     public bool? Optimistic { get; set; }
 

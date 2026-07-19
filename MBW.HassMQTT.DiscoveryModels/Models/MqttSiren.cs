@@ -140,7 +140,7 @@ public class MqttSiren : MqttSensorDiscoveryBase<MqttSiren, MqttSiren.MqttSirenV
     /// <inheritdoc />
     public string? Encoding { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
     /// <inheritdoc />
     public bool? Optimistic { get; set; }
 

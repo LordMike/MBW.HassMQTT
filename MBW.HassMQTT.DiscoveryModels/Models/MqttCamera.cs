@@ -67,7 +67,7 @@ public class MqttCamera : MqttSensorDiscoveryBase<MqttCamera, MqttCamera.MqttCam
     /// <inheritdoc />
     public bool? VisibleByDefault { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
 
     public class MqttCameraValidator : MqttSensorDiscoveryBaseValidator<MqttCamera>
     {
