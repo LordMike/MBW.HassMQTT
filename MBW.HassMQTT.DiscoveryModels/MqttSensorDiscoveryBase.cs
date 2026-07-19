@@ -23,14 +23,14 @@ namespace MBW.HassMQTT.DiscoveryModels;
 public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDocument, INotifyPropertyChanged where T : IHassDiscoveryDocument where TValidator : AbstractValidator<T>, new()
 {
     private MqttDeviceDocument _device = null!;
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public static TValidator Validator { get; } = new TValidator();
     IValidator IHassDiscoveryDocument.Validator => Validator;
 
     [NotifyPropertyChangedInvocator]
     [UsedImplicitly]
-    protected virtual void OnPropertyChanged(string propertyName, object before, object after)
+    protected virtual void OnPropertyChanged(string propertyName, object? before, object? after)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
