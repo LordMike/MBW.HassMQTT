@@ -56,7 +56,6 @@ internal static class HassJson
         options.Converters.Add(new QosLevelConverter());
         options.Converters.Add(new EnumMemberJsonConverterFactory());
         options.Converters.Add(new ConnectionInfoConverter());
-        options.Converters.Add(new IdentifierCollectionConverter());
 
         // TODO #16: register the Optional<T> converter here once Optional<T> lands.
         return options;

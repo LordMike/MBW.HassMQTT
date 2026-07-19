@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -101,6 +102,16 @@ public class SerializationInfrastructureTests
 
         Assert.True(json.ContainsKey("options"));
         Assert.Empty(json["options"]!.AsArray());
+    }
+
+    [Fact]
+    public void RuntimeObservableStringCollectionsRemainArrays()
+    {
+        ObservableCollection<string> values = new() { "only-value" };
+
+        JsonArray json = JsonNode.Parse(PayloadSerializer.Serialize(values))!.AsArray();
+
+        Assert.Equal("only-value", Assert.Single(json)!.GetValue<string>());
     }
 
     [Fact]
