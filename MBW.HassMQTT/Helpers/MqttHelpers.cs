@@ -1,12 +1,12 @@
-using System.IO;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.Interfaces;
+using MBW.HassMQTT.Serialization;
 using MQTTnet;
 using MQTTnet.Protocol;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace MBW.HassMQTT.Helpers;
 
@@ -14,21 +14,14 @@ public static class MqttHelpers
 {
     private static readonly Encoding Encoding = new UTF8Encoding(false);
 
-    private static byte[] ConvertJson(JToken token)
-    {
-        using MemoryStream stream = new MemoryStream();
-        using (StreamWriter writer = new StreamWriter(stream, Encoding))
-        using (JsonTextWriter jsonWriter = new JsonTextWriter(writer))
-            token.WriteTo(jsonWriter);
+    public static Task<MqttClientPublishResult> SendJsonAsync<T>(this IHassMqttClient mqttClient, string topic, T document, CancellationToken token = default) =>
+        mqttClient.PublishAsync(CreateMessage(topic, JsonSerializer.SerializeToUtf8Bytes(document, HassJson.WireOptions)), token);
 
-        return stream.ToArray();
-    }
-
-    public static Task<MqttClientPublishResult> SendJsonAsync(this IHassMqttClient mqttClient, string topic, JToken document, CancellationToken token = default) =>
-        mqttClient.PublishAsync(CreateMessage(topic, ConvertJson(document)), token);
+    public static Task<MqttClientPublishResult> SendJsonAsync<T>(this IHassMqttClient mqttClient, string topic, T document, JsonTypeInfo<T> jsonTypeInfo, CancellationToken token = default) =>
+        mqttClient.PublishAsync(CreateMessage(topic, JsonSerializer.SerializeToUtf8Bytes(document, jsonTypeInfo)), token);
 
     public static Task<MqttClientPublishResult> SendValueAsync(this IHassMqttClient mqttClient, string topic, string value, CancellationToken token = default) =>
-        mqttClient.PublishAsync(CreateMessage(topic, Encoding.UTF8.GetBytes(value)), token);
+        mqttClient.PublishAsync(CreateMessage(topic, Encoding.GetBytes(value)), token);
 
     public static MqttApplicationMessage CreateMessage(string topic, byte[] payload) =>
         new MqttApplicationMessageBuilder()

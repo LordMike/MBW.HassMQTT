@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Packets;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 using Xunit;
 
 namespace MBW.HassMQTT.Tests;
@@ -78,8 +78,8 @@ public class EntityBuilderTests
         fahrenheit.Build("weather", "fahrenheit");
         await manager.FlushAll();
 
-        JObject celsiusPayload = DiscoveryPayload(client, "homeassistant/sensor/weather/celsius/config");
-        JObject fahrenheitPayload = DiscoveryPayload(client, "homeassistant/sensor/weather/fahrenheit/config");
+        JsonObject celsiusPayload = DiscoveryPayload(client, "homeassistant/sensor/weather/celsius/config");
+        JsonObject fahrenheitPayload = DiscoveryPayload(client, "homeassistant/sensor/weather/fahrenheit/config");
         Assert.Equal("Celsius", (string)celsiusPayload["name"]);
         Assert.Equal("°C", (string)celsiusPayload["unit_of_measurement"]);
         Assert.Equal("Fahrenheit", (string)fahrenheitPayload["name"]);
@@ -185,16 +185,16 @@ public class EntityBuilderTests
         Assert.Equal(0, result.Attributes);
         Assert.Equal(2, client.Messages.Count);
 
-        JObject discovery = DiscoveryPayload(client, "homeassistant/sensor/weather/combined/config");
+        JsonObject discovery = DiscoveryPayload(client, "homeassistant/sensor/weather/combined/config");
         Assert.Equal("test/weather/combined/state", (string)discovery["state_topic"]);
         Assert.Equal((string)discovery["state_topic"], (string)discovery["json_attributes_topic"]);
         Assert.Equal("{{ value_json.state }}", (string)discovery["value_template"]);
         Assert.Equal("{{ value_json.attributes | tojson }}", (string)discovery["json_attributes_template"]);
 
         MqttApplicationMessage valueMessage = Assert.Single(client.Messages, message => message.Topic == "test/weather/combined/state");
-        Assert.Equal(
-            JObject.Parse("{\"state\":21.4,\"attributes\":{\"quality\":\"good\"}}"),
-            JObject.Parse(valueMessage.ConvertPayloadToString()));
+        Assert.True(JsonNode.DeepEquals(
+            JsonNode.Parse("{\"state\":21.4,\"attributes\":{\"quality\":\"good\"}}"),
+            JsonNode.Parse(valueMessage.ConvertPayloadToString())));
     }
 
     [Fact]
@@ -214,7 +214,7 @@ public class EntityBuilderTests
 
         await manager.FlushAll();
 
-        JObject discovery = DiscoveryPayload(client, "homeassistant/siren/siren/combined/config");
+        JsonObject discovery = DiscoveryPayload(client, "homeassistant/siren/siren/combined/config");
         Assert.Equal("custom/siren/state", (string)discovery["state_topic"]);
         Assert.Equal("custom/siren/state", (string)discovery["json_attributes_topic"]);
         Assert.Equal("{{ value_json.state }}", (string)discovery["state_value_template"]);
@@ -297,8 +297,9 @@ public class EntityBuilderTests
 
         Assert.Equal(1, initialized.Values);
         MqttApplicationMessage message = Assert.Single(client.Messages);
-        JObject payload = JObject.Parse(message.ConvertPayloadToString());
-        Assert.Equal(JTokenType.Null, payload["state"]?.Type);
+        JsonObject payload = JsonNode.Parse(message.ConvertPayloadToString())!.AsObject();
+        Assert.True(payload.ContainsKey("state"));
+        Assert.Null(payload["state"]);
         Assert.Equal("pending", (string)payload["attributes"]?["quality"]);
         Assert.False(entity.GetValueSender(HassTopicKind.State).Dirty);
         Assert.False(entity.GetAttributesSender().Dirty);
@@ -345,9 +346,9 @@ public class EntityBuilderTests
         await manager.FlushAll();
 
         string stateOnlyPayload = client.Messages[^1].ConvertPayloadToString();
-        JObject stateOnly = JObject.Parse(stateOnlyPayload);
+        JsonObject stateOnly = JsonNode.Parse(stateOnlyPayload)!.AsObject();
         Assert.Contains("\"state\":\"2026-07-19T14:30:00.0000000+02:00\"", stateOnlyPayload);
-        Assert.Empty((JObject)stateOnly["attributes"]);
+        Assert.Empty(stateOnly["attributes"]!.AsObject());
 
         entity.SetAttribute("quality", "good");
         await manager.FlushAll();
@@ -355,9 +356,9 @@ public class EntityBuilderTests
         await manager.FlushAll();
 
         string removedPayload = client.Messages[^1].ConvertPayloadToString();
-        JObject removed = JObject.Parse(removedPayload);
+        JsonObject removed = JsonNode.Parse(removedPayload)!.AsObject();
         Assert.Contains("\"state\":\"2026-07-19T14:30:00.0000000+02:00\"", removedPayload);
-        Assert.Empty((JObject)removed["attributes"]);
+        Assert.Empty(removed["attributes"]!.AsObject());
     }
 
     [Fact]
@@ -393,7 +394,7 @@ public class EntityBuilderTests
 
         client.PublishOverride = null;
         await manager.FlushAll();
-        JObject payload = JObject.Parse(client.Messages[^1].ConvertPayloadToString());
+        JsonObject payload = JsonNode.Parse(client.Messages[^1].ConvertPayloadToString())!.AsObject();
         Assert.Equal("second", (string)payload["state"]);
         Assert.Equal("second", (string)payload["attributes"]?["quality"]);
         Assert.False(entity.GetValueSender(HassTopicKind.State).Dirty);
@@ -444,8 +445,8 @@ public class EntityBuilderTests
         separate.Build("weather", "separate-branch");
         await manager.FlushAll();
 
-        JObject combinedDiscovery = DiscoveryPayload(client, "homeassistant/sensor/weather/combined-branch/config");
-        JObject separateDiscovery = DiscoveryPayload(client, "homeassistant/sensor/weather/separate-branch/config");
+        JsonObject combinedDiscovery = DiscoveryPayload(client, "homeassistant/sensor/weather/combined-branch/config");
+        JsonObject separateDiscovery = DiscoveryPayload(client, "homeassistant/sensor/weather/separate-branch/config");
         Assert.Equal((string)combinedDiscovery["state_topic"], (string)combinedDiscovery["json_attributes_topic"]);
         Assert.NotEqual((string)separateDiscovery["state_topic"], (string)separateDiscovery["json_attributes_topic"]);
         Assert.Null(separateDiscovery["value_template"]);
@@ -574,10 +575,10 @@ public class EntityBuilderTests
             .ConfigureTopics(HassTopicKind.State)
             .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"));
 
-    private static JObject DiscoveryPayload(FakeMqttClient client, string topic)
+    private static JsonObject DiscoveryPayload(FakeMqttClient client, string topic)
     {
         MqttApplicationMessage message = Assert.Single(client.Messages, candidate => candidate.Topic == topic);
-        return JObject.Parse(message.ConvertPayloadToString());
+        return JsonNode.Parse(message.ConvertPayloadToString())!.AsObject();
     }
 
     private static HassMqttManager CreateManager(FakeMqttClient client, ILogger<HassMqttManager> logger = null)

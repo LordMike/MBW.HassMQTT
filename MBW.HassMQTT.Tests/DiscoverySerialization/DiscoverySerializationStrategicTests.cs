@@ -1,7 +1,6 @@
 using System;
 using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Serialization;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace MBW.HassMQTT.Tests.DiscoverySerialization;
@@ -25,9 +24,8 @@ public class DiscoverySerializationStrategicTests
     [Fact]
     public void UnsupportedQosLevelIsRejected()
     {
-        JToken json = JToken.Parse("""{"state_topic":"example/state","qos":3}""");
-
-        Assert.ThrowsAny<Exception>(() => json.ToObject(typeof(MqttSensor), CustomJsonSerializer.Serializer));
+        byte[] json = System.Text.Encoding.UTF8.GetBytes("""{"state_topic":"example/state","qos":3}""");
+        Assert.ThrowsAny<Exception>(() => DiscoveryJsonSerializer.Deserialize(json, typeof(MqttSensor)));
     }
 
     [Fact]

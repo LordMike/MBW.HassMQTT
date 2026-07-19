@@ -13,7 +13,6 @@ using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Validation;
-using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.DiscoveryModels;
 
@@ -40,7 +39,6 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
     /// Device details for this entity, usually this is duplicated between multiple entities to let HA link them together.
     /// At least one of identifiers or connections must be present to identify the device.
     /// </summary>
-    [JsonProperty]
     public MqttDeviceDocument Device
     {
         get => _device;

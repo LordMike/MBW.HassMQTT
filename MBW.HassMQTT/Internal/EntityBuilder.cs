@@ -226,7 +226,7 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
             }
         }
 
-        byte[] discoveryPayload = PayloadSerializer.Serialize(discovery);
+        byte[] discoveryPayload = DiscoveryJsonSerializer.Serialize(discovery);
         HassMqttEntity entity = new HassMqttEntity(
             deviceId,
             entityId,
@@ -310,9 +310,9 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
 
     private TEntity Materialize(string discoveryTopic, string uniqueId)
     {
-        TEntity discovery = CreateDocument(discoveryTopic, uniqueId);
-        DiscoverySnapshotSerializer.Populate(_discoverySnapshot, discovery);
-        return discovery;
+        return DiscoverySnapshotSerializer.Restore(
+            _discoverySnapshot,
+            () => CreateDocument(discoveryTopic, uniqueId));
     }
 
     private TEntity CreateDocument(string discoveryTopic, string uniqueId)

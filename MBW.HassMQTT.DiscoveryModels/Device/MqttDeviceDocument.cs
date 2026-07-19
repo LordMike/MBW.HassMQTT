@@ -8,7 +8,6 @@ using System.Linq;
 using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
-using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.DiscoveryModels.Device;
 
@@ -88,7 +87,6 @@ public class MqttDeviceDocument : INotifyPropertyChanged
     /// <summary>
     /// A list of IDs that uniquely identify the device. For example a serial number.
     /// </summary>
-    [JsonConverter(typeof(IdentifierCollectionConverter))]
     public ObservableCollection<string> Identifiers { get; }
 
     /// <summary>

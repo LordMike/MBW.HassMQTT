@@ -4,6 +4,16 @@ Code to help me build integrations for Home Assistants MQTT integration. Contain
 
 There will be little to no support on this.
 
+# Version 5
+
+Version 5 uses `System.Text.Json` for discovery and runtime JSON payloads. The
+library's built-in discovery contracts are source-generated, with a reflection
+fallback retained for application-defined payload types.
+
+The public Newtonsoft.Json-specific API has been removed. `SendJsonAsync` now
+accepts a typed value, or a typed value together with `JsonTypeInfo<T>` when an
+application supplies its own source-generated contract.
+
 # Version 4
 
 Version 4 targets .NET 8 and .NET 10 and uses MQTTnet 5. The MQTT connection is
