@@ -1,12 +1,16 @@
 #nullable enable
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
+using MBW.HassMQTT.DiscoveryModels.Serialization;
 using MBW.HassMQTT.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using Xunit;
 
 namespace MBW.HassMQTT.Tests;
@@ -41,6 +45,17 @@ public class OptionalSerializationTests
         Assert.True(explicitDefault.IsSet);
         Assert.Equal(0, explicitDefault.Value);
         Assert.NotEqual(default, explicitDefault);
+    }
+
+    [Fact]
+    public void Try_get_value_marks_failed_output_as_maybe_null()
+    {
+        ParameterInfo valueParameter = typeof(Optional<>).GetMethod(nameof(Optional<object>.TryGetValue))!
+            .GetParameters()[0];
+        MaybeNullWhenAttribute attribute = Assert.IsType<MaybeNullWhenAttribute>(
+            valueParameter.GetCustomAttribute(typeof(MaybeNullWhenAttribute)));
+
+        Assert.False(attribute.ReturnValue);
     }
 
     [Fact]
@@ -130,6 +145,40 @@ public class OptionalSerializationTests
         Assert.Throws<JsonSerializationException>(() =>
             JObject.Parse("""{ "value": null }""")
                 .ToObject<NonNullableOptionalDocument>(CustomJsonSerializer.Serializer));
+    }
+
+    [Fact]
+    public void Discovery_models_package_exposes_optional_serialization_support()
+    {
+        Assert.True(typeof(OptionalJsonConverter).IsPublic);
+        Assert.True(typeof(OptionalAwareContractResolver).IsPublic);
+        Assert.Equal(typeof(Optional<>).Assembly, typeof(OptionalJsonConverter).Assembly);
+        Assert.Equal(typeof(Optional<>).Assembly, typeof(OptionalAwareContractResolver).Assembly);
+
+        JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            ContractResolver = new OptionalAwareContractResolver
+            {
+                NamingStrategy = new SnakeCaseNamingStrategy(),
+            },
+            Converters = { new OptionalJsonConverter() },
+        });
+        var cover = new MqttCover("homeassistant/cover/example/config", "example")
+        {
+            PayloadClose = null,
+        };
+
+        JObject json = JObject.FromObject(cover, serializer);
+
+        Assert.Equal(JTokenType.Null, json["payload_close"]!.Type);
+        Assert.Null(json.Property("payload_open"));
+
+        MqttCover roundTripped = json.ToObject<MqttCover>(serializer)!;
+        Assert.True(roundTripped.PayloadClose.IsSet);
+        Assert.Null(roundTripped.PayloadClose.Value);
+        Assert.False(roundTripped.PayloadOpen.IsSet);
     }
 
     private static JObject Serialize(object value) => JObject.FromObject(value, CustomJsonSerializer.Serializer);

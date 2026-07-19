@@ -3,20 +3,24 @@
 using System;
 using System.Collections.Concurrent;
 using System.Reflection;
-using MBW.HassMQTT.DiscoveryModels;
 using Newtonsoft.Json;
 
-namespace MBW.HassMQTT.Serialization;
+namespace MBW.HassMQTT.DiscoveryModels.Serialization;
 
-internal sealed class OptionalJsonConverter : JsonConverter
+/// <summary>
+/// Serializes a set <see cref="Optional{T}" /> as its contained value and restores presence during deserialization.
+/// </summary>
+public sealed class OptionalJsonConverter : JsonConverter
 {
     private static readonly ConcurrentDictionary<Type, Func<object?, object>> Factories = new();
 
+    /// <inheritdoc />
     public override bool CanConvert(Type objectType)
     {
         return objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(Optional<>);
     }
 
+    /// <inheritdoc />
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         if (value == null)
@@ -32,6 +36,7 @@ internal sealed class OptionalJsonConverter : JsonConverter
         serializer.Serialize(writer, innerValue, valueType);
     }
 
+    /// <inheritdoc />
     public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         Type valueType = objectType.GetGenericArguments()[0];

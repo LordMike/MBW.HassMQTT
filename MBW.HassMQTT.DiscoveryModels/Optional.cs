@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MBW.HassMQTT.DiscoveryModels;
 
@@ -37,6 +38,11 @@ namespace MBW.HassMQTT.DiscoveryModels;
 /// Use <see cref="Unset" /> or <see langword="default" /> to return a discovery property to the omitted state. Use a
 /// nullable contained type, such as <c>Optional&lt;string?&gt;</c> or <c>Optional&lt;SomeEnum?&gt;</c>, when explicit null is a
 /// valid value. Do not add another nullable layer such as <c>Optional&lt;T&gt;?</c>; this type already represents absence.
+/// </para>
+/// <para>
+/// Newtonsoft.Json serializers created by consumers should register
+/// <see cref="Serialization.OptionalJsonConverter" /> and use
+/// <see cref="Serialization.OptionalAwareContractResolver" />.
 /// </para>
 /// </remarks>
 public readonly record struct Optional<T>
@@ -81,7 +87,7 @@ public readonly record struct Optional<T>
     /// Attempts to get the supplied value. Returns <see langword="true" /> when null was explicitly supplied, with
     /// <paramref name="value" /> set to <see langword="null" />; returns <see langword="false" /> only when unset.
     /// </summary>
-    public bool TryGetValue(out T value)
+    public bool TryGetValue([MaybeNullWhen(false)] out T value)
     {
         value = _value;
         return IsSet;

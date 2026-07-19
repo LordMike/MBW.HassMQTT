@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MBW.HassMQTT.DiscoveryModels.Serialization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 

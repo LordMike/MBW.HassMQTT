@@ -2,14 +2,17 @@
 
 using System;
 using System.Reflection;
-using MBW.HassMQTT.DiscoveryModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace MBW.HassMQTT.Serialization;
+namespace MBW.HassMQTT.DiscoveryModels.Serialization;
 
-internal class OptionalAwareContractResolver : DefaultContractResolver
+/// <summary>
+/// Omits unset <see cref="Optional{T}" /> properties while preserving explicitly supplied JSON null values.
+/// </summary>
+public class OptionalAwareContractResolver : DefaultContractResolver
 {
+    /// <inheritdoc />
     protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
     {
         JsonProperty jsonProperty = base.CreateProperty(member, memberSerialization);
