@@ -1,5 +1,6 @@
 using System;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.Interfaces;
 
 namespace MBW.HassMQTT.Extensions;
@@ -18,9 +19,10 @@ public static class EntityExtensions
         return entity;
     }
 
-    public static IHassMqttEntity GetEntity(this HassMqttManager manager, string deviceId, string entityId)
+    public static IHassMqttEntity GetEntity<TEntity>(this HassMqttManager manager, string deviceId, string entityId)
+        where TEntity : IHassDiscoveryDocument
     {
-        if (manager.TryGetEntity(deviceId, entityId, out IHassMqttEntity entity))
+        if (manager.TryGetEntity<TEntity>(deviceId, entityId, out IHassMqttEntity entity))
             return entity;
 
         throw new InvalidOperationException($"Unable to find entity {deviceId}/{entityId} - has it been built?");

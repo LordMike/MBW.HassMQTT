@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.CommonServices.AliveAndWill;
+using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;
@@ -138,7 +139,7 @@ public class HassConnectedEntityServiceTests
     {
         await service.StartAsync(default);
         DateTime deadline = DateTime.UtcNow.AddSeconds(5);
-        while (!manager.TryGetEntity("test-application", "status", out _))
+        while (!manager.TryGetEntity<MqttBinarySensor>("test-application", "status", out _))
         {
             if (DateTime.UtcNow >= deadline)
                 throw new TimeoutException("The connected entity service did not register its status entity.");

@@ -68,7 +68,7 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
 
     public void SetAttribute(string name, MqttValue value)
     {
-        IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
+        IHassMqttEntity sensor = _hassMqttManager.GetEntity<MqttBinarySensor>(_config.DeviceId, _config.EntityId);
 
         sensor.SetAttribute(name, value);
     }
@@ -116,7 +116,7 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
         CreateSystemEntities();
 
         // Push starting values
-        IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
+        IHassMqttEntity sensor = _hassMqttManager.GetEntity<MqttBinarySensor>(_config.DeviceId, _config.EntityId);
         MqttAttributesTopic attributes = sensor.GetAttributesSender();
 
         Assembly entryAssembly = Assembly.GetEntryAssembly();
