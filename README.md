@@ -4,30 +4,6 @@ Code to help me build integrations for Home Assistants MQTT integration. Contain
 
 There will be little to no support on this.
 
-# Version 5
-
-Version 5 uses `System.Text.Json` for discovery and runtime JSON payloads. The
-library's built-in discovery contracts are source-generated, with a reflection
-fallback retained for application-defined payload types.
-
-# Version 4
-
-Version 4 targets .NET 8 and .NET 10 and uses MQTTnet 5. The MQTT connection is
-owned by a supervised hosted service which reconnects with bounded backoff,
-restores subscriptions, and republishes the latest dirty state after reconnecting.
-
-Applications upgrading from version 3 should note these API changes:
-
-* MQTTnet's managed client is no longer exposed or used. Resolve
-  `IHassMqttClient` when direct publish or subscription access is required.
-* `HassMqttManager.FlushAll` returns `MqttFlushResult`. Existing awaited calls may
-  discard the result; callers that need delivery status can inspect it.
-* `MqttValueTopic.SetDirty()` is now `MarkDirty()`.
-* Dirty state is revision-based. Multiple updates while offline are coalesced and
-  the latest value is published after reconnection.
-
-No package is provided for .NET versions older than .NET 8.
-
 # Example usage
 
 This example configures the library with Microsoft.Extensions.DependencyInjection,
