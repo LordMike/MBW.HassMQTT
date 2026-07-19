@@ -16,9 +16,13 @@ namespace MBW.HassMQTT.Internal;
 
 internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEntity : IHassDiscoveryDocument
 {
+    private const string CombinedStateTemplate = "{{ value_json.state }}";
+    private const string CombinedAttributesTemplate = "{{ value_json.attributes | tojson }}";
+
     private readonly HassMqttManager _hassMqttManager;
     private readonly byte[] _discoverySnapshot;
     private readonly HassTopicKind[] _requiredTopics;
+    private readonly bool _publishStateAndAttributesTogether;
 
     HassMqttManager IEntityBuilder<TEntity>.HassMqttManager => _hassMqttManager;
 
@@ -33,11 +37,16 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
             : Array.Empty<HassTopicKind>();
     }
 
-    private EntityBuilder(HassMqttManager hassMqttManager, byte[] discoverySnapshot, HassTopicKind[] requiredTopics)
+    private EntityBuilder(
+        HassMqttManager hassMqttManager,
+        byte[] discoverySnapshot,
+        HassTopicKind[] requiredTopics,
+        bool publishStateAndAttributesTogether)
     {
         _hassMqttManager = hassMqttManager;
         _discoverySnapshot = discoverySnapshot;
         _requiredTopics = requiredTopics;
+        _publishStateAndAttributesTogether = publishStateAndAttributesTogether;
     }
 
     public IEntityBuilder<TEntity> ConfigureTopics(params HassTopicKind[] topicKinds)
@@ -56,7 +65,29 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
                 requiredTopics.Add(topicKind);
         }
 
-        return new EntityBuilder<TEntity>(_hassMqttManager, _discoverySnapshot, requiredTopics.ToArray());
+        return new EntityBuilder<TEntity>(
+            _hassMqttManager,
+            _discoverySnapshot,
+            requiredTopics.ToArray(),
+            _publishStateAndAttributesTogether);
+    }
+
+    internal IEntityBuilder<TEntity> PublishStateAndAttributesTogether()
+    {
+        if (_publishStateAndAttributesTogether)
+            return this;
+
+        List<HassTopicKind> requiredTopics = new List<HassTopicKind>(_requiredTopics);
+        if (!requiredTopics.Contains(HassTopicKind.State))
+            requiredTopics.Add(HassTopicKind.State);
+        if (!requiredTopics.Contains(HassTopicKind.JsonAttributes))
+            requiredTopics.Add(HassTopicKind.JsonAttributes);
+
+        return new EntityBuilder<TEntity>(
+            _hassMqttManager,
+            _discoverySnapshot,
+            requiredTopics.ToArray(),
+            true);
     }
 
     public IEntityBuilder<TEntity> ConfigureDiscovery(Action<TEntity> configure)
@@ -97,6 +128,16 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
         if (discovery is IHasUniqueId hasUniqueId)
             hasUniqueId.UniqueId = resolvedUniqueId;
 
+        StateAndAttributesPublishingCapability combinedCapability = null;
+        if (_publishStateAndAttributesTogether)
+        {
+            if (!StateAndAttributesPublishingCapability.TryCreate(typeof(TEntity), out combinedCapability))
+                throw new NotSupportedException(
+                    $"{typeof(TEntity).Name} does not expose one templatable State topic and JSON attributes");
+
+            ConfigureCombinedDiscovery(discovery, deviceId, entityId, combinedCapability);
+        }
+
         foreach (HassTopicKind topicKind in _requiredTopics)
         {
             if (string.IsNullOrWhiteSpace(discovery.GetTopic(topicKind)))
@@ -121,14 +162,7 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
             {
                 attributesSender ??= new MqttAttributesTopic(topic);
                 if (!sources.Contains(attributesSender))
-                {
                     sources.Add(attributesSender);
-                    publishingPlan.Add(CompiledPublishOperation.CreateTransform<object, object>(
-                        topic,
-                        attributesSender,
-                        value => value,
-                        PublishOperationKind.Attributes));
-                }
                 continue;
             }
 
@@ -137,14 +171,59 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
                 sender = new MqttStateValueTopic(topic);
                 valueSendersByTopic.Add(topic, sender);
                 sources.Add(sender);
+            }
+
+            valueSenders.Add(topicKind, sender);
+        }
+
+        MqttStateValueTopic combinedStateSender = _publishStateAndAttributesTogether
+            ? valueSenders[HassTopicKind.State]
+            : null;
+        HashSet<MqttStateValueTopic> compiledValueSenders = new HashSet<MqttStateValueTopic>();
+        bool combinedOperationAdded = false;
+
+        foreach (HassTopicKind topicKind in _requiredTopics)
+        {
+            if (topicKind == HassTopicKind.JsonAttributes)
+            {
+                if (!_publishStateAndAttributesTogether)
+                {
+                    publishingPlan.Add(CompiledPublishOperation.CreateTransform<object, object>(
+                        attributesSender.PublishTopic,
+                        attributesSender,
+                        value => value,
+                        PublishOperationKind.Attributes));
+                }
+                continue;
+            }
+
+            MqttStateValueTopic sender = valueSenders[topicKind];
+            if (_publishStateAndAttributesTogether && ReferenceEquals(sender, combinedStateSender))
+            {
+                if (!combinedOperationAdded)
+                {
+                    publishingPlan.Add(CompiledPublishOperation.CreateComposition<object, Dictionary<string, object>, StateAndAttributesPayload>(
+                        combinedStateSender.PublishTopic,
+                        combinedStateSender,
+                        attributesSender,
+                        (state, attributes) => new StateAndAttributesPayload(state, attributes),
+                        PublishOperationKind.Value,
+                        () => combinedStateSender.Initialized));
+                    combinedOperationAdded = true;
+                }
+
+                compiledValueSenders.Add(sender);
+                continue;
+            }
+
+            if (compiledValueSenders.Add(sender))
+            {
                 publishingPlan.Add(CompiledPublishOperation.CreateTransform<object, object>(
-                    topic,
+                    sender.PublishTopic,
                     sender,
                     value => value,
                     PublishOperationKind.Value));
             }
-
-            valueSenders.Add(topicKind, sender);
         }
 
         byte[] discoveryPayload = PayloadSerializer.Serialize(discovery);
@@ -163,7 +242,71 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
     }
 
     private EntityBuilder<TEntity> WithDiscovery(TEntity discovery) =>
-        new EntityBuilder<TEntity>(_hassMqttManager, DiscoverySnapshotSerializer.Capture(discovery), _requiredTopics);
+        new EntityBuilder<TEntity>(
+            _hassMqttManager,
+            DiscoverySnapshotSerializer.Capture(discovery),
+            _requiredTopics,
+            _publishStateAndAttributesTogether);
+
+    private void ConfigureCombinedDiscovery(
+        TEntity discovery,
+        string deviceId,
+        string entityId,
+        StateAndAttributesPublishingCapability capability)
+    {
+        IHasJsonAttributes attributes = (IHasJsonAttributes)discovery;
+        string stateTopic = capability.StateTopicProperty.GetValue(discovery) as string;
+        string attributesTopic = attributes.JsonAttributesTopic;
+        bool stateTopicMissing = string.IsNullOrWhiteSpace(stateTopic);
+        bool attributesTopicMissing = string.IsNullOrWhiteSpace(attributesTopic);
+        List<ValidationFailure> errors = new List<ValidationFailure>();
+
+        if (stateTopicMissing && attributesTopicMissing)
+        {
+            stateTopic = _hassMqttManager.TopicBuilder.GetServiceTopic(deviceId, entityId, "state");
+        }
+        else if (stateTopicMissing || attributesTopicMissing ||
+                 !string.Equals(stateTopic, attributesTopic, StringComparison.Ordinal))
+        {
+            errors.Add(new ValidationFailure(
+                capability.StateTopicProperty.Name,
+                $"{capability.StateTopicProperty.Name} and {nameof(IHasJsonAttributes.JsonAttributesTopic)} must be identical when state and attributes are published together"));
+        }
+
+        string stateTemplate = capability.StateTemplateProperty.GetValue(discovery) as string;
+        if (stateTemplate != null && !string.Equals(stateTemplate, CombinedStateTemplate, StringComparison.Ordinal))
+        {
+            errors.Add(new ValidationFailure(
+                capability.StateTemplateProperty.Name,
+                $"Custom {capability.StateTemplateProperty.Name} values are not supported when state and attributes are published together"));
+        }
+
+        if (attributes.JsonAttributesTemplate != null &&
+            !string.Equals(attributes.JsonAttributesTemplate, CombinedAttributesTemplate, StringComparison.Ordinal))
+        {
+            errors.Add(new ValidationFailure(
+                nameof(IHasJsonAttributes.JsonAttributesTemplate),
+                "Custom JsonAttributesTemplate values are not supported when state and attributes are published together"));
+        }
+
+        foreach (System.Reflection.PropertyInfo property in capability.AdditionalStateTemplateProperties)
+        {
+            if (property.GetValue(discovery) != null)
+            {
+                errors.Add(new ValidationFailure(
+                    property.Name,
+                    $"{property.Name} consumes the combined state payload and is not supported when state and attributes are published together"));
+            }
+        }
+
+        if (errors.Count > 0)
+            throw new ValidationException(errors);
+
+        capability.StateTopicProperty.SetValue(discovery, stateTopic);
+        attributes.JsonAttributesTopic = stateTopic;
+        capability.StateTemplateProperty.SetValue(discovery, CombinedStateTemplate);
+        attributes.JsonAttributesTemplate = CombinedAttributesTemplate;
+    }
 
     private TEntity Materialize(string discoveryTopic, string uniqueId)
     {

@@ -9,6 +9,7 @@ internal sealed class CompiledPublishOperation
 {
     private readonly IReadOnlyList<IMqttValueContainer> _sources;
     private readonly Func<IReadOnlyList<object>, object> _transform;
+    private readonly Func<bool> _isReady;
 
     public string Topic { get; }
     public PublishOperationKind Kind { get; }
@@ -17,12 +18,14 @@ internal sealed class CompiledPublishOperation
         string topic,
         IReadOnlyList<IMqttValueContainer> sources,
         Func<IReadOnlyList<object>, object> transform,
-        PublishOperationKind kind)
+        PublishOperationKind kind,
+        Func<bool> isReady = null)
     {
         Topic = topic;
         _sources = sources;
         _transform = transform;
         Kind = kind;
+        _isReady = isReady ?? (() => true);
     }
 
     public static CompiledPublishOperation CreateTransform<TInput, TOutput>(
@@ -41,16 +44,18 @@ internal sealed class CompiledPublishOperation
         IMqttValueContainer first,
         IMqttValueContainer second,
         Func<TFirst, TSecond, TOutput> compose,
-        PublishOperationKind kind) =>
+        PublishOperationKind kind,
+        Func<bool> isReady = null) =>
         new CompiledPublishOperation(
             topic,
             new[] { first, second },
             values => compose((TFirst)values[0], (TSecond)values[1]),
-            kind);
+            kind,
+            isReady);
 
     public bool TryCapture(out CompiledPublishAttempt attempt)
     {
-        if (!_sources.Any(source => source.Dirty))
+        if (!_isReady() || !_sources.Any(source => source.Dirty))
         {
             attempt = null;
             return false;
