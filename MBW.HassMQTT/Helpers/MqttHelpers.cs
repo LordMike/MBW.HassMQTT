@@ -15,7 +15,7 @@ public static class MqttHelpers
     private static readonly Encoding Encoding = new UTF8Encoding(false);
 
     public static Task<MqttClientPublishResult> SendJsonAsync<T>(this IHassMqttClient mqttClient, string topic, T document, CancellationToken token = default) =>
-        mqttClient.PublishAsync(CreateMessage(topic, JsonSerializer.SerializeToUtf8Bytes(document, HassJson.WireOptions)), token);
+        mqttClient.PublishAsync(CreateMessage(topic, JsonSerializer.SerializeToUtf8Bytes(document, HassJson.RuntimeOptions)), token);
 
     public static Task<MqttClientPublishResult> SendJsonAsync<T>(this IHassMqttClient mqttClient, string topic, T document, JsonTypeInfo<T> jsonTypeInfo, CancellationToken token = default) =>
         mqttClient.PublishAsync(CreateMessage(topic, JsonSerializer.SerializeToUtf8Bytes(document, jsonTypeInfo)), token);

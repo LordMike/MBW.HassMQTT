@@ -15,6 +15,6 @@ internal static class PayloadSerializer
         if (value == null)
             return Array.Empty<byte>();
 
-        return JsonSerializer.SerializeToUtf8Bytes(value, value.GetType(), HassJson.WireOptions);
+        return JsonSerializer.SerializeToUtf8Bytes(value, value.GetType(), HassJson.RuntimeOptions);
     }
 }

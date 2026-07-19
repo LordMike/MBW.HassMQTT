@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
@@ -19,27 +20,35 @@ namespace MBW.HassMQTT.Serialization;
 internal static class HassJson
 {
     public static JsonSerializerOptions WireOptions { get; } = CreateWireOptions();
+    public static JsonSerializerOptions RuntimeOptions { get; } = CreateRuntimeOptions();
     public static JsonSerializerOptions DeserializationOptions { get; } = CreateDeserializationOptions();
     public static JsonSerializerOptions SnapshotOptions { get; } = CreateSnapshotOptions();
 
     public static JsonSerializerOptions CreateSnapshotOptions(Type? rootType = null, Func<object>? rootFactory = null)
     {
         JsonSerializerOptions options = CreateBaseOptions(JsonIgnoreCondition.Never);
-        ConfigureResolver(options, typeInfo => ModifyContract(typeInfo, false, rootType, rootFactory), false);
+        ConfigureResolver(options, typeInfo => ModifyContract(typeInfo, false, true, rootType, rootFactory), false);
         return options;
     }
 
     private static JsonSerializerOptions CreateWireOptions()
     {
         JsonSerializerOptions options = CreateBaseOptions(JsonIgnoreCondition.WhenWritingDefault);
-        ConfigureResolver(options, typeInfo => ModifyContract(typeInfo, true, null, null), true);
+        ConfigureResolver(options, typeInfo => ModifyContract(typeInfo, true, false, null, null), true);
+        return options;
+    }
+
+    private static JsonSerializerOptions CreateRuntimeOptions()
+    {
+        JsonSerializerOptions options = CreateBaseOptions(JsonIgnoreCondition.WhenWritingDefault);
+        ConfigureResolver(options, ModifyRuntimeContract, true);
         return options;
     }
 
     private static JsonSerializerOptions CreateDeserializationOptions()
     {
         JsonSerializerOptions options = CreateBaseOptions(JsonIgnoreCondition.WhenWritingDefault);
-        ConfigureResolver(options, typeInfo => ModifyContract(typeInfo, false, null, null), false);
+        ConfigureResolver(options, typeInfo => ModifyContract(typeInfo, false, false, null, null), false);
         return options;
     }
 
@@ -77,7 +86,12 @@ internal static class HassJson
             reflection);
     }
 
-    private static void ModifyContract(JsonTypeInfo typeInfo, bool omitEmptyCollections, Type? rootType, Func<object>? rootFactory)
+    private static void ModifyContract(
+        JsonTypeInfo typeInfo,
+        bool omitEmptyCollections,
+        bool replaceWritableCollections,
+        Type? rootType,
+        Func<object>? rootFactory)
     {
         if (rootType == typeInfo.Type && rootFactory != null)
             typeInfo.CreateObject = rootFactory;
@@ -108,6 +122,15 @@ internal static class HassJson
             }
         }
 
+        if (replaceWritableCollections && typeInfo.Kind == JsonTypeInfoKind.Object)
+        {
+            foreach (JsonPropertyInfo property in typeInfo.Properties)
+            {
+                if (property.Set != null && IsEnumerableType(property.PropertyType))
+                    property.ObjectCreationHandling = JsonObjectCreationHandling.Replace;
+            }
+        }
+
         // TODO #16: customize Optional<T> property contracts here after its final API is known.
         if (!omitEmptyCollections || typeInfo.Kind != JsonTypeInfoKind.Object)
             return;
@@ -121,7 +144,7 @@ internal static class HassJson
                     property.ShouldSerialize = (instance, _) => deviceGetter(instance) is MqttDeviceDocument device && !IsEmpty(device);
                 continue;
             }
-            if (property.PropertyType == typeof(string) || !typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
+            if (!IsEnumerableType(property.PropertyType))
                 continue;
             if (typeInfo.Type == typeof(MqttSelect) && property.Name == "options")
                 continue;
@@ -132,6 +155,47 @@ internal static class HassJson
             if (getter != null)
                 property.ShouldSerialize = (instance, _) => getter(instance) is IEnumerable values && values.GetEnumerator().MoveNext();
         }
+    }
+
+    private static void ModifyRuntimeContract(JsonTypeInfo typeInfo)
+    {
+        if (typeInfo.Kind != JsonTypeInfoKind.Object)
+            return;
+
+        foreach (JsonPropertyInfo property in typeInfo.Properties)
+        {
+            if (!IsCountedCollectionType(property.PropertyType))
+                continue;
+
+            Func<object, object?>? getter = property.Get;
+            if (getter != null)
+                property.ShouldSerialize = (instance, _) => HasItems(getter(instance));
+        }
+    }
+
+    private static bool IsEnumerableType(Type type) =>
+        type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
+
+    private static bool IsCountedCollectionType(Type type)
+    {
+        if (typeof(ICollection).IsAssignableFrom(type))
+            return true;
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(ICollection<>))
+            return true;
+        return type.GetInterfaces().Any(@interface =>
+            @interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(ICollection<>));
+    }
+
+    private static bool HasItems(object? value)
+    {
+        if (value is ICollection collection)
+            return collection.Count > 0;
+        if (value == null)
+            return false;
+
+        Type? collectionInterface = value.GetType().GetInterfaces().FirstOrDefault(@interface =>
+            @interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(ICollection<>));
+        return collectionInterface?.GetProperty(nameof(ICollection<object>.Count))?.GetValue(value) is int count && count > 0;
     }
 
     private static bool IsEmpty(MqttDeviceDocument device) =>

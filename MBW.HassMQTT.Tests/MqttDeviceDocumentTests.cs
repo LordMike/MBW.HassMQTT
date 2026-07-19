@@ -29,4 +29,26 @@ public class MqttDeviceDocumentTests
         Assert.Equal(4, changedProperties.FindAll(name => name == nameof(document.Identifiers)).Count);
         Assert.Equal(4, changedProperties.FindAll(name => name == nameof(document.Connections)).Count);
     }
+
+    [Fact]
+    public void Collection_moves_raise_property_notifications()
+    {
+        MqttDeviceDocument document = new MqttSensor(string.Empty, string.Empty).Device;
+        List<string> changedProperties = new();
+        document.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName!);
+
+        document.Identifiers.Add("one");
+        document.Identifiers.Add("two");
+        changedProperties.Clear();
+        document.Identifiers.Move(0, 1);
+
+        Assert.Equal(new[] { nameof(document.Identifiers) }, changedProperties);
+
+        document.Connections.Add(new ConnectionInfo { Type = "mac", Value = "one" });
+        document.Connections.Add(new ConnectionInfo { Type = "mac", Value = "two" });
+        changedProperties.Clear();
+        document.Connections.Move(0, 1);
+
+        Assert.Equal(new[] { nameof(document.Connections) }, changedProperties);
+    }
 }

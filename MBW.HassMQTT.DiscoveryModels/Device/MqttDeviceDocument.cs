@@ -56,6 +56,8 @@ public class MqttDeviceDocument : INotifyPropertyChanged
     {
         object? oldValue = args.OldItems is { Count: > 0 } ? args.OldItems[0] : null;
         object? newValue = args.NewItems is { Count: > 0 } ? args.NewItems[0] : null;
+        if (args.Action == NotifyCollectionChangedAction.Move)
+            oldValue = null;
         OnPropertyChanged(propertyName, oldValue, newValue);
     }
 
