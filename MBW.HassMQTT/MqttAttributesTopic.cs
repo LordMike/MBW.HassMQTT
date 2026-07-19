@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using MBW.HassMQTT.Abstracts.Interfaces;
-using MBW.HassMQTT.DiscoveryModels.Helpers;
 
 namespace MBW.HassMQTT;
 
-public class MqttAttributesTopic : IMqttValueContainer
+public class MqttAttributesTopic
 {
     private readonly object _syncRoot = new object();
-    private readonly Dictionary<string, object> _attributes = new Dictionary<string, object>();
+    private readonly Dictionary<string, MqttValue> _attributes = new Dictionary<string, MqttValue>();
     private long _revision;
     private long _publishedRevision;
     private bool _initialized;
@@ -32,29 +30,12 @@ public class MqttAttributesTopic : IMqttValueContainer
         }
     }
 
-    public void SetAttribute(string name, object value)
+    public void SetAttribute(string name, MqttValue value)
     {
         lock (_syncRoot)
         {
-            if (value == default)
-            {
-                if (_attributes.Remove(name))
-                    Interlocked.Increment(ref _revision);
+            if (_attributes.TryGetValue(name, out MqttValue existing) && existing == value)
                 return;
-            }
-
-            if (_attributes.TryGetValue(name, out object existing))
-            {
-                try
-                {
-                    if (ComparisonHelper.IsSameValue(existing, value))
-                        return;
-                }
-                catch (Exception e)
-                {
-                    throw new InvalidOperationException($"Unable to compare values for '{PublishTopic}'", e);
-                }
-            }
 
             _attributes[name] = value;
             _initialized = true;
@@ -85,9 +66,13 @@ public class MqttAttributesTopic : IMqttValueContainer
 
     public void MarkPublished(long revision) => Interlocked.Exchange(ref _publishedRevision, revision);
 
-    public object GetSerializedValue()
+    internal Snapshot Capture()
     {
         lock (_syncRoot)
-            return new Dictionary<string, object>(_attributes);
+            return new Snapshot(new Dictionary<string, MqttValue>(_attributes), _revision);
     }
+
+    internal readonly record struct Snapshot(
+        IReadOnlyDictionary<string, MqttValue> Values,
+        long Revision);
 }

@@ -2,75 +2,58 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using MBW.HassMQTT.Serialization;
-using Newtonsoft.Json.Linq;
 
 namespace MBW.HassMQTT.Tests.DiscoverySerialization;
 
 internal static class DiscoveryJsonRoundTrip
 {
-    public static void Assert(Type modelType, string json)
-    {
+    public static void Assert(Type modelType, string json) =>
         Assert(modelType.Name, modelType, json);
-    }
 
-    public static void Assert(Type modelType, string json, bool _)
-    {
+    public static void Assert(Type modelType, string json, bool _) =>
         Assert(modelType, json);
-    }
 
     public static void Assert(string caseName, Type modelType, string json)
     {
-        JToken source = JToken.Parse(json);
-        object? document = source.ToObject(modelType, CustomJsonSerializer.Serializer);
+        JsonNode source = JsonNode.Parse(json)!;
+        object? document = DiscoveryJsonSerializer.Deserialize(JsonSerializer.SerializeToUtf8Bytes(source), modelType);
         Xunit.Assert.NotNull(document);
 
-        JToken actual = JToken.FromObject(document, CustomJsonSerializer.Serializer);
-        JToken expected = source.DeepClone();
-
-        JToken canonicalExpected = Canonicalize(expected);
-        JToken canonicalActual = Canonicalize(actual);
-
+        JsonNode actual = JsonNode.Parse(DiscoveryJsonSerializer.Serialize(document))!;
+        JsonNode expected = source.DeepClone();
+        JsonNode canonicalExpected = Canonicalize(expected);
+        JsonNode canonicalActual = Canonicalize(actual);
         Xunit.Assert.True(
-            JToken.DeepEquals(canonicalExpected, canonicalActual),
+            JsonNode.DeepEquals(canonicalExpected, canonicalActual),
             $"Discovery JSON changed after a {modelType.Name} round trip for '{caseName}'.{Environment.NewLine}" +
-            $"Expected:{Environment.NewLine}{expected}{Environment.NewLine}" +
-            $"Actual:{Environment.NewLine}{actual}");
+            $"Expected:{Environment.NewLine}{expected}{Environment.NewLine}Actual:{Environment.NewLine}{actual}");
     }
 
-    public static void Assert(string caseName, Type modelType, string json, bool _)
-    {
+    public static void Assert(string caseName, Type modelType, string json, bool _) =>
         Assert(caseName, modelType, json);
-    }
 
-    private static JToken Canonicalize(JToken token)
+    private static JsonNode Canonicalize(JsonNode token)
     {
-        return token switch
+        if (token is JsonObject obj)
         {
-            JObject obj => new JObject(
-                obj.Properties()
-                    .OrderBy(property => property.Name, StringComparer.Ordinal)
-                    .Select(property => new JProperty(property.Name, CanonicalizeProperty(property)))),
-            JArray array => new JArray(array.Select(Canonicalize)),
-            JValue value when value.Type is JTokenType.Integer or JTokenType.Float => CanonicalizeNumber(value),
-            _ => token.DeepClone()
-        };
-    }
-
-    private static JToken CanonicalizeProperty(JProperty property)
-    {
-        // Device identifiers use Home Assistant's minimal scalar-or-list form on serialization.
-        if (property.Name == "identifiers" && property.Value is JArray { Count: 1 } identifiers)
-            return Canonicalize(identifiers[0]);
-
-        return Canonicalize(property.Value);
-    }
-
-    private static JToken CanonicalizeNumber(JValue value)
-    {
-        string? text = Convert.ToString(value.Value, CultureInfo.InvariantCulture);
-        return decimal.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal number)
-            ? new JValue(number)
-            : value.DeepClone();
+            JsonObject result = new();
+            foreach ((string name, JsonNode? child) in obj.OrderBy(property => property.Key, StringComparer.Ordinal))
+            {
+                JsonNode? normalized = child == null ? null : Canonicalize(child);
+                if (name == "identifiers" && normalized is JsonArray { Count: 1 } identifiers)
+                    normalized = identifiers[0]?.DeepClone();
+                result[name] = normalized;
+            }
+            return result;
+        }
+        if (token is JsonArray array)
+            return new JsonArray(array.Select(item => item == null ? null : Canonicalize(item)).ToArray());
+        if (token is JsonValue value && value.TryGetValue<JsonElement>(out JsonElement element) && element.ValueKind == JsonValueKind.Number &&
+            decimal.TryParse(element.GetRawText(), NumberStyles.Float, CultureInfo.InvariantCulture, out decimal number))
+            return JsonValue.Create(number)!;
+        return token.DeepClone();
     }
 }

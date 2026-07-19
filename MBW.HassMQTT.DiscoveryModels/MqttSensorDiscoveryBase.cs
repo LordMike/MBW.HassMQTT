@@ -13,7 +13,6 @@ using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Validation;
-using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.DiscoveryModels;
 
@@ -24,14 +23,14 @@ namespace MBW.HassMQTT.DiscoveryModels;
 public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDocument, INotifyPropertyChanged where T : IHassDiscoveryDocument where TValidator : AbstractValidator<T>, new()
 {
     private MqttDeviceDocument _device = null!;
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public static TValidator Validator { get; } = new TValidator();
     IValidator IHassDiscoveryDocument.Validator => Validator;
 
     [NotifyPropertyChangedInvocator]
     [UsedImplicitly]
-    protected virtual void OnPropertyChanged(string propertyName, object before, object after)
+    protected virtual void OnPropertyChanged(string propertyName, object? before, object? after)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -40,7 +39,6 @@ public abstract class MqttSensorDiscoveryBase<T, TValidator> : IHassDiscoveryDoc
     /// Device details for this entity, usually this is duplicated between multiple entities to let HA link them together.
     /// At least one of identifiers or connections must be present to identify the device.
     /// </summary>
-    [JsonProperty]
     public MqttDeviceDocument Device
     {
         get => _device;

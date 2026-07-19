@@ -3,14 +3,12 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
-using MBW.HassMQTT.DiscoveryModels.Serialization;
 using MBW.HassMQTT.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using Xunit;
 
 namespace MBW.HassMQTT.Tests;
@@ -80,16 +78,17 @@ public class OptionalSerializationTests
     {
         var cover = new MqttCover("homeassistant/cover/example/config", "example");
 
-        Assert.Null(Serialize(cover).Property("payload_close"));
+        Assert.False(Serialize(cover).ContainsKey("payload_close"));
 
         cover.PayloadClose = null;
-        Assert.Equal(JTokenType.Null, Serialize(cover)["payload_close"]!.Type);
+        Assert.True(Serialize(cover).ContainsKey("payload_close"));
+        Assert.Null(Serialize(cover)["payload_close"]);
 
         cover.PayloadClose = "CLOSE";
-        Assert.Equal("CLOSE", (string?)Serialize(cover)["payload_close"]);
+        Assert.Equal("CLOSE", Serialize(cover)["payload_close"]!.GetValue<string>());
 
         cover.PayloadClose = default;
-        Assert.Null(Serialize(cover).Property("payload_close"));
+        Assert.False(Serialize(cover).ContainsKey("payload_close"));
     }
 
     [Fact]
@@ -114,10 +113,12 @@ public class OptionalSerializationTests
             DeviceClass = HassSensorDeviceClass.Temperature,
         };
 
-        Assert.Equal("temperature", (string?)Serialize(sensor)["device_class"]);
+        Assert.Equal("temperature", Serialize(sensor)["device_class"]!.GetValue<string>());
 
         sensor.DeviceClass = null;
-        Assert.Equal(JTokenType.Null, Serialize(sensor)["device_class"]!.Type);
+        JsonObject json = Serialize(sensor);
+        Assert.True(json.ContainsKey("device_class"));
+        Assert.Null(json["device_class"]);
     }
 
     [Fact]
@@ -128,69 +129,61 @@ public class OptionalSerializationTests
         MqttNumber value = DeserializeNumber("""{ "unit_of_measurement": "°C" }""");
 
         Assert.False(missing.UnitOfMeasurement.IsSet);
-        Assert.Null(Serialize(missing).Property("unit_of_measurement"));
+        Assert.False(Serialize(missing).ContainsKey("unit_of_measurement"));
 
         Assert.True(explicitNull.UnitOfMeasurement.IsSet);
         Assert.Null(explicitNull.UnitOfMeasurement.Value);
-        Assert.Equal(JTokenType.Null, Serialize(explicitNull)["unit_of_measurement"]!.Type);
+        JsonObject explicitNullJson = Serialize(explicitNull);
+        Assert.True(explicitNullJson.ContainsKey("unit_of_measurement"));
+        Assert.Null(explicitNullJson["unit_of_measurement"]);
 
         Assert.True(value.UnitOfMeasurement.IsSet);
         Assert.Equal("°C", value.UnitOfMeasurement.Value);
-        Assert.Equal("°C", (string?)Serialize(value)["unit_of_measurement"]);
+        Assert.Equal("°C", Serialize(value)["unit_of_measurement"]!.GetValue<string>());
     }
 
     [Fact]
     public void Explicit_null_is_rejected_for_non_nullable_optional_value()
     {
-        Assert.Throws<JsonSerializationException>(() =>
-            JObject.Parse("""{ "value": null }""")
-                .ToObject<NonNullableOptionalDocument>(CustomJsonSerializer.Serializer));
+        Assert.Throws<JsonException>(() =>
+            JsonSerializer.Deserialize<NonNullableOptionalDocument>(
+                """{ "value": null }""",
+                HassJson.DeserializationOptions));
     }
 
     [Fact]
-    public void Discovery_models_package_exposes_optional_serialization_support()
+    public void Snapshot_preserves_optional_presence_states()
     {
-        Assert.True(typeof(OptionalJsonConverter).IsPublic);
-        Assert.True(typeof(OptionalAwareContractResolver).IsPublic);
-        Assert.Equal(typeof(Optional<>).Assembly, typeof(OptionalJsonConverter).Assembly);
-        Assert.Equal(typeof(Optional<>).Assembly, typeof(OptionalAwareContractResolver).Assembly);
-
-        JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings
-        {
-            NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            ContractResolver = new OptionalAwareContractResolver
-            {
-                NamingStrategy = new SnakeCaseNamingStrategy(),
-            },
-            Converters = { new OptionalJsonConverter() },
-        });
-        var cover = new MqttCover("homeassistant/cover/example/config", "example")
+        var source = new MqttCover(string.Empty, "source")
         {
             PayloadClose = null,
+            PayloadOpen = "OPEN",
         };
 
-        JObject json = JObject.FromObject(cover, serializer);
+        byte[] snapshot = DiscoverySnapshotSerializer.Capture(source);
+        MqttCover restored = DiscoverySnapshotSerializer.Restore(
+            snapshot,
+            () => new MqttCover(string.Empty, "target"));
 
-        Assert.Equal(JTokenType.Null, json["payload_close"]!.Type);
-        Assert.Null(json.Property("payload_open"));
-
-        MqttCover roundTripped = json.ToObject<MqttCover>(serializer)!;
-        Assert.True(roundTripped.PayloadClose.IsSet);
-        Assert.Null(roundTripped.PayloadClose.Value);
-        Assert.False(roundTripped.PayloadOpen.IsSet);
+        Assert.True(restored.PayloadClose.IsSet);
+        Assert.Null(restored.PayloadClose.Value);
+        Assert.True(restored.PayloadOpen.IsSet);
+        Assert.Equal("OPEN", restored.PayloadOpen.Value);
+        Assert.False(restored.PayloadStop.IsSet);
     }
 
-    private static JObject Serialize(object value) => JObject.FromObject(value, CustomJsonSerializer.Serializer);
+    private static JsonObject Serialize<T>(T value) =>
+        JsonNode.Parse(DiscoveryJsonSerializer.Serialize(value))!.AsObject();
 
     private static MqttCover DeserializeCover(string json) =>
-        JObject.Parse(json).ToObject<MqttCover>(CustomJsonSerializer.Serializer)!;
+        DiscoveryJsonSerializer.Deserialize<MqttCover>(JsonSerializer.SerializeToUtf8Bytes(JsonNode.Parse(json)))!;
 
     private static MqttNumber DeserializeNumber(string json) =>
-        JObject.Parse(json).ToObject<MqttNumber>(CustomJsonSerializer.Serializer)!;
+        DiscoveryJsonSerializer.Deserialize<MqttNumber>(JsonSerializer.SerializeToUtf8Bytes(JsonNode.Parse(json)))!;
 
     private sealed class NonNullableOptionalDocument
     {
         public Optional<int> Value { get; set; }
     }
+
 }

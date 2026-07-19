@@ -8,19 +8,18 @@ using System.Linq;
 using FluentValidation;
 using JetBrains.Annotations;
 using MBW.HassMQTT.DiscoveryModels.Metadata;
-using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.DiscoveryModels.Device;
 
 public class MqttDeviceDocument : INotifyPropertyChanged
 {
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public static MqttDeviceDocumentValidator Validator { get; } = new MqttDeviceDocumentValidator();
 
     [NotifyPropertyChangedInvocator]
     [UsedImplicitly]
-    protected virtual void OnPropertyChanged(string propertyName, object before, object after)
+    protected virtual void OnPropertyChanged(string propertyName, object? before, object? after)
     {
         if (propertyName == nameof(Identifiers))
         {
@@ -49,34 +48,17 @@ public class MqttDeviceDocument : INotifyPropertyChanged
         Connections = new ObservableCollection<ConnectionInfo>();
         Identifiers = new ObservableCollection<string>();
 
-        Connections.CollectionChanged += (sender, args) =>
-        {
-            object? oldValue = null;
-            switch (args.Action)
-            {
-                case NotifyCollectionChangedAction.Move:
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Replace:
-                    oldValue = args.OldItems[0];
-                    break;
-            }
+        Connections.CollectionChanged += (_, args) => HandleCollectionChanged(nameof(Connections), args);
+        Identifiers.CollectionChanged += (_, args) => HandleCollectionChanged(nameof(Identifiers), args);
+    }
 
-            OnPropertyChanged(nameof(Connections), oldValue, args.NewItems[0]);
-        };
-        Identifiers.CollectionChanged += (sender, args) =>
-        {
-            object? oldValue = null;
-            switch (args.Action)
-            {
-                case NotifyCollectionChangedAction.Move:
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Replace:
-                    oldValue = args.OldItems[0];
-                    break;
-            }
-
-            OnPropertyChanged(nameof(Identifiers), oldValue, args.NewItems[0]);
-        };
+    private void HandleCollectionChanged(string propertyName, NotifyCollectionChangedEventArgs args)
+    {
+        object? oldValue = args.OldItems is { Count: > 0 } ? args.OldItems[0] : null;
+        object? newValue = args.NewItems is { Count: > 0 } ? args.NewItems[0] : null;
+        if (args.Action == NotifyCollectionChangedAction.Move)
+            oldValue = null;
+        OnPropertyChanged(propertyName, oldValue, newValue);
     }
 
     /// <summary>
@@ -88,7 +70,6 @@ public class MqttDeviceDocument : INotifyPropertyChanged
     /// <summary>
     /// A list of IDs that uniquely identify the device. For example a serial number.
     /// </summary>
-    [JsonConverter(typeof(IdentifierCollectionConverter))]
     public ObservableCollection<string> Identifiers { get; }
 
     /// <summary>

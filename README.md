@@ -4,24 +4,6 @@ Code to help me build integrations for Home Assistants MQTT integration. Contain
 
 There will be little to no support on this.
 
-# Version 4
-
-Version 4 targets .NET 8 and .NET 10 and uses MQTTnet 5. The MQTT connection is
-owned by a supervised hosted service which reconnects with bounded backoff,
-restores subscriptions, and republishes the latest dirty state after reconnecting.
-
-Applications upgrading from version 3 should note these API changes:
-
-* MQTTnet's managed client is no longer exposed or used. Resolve
-  `IHassMqttClient` when direct publish or subscription access is required.
-* `HassMqttManager.FlushAll` returns `MqttFlushResult`. Existing awaited calls may
-  discard the result; callers that need delivery status can inspect it.
-* `MqttValueTopic.SetDirty()` is now `MarkDirty()`.
-* Dirty state is revision-based. Multiple updates while offline are coalesced and
-  the latest value is published after reconnection.
-
-No package is provided for .NET versions older than .NET 8.
-
 # Example usage
 
 This example configures the library with Microsoft.Extensions.DependencyInjection,
@@ -45,7 +27,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-await using ServiceProvider provider = new ServiceCollection()
+HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+
+builder.Services
     .AddLogging(logging => logging.AddConsole())
     .Configure<HassConfiguration>(configuration =>
     {
@@ -60,15 +44,11 @@ await using ServiceProvider provider = new ServiceCollection()
     })
     .AddSingleton(provider => new HassMqttTopicBuilder(
         provider.GetRequiredService<IOptions<HassConfiguration>>().Value))
-    .AddAndConfigureMqtt("WeatherSample")
-    .BuildServiceProvider();
+    .AddAndConfigureMqtt("WeatherSample");
 
-// An IHost starts its IHostedService registrations automatically. This standalone
-// example starts the MQTT client service explicitly.
-var mqttClientService = provider.GetRequiredService<IHostedService>();
-await mqttClientService.StartAsync(default);
+using IHost host = builder.Build();
 
-var manager = provider.GetRequiredService<HassMqttManager>();
+var manager = host.Services.GetRequiredService<HassMqttManager>();
 var outsideTemperature = manager
     .CreateEntity<MqttSensor>()
     .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
@@ -89,10 +69,24 @@ var outsideTemperature = manager
 outsideTemperature.SetValue(HassTopicKind.State, 21.4);
 outsideTemperature.SetAttribute("quality", "good");
 
+// Starting the host starts every registered IHostedService in order, including
+// the connected-status entity and the MQTT client lifetime service.
+await host.StartAsync();
+
 // FlushAll attempts delivery immediately. Pending data remains queued while
 // disconnected, so keep the application running to allow reconnect delivery.
 await manager.FlushAll();
+
+// Wait for Ctrl+C/SIGTERM and stop every hosted service cleanly.
+await host.WaitForShutdownAsync();
 ```
+
+Runtime state and attributes use `MqttValue`. Strings, booleans, numbers, dates,
+and `JsonElement` values convert implicitly. Use `MqttValue.FromEnum(...)` for enum
+wire names and `MqttValue.FromJson(...)` for structured or pre-serialized JSON.
+`MqttValue.Null` stores a null value; remove attributes explicitly with
+`RemoveAttribute(...)`. Arbitrary binary messages remain available through
+`IHassMqttClient.PublishAsync`.
 
 # Features
 
@@ -106,6 +100,5 @@ await manager.FlushAll();
 | Name | Nuget | Note |
 |---|---|---|
 | MBW.HassMQTT | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT)](https://www.nuget.org/packages/MBW.HassMQTT/) | Core services such as value managers and senders |
-| MBW.HassMQTT.Abstracts | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.Abstracts)](https://www.nuget.org/packages/MBW.HassMQTT.Abstracts/) | Common interfaces |
 | MBW.HassMQTT.CommonServices | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.CommonServices)](https://www.nuget.org/packages/MBW.HassMQTT.CommonServices/) | Addon service such as notifying HASS of downtime with MQTT LWT |
 | MBW.HassMQTT.DiscoveryModels | [![Nuget](https://img.shields.io/nuget/v/MBW.HassMQTT.DiscoveryModels)](https://www.nuget.org/packages/MBW.HassMQTT.DiscoveryModels/) | HASS MQTT discovery models |

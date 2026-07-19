@@ -27,7 +27,7 @@ public class MqttSelect : MqttSensorDiscoveryBase<MqttSelect, MqttSelect.MqttSel
     {
     }
 
-    protected override void OnPropertyChanged(string propertyName, object before, object after)
+    protected override void OnPropertyChanged(string propertyName, object? before, object? after)
     {
         if (propertyName == nameof(Options))
         {

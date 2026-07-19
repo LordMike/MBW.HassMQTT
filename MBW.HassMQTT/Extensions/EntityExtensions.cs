@@ -6,13 +6,13 @@ namespace MBW.HassMQTT.Extensions;
 
 public static class EntityExtensions
 {
-    public static IHassMqttEntity SetAttribute(this IHassMqttEntity entity, string name, object value)
+    public static IHassMqttEntity SetAttribute(this IHassMqttEntity entity, string name, MqttValue value)
     {
         entity.GetAttributesSender().SetAttribute(name, value);
         return entity;
     }
 
-    public static IHassMqttEntity SetValue(this IHassMqttEntity entity, HassTopicKind topicKind, object value)
+    public static IHassMqttEntity SetValue(this IHassMqttEntity entity, HassTopicKind topicKind, MqttValue value)
     {
         entity.GetValueSender(topicKind).Value = value;
         return entity;

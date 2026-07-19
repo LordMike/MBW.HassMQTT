@@ -40,9 +40,7 @@ namespace MBW.HassMQTT.DiscoveryModels;
 /// valid value. Do not add another nullable layer such as <c>Optional&lt;T&gt;?</c>; this type already represents absence.
 /// </para>
 /// <para>
-/// Newtonsoft.Json serializers created by consumers should register
-/// <see cref="Serialization.OptionalJsonConverter" /> and use
-/// <see cref="Serialization.OptionalAwareContractResolver" />.
+/// Discovery serialization provided by the MBW.HassMQTT package handles these presence states automatically.
 /// </para>
 /// </remarks>
 public readonly record struct Optional<T>

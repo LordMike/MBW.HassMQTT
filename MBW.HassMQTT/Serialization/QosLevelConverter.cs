@@ -1,37 +1,25 @@
-﻿using System;
+using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using MBW.HassMQTT.DiscoveryModels.Enum;
-using Newtonsoft.Json;
 
 namespace MBW.HassMQTT.Serialization;
 
-internal class QosLevelConverter : JsonConverter<MqttQosLevel?>
+internal sealed class QosLevelConverter : JsonConverter<MqttQosLevel>
 {
-    public override void WriteJson(JsonWriter writer, MqttQosLevel? value, JsonSerializer serializer)
+    public override MqttQosLevel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (!value.HasValue)
-        {
-            writer.WriteNull();
-            return;
-        }
-
-        if (!System.Enum.IsDefined(typeof(MqttQosLevel), value.Value))
-            throw new JsonSerializationException($"Unsupported MQTT QoS level: {(byte)value.Value}");
-
-        writer.WriteValue((byte)value.Value);
-    }
-
-    public override MqttQosLevel? ReadJson(JsonReader reader, Type objectType, MqttQosLevel? existingValue, bool hasExistingValue, JsonSerializer serializer)
-    {
-        if (reader.TokenType == JsonToken.Null)
-            return null;
-
-        if (reader.TokenType != JsonToken.Integer)
-            throw new JsonSerializationException($"Expected an integer MQTT QoS level, got {reader.TokenType}");
-
-        int value = Convert.ToInt32(reader.Value);
-        if (!System.Enum.IsDefined(typeof(MqttQosLevel), (byte)value) || value is < 0 or > 2)
-            throw new JsonSerializationException($"Unsupported MQTT QoS level: {value}");
+        if (reader.TokenType != JsonTokenType.Number || !reader.TryGetByte(out byte value) || value > 2)
+            throw new JsonException("MQTT QoS must be an integer between 0 and 2.");
 
         return (MqttQosLevel)value;
+    }
+
+    public override void Write(Utf8JsonWriter writer, MqttQosLevel value, JsonSerializerOptions options)
+    {
+        if (!Enum.IsDefined(typeof(MqttQosLevel), value))
+            throw new JsonException($"Unsupported MQTT QoS level: {(byte)value}");
+
+        writer.WriteNumberValue((byte)value);
     }
 }

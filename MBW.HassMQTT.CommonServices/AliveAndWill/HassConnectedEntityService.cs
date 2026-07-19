@@ -1,16 +1,17 @@
 using System;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Extensions;
-using MBW.HassMQTT.Helpers;
 using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MQTTnet;
+using MQTTnet.Protocol;
 
 namespace MBW.HassMQTT.CommonServices.AliveAndWill;
 
@@ -65,7 +66,7 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
             .Build(_config.DeviceId, _config.EntityId);
     }
 
-    public void SetAttribute(string name, object value)
+    public void SetAttribute(string name, MqttValue value)
     {
         IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
 
@@ -80,7 +81,7 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
         if (token.IsCancellationRequested)
             return;
 
-        await _mqttClient.SendValueAsync(StateTopic, OkMessage, token);
+        await PublishStatus(OkMessage, token);
     }
 
     Task IMqttEventReceiver.OnDisconnect(MqttClientDisconnectedEventArgs args, CancellationToken token)
@@ -92,7 +93,22 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
     async Task IMqttEventReceiver.OnStopping(CancellationToken token)
     {
         if (_mqttClient.IsConnected)
-            await _mqttClient.SendValueAsync(StateTopic, ProblemMessage, token);
+            await PublishStatus(ProblemMessage, token);
+    }
+
+    private async Task PublishStatus(string value, CancellationToken token)
+    {
+        MqttApplicationMessage message = new MqttApplicationMessageBuilder()
+            .WithTopic(StateTopic)
+            .WithPayload(Encoding.UTF8.GetBytes(value))
+            .WithRetainFlag()
+            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+            .Build();
+
+        MqttClientPublishResult result = await _mqttClient.PublishAsync(message, token);
+        if (!result.IsSuccess)
+            throw new InvalidOperationException(
+                $"MQTT broker rejected lifecycle status publish to {StateTopic}: {result.ReasonCode} {result.ReasonString}");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

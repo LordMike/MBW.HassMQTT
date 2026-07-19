@@ -1,15 +1,12 @@
 using System;
 using System.Threading;
-using MBW.HassMQTT.Abstracts.Interfaces;
-using MBW.HassMQTT.DiscoveryModels.Helpers;
-using MBW.HassMQTT.Internal;
 
 namespace MBW.HassMQTT;
 
-public class MqttStateValueTopic : IMqttValueContainer
+public class MqttStateValueTopic
 {
     private readonly object _syncRoot = new object();
-    private object _value;
+    private MqttValue _value;
     private long _revision;
     private long _publishedRevision;
     private bool _initialized;
@@ -26,7 +23,7 @@ public class MqttStateValueTopic : IMqttValueContainer
         }
     }
 
-    public object Value
+    public MqttValue Value
     {
         get
         {
@@ -37,15 +34,8 @@ public class MqttStateValueTopic : IMqttValueContainer
         {
             lock (_syncRoot)
             {
-                try
-                {
-                    if (_initialized && ComparisonHelper.IsSameValue(value, _value))
-                        return;
-                }
-                catch (Exception e)
-                {
-                    throw new InvalidOperationException("Unable to compare values for '" + PublishTopic + "'", e);
-                }
+                if (_initialized && value == _value)
+                    return;
 
                 _value = value;
                 _initialized = true;
@@ -59,25 +49,6 @@ public class MqttStateValueTopic : IMqttValueContainer
         PublishTopic = topic;
     }
 
-    private static bool TryConvertStateValue(object val, out string str)
-    {
-        switch (val)
-        {
-            case DateTime asDateTime:
-                str = asDateTime.ToIso8601();
-                return true;
-            case DateTimeOffset asDateTimeOffset:
-                str = asDateTimeOffset.ToIso8601();
-                return true;
-            case string asString:
-                str = asString;
-                return true;
-            default:
-                str = null;
-                return false;
-        }
-    }
-
     public void MarkDirty()
     {
         lock (_syncRoot)
@@ -89,12 +60,11 @@ public class MqttStateValueTopic : IMqttValueContainer
 
     public void MarkPublished(long revision) => Interlocked.Exchange(ref _publishedRevision, revision);
 
-    public object GetSerializedValue()
+    internal Snapshot Capture()
     {
-        object value;
         lock (_syncRoot)
-            value = _value;
-
-        return TryConvertStateValue(value, out string asString) ? asString : value;
+            return new Snapshot(_value, _revision, _initialized);
     }
+
+    internal readonly record struct Snapshot(MqttValue Value, long Revision, bool Initialized);
 }
