@@ -31,16 +31,108 @@ public class EntityBuilderTests
         HassMqttManager manager = CreateManager(new FakeMqttClient());
         IEntityBuilder<MqttSensor> template = ValidSensorTemplate(manager);
 
-        Assert.False(manager.TryGetEntity("weather", "celsius", out _));
+        Assert.False(manager.TryGetEntity<MqttSensor>("weather", "celsius", out _));
 
         IHassMqttEntity celsius = template.Build("weather", "celsius");
         IHassMqttEntity fahrenheit = template.Build("weather", "fahrenheit");
 
-        Assert.True(manager.TryGetEntity("weather", "celsius", out IHassMqttEntity found));
+        Assert.True(manager.TryGetEntity<MqttSensor>("weather", "celsius", out IHassMqttEntity found));
         Assert.Same(celsius, found);
         Assert.NotSame(celsius.GetValueSender(HassTopicKind.State), fahrenheit.GetValueSender(HassTopicKind.State));
         Assert.Equal("weather_celsius", celsius.UniqueId);
         Assert.Equal("weather_fahrenheit", fahrenheit.UniqueId);
+    }
+
+    [Fact]
+    public void Entity_identity_includes_component_and_preserves_identifier_case()
+    {
+        HassMqttManager manager = CreateManager(new FakeMqttClient());
+        IEntityBuilder<MqttSensor> sensorTemplate = ValidSensorTemplate(manager);
+        IHassMqttEntity upperSensor = sensorTemplate.Build("Weather", "State");
+        IHassMqttEntity lowerSensor = sensorTemplate.Build("Weather", "state");
+        IHassMqttEntity lowerDevice = sensorTemplate.Build("weather", "State");
+        IHassMqttEntity binarySensor = manager.CreateEntity<MqttBinarySensor>()
+            .ConfigureTopics(HassTopicKind.State)
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .Build("Weather", "State");
+
+        Assert.True(manager.TryGetEntity<MqttSensor>("Weather", "State", out IHassMqttEntity foundUpper));
+        Assert.True(manager.TryGetEntity<MqttSensor>("Weather", "state", out IHassMqttEntity foundLower));
+        Assert.True(manager.TryGetEntity<MqttSensor>("weather", "State", out IHassMqttEntity foundLowerDevice));
+        Assert.True(manager.TryGetEntity<MqttBinarySensor>("Weather", "State", out IHassMqttEntity foundBinary));
+        Assert.Same(upperSensor, foundUpper);
+        Assert.Same(lowerSensor, foundLower);
+        Assert.Same(lowerDevice, foundLowerDevice);
+        Assert.Same(binarySensor, foundBinary);
+        Assert.Equal("Weather_State", upperSensor.UniqueId);
+        Assert.Equal("Weather_state", lowerSensor.UniqueId);
+        Assert.Equal("weather_State", lowerDevice.UniqueId);
+
+        manager.RemoveEntity<MqttSensor>("Weather", "State");
+
+        Assert.False(manager.TryGetEntity<MqttSensor>("Weather", "State", out _));
+        Assert.True(manager.TryGetEntity<MqttBinarySensor>("Weather", "State", out foundBinary));
+        Assert.Same(binarySensor, foundBinary);
+    }
+
+    [Fact]
+    public async Task Compiled_plan_preserves_topics_that_differ_only_by_case()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IHassMqttEntity entity = manager.CreateEntity<MqttCover>()
+            .ConfigureTopics(HassTopicKind.State, HassTopicKind.TiltStatus)
+            .ConfigureDevice(device => device.Identifiers.Add("cover-hardware"))
+            .ConfigureDiscovery(discovery =>
+            {
+                discovery.StateTopic = "cover/State";
+                discovery.TiltStatusTopic = "cover/state";
+            })
+            .Build("cover", "case-sensitive");
+
+        MqttStateValueTopic upper = entity.GetValueSender(HassTopicKind.State);
+        MqttStateValueTopic lower = entity.GetValueSender(HassTopicKind.TiltStatus);
+        upper.Value = "OPEN";
+        lower.Value = 42;
+        MqttFlushResult result = await manager.FlushAll();
+
+        Assert.NotSame(upper, lower);
+        Assert.Equal(2, result.Values);
+        Assert.Contains(client.Messages, message => message.Topic == "cover/State" && message.ConvertPayloadToString() == "OPEN");
+        Assert.Contains(client.Messages, message => message.Topic == "cover/state" && message.ConvertPayloadToString() == "42");
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("bad/id")]
+    [InlineData("bad id")]
+    [InlineData("bad+id")]
+    [InlineData("bad#id")]
+    [InlineData("bäd")]
+    public void Discovery_ids_reject_values_outside_home_assistant_grammar(string invalidId)
+    {
+        HassMqttTopicBuilder topics = new HassMqttTopicBuilder(new HassConfiguration
+        {
+            DiscoveryPrefix = "homeassistant",
+            TopicPrefix = "test"
+        });
+
+        Assert.Throws<ArgumentException>(() => topics.GetDiscoveryTopic<MqttSensor>(invalidId, "entity"));
+        Assert.Throws<ArgumentException>(() => topics.GetDiscoveryTopic<MqttSensor>("device", invalidId));
+    }
+
+    [Fact]
+    public void Discovery_ids_accept_home_assistant_ascii_grammar()
+    {
+        HassMqttTopicBuilder topics = new HassMqttTopicBuilder(new HassConfiguration
+        {
+            DiscoveryPrefix = "homeassistant",
+            TopicPrefix = "test"
+        });
+
+        Assert.Equal(
+            "homeassistant/sensor/Weather_Station-1/Outside_Temperature-2/config",
+            topics.GetDiscoveryTopic<MqttSensor>("Weather_Station-1", "Outside_Temperature-2"));
     }
 
     [Fact]
@@ -141,12 +233,12 @@ public class EntityBuilderTests
             .ConfigureTopics(HassTopicKind.State);
 
         Assert.Throws<ValidationException>(() => invalid.Build("weather", "invalid"));
-        Assert.False(manager.TryGetEntity("weather", "invalid", out _));
+        Assert.False(manager.TryGetEntity<MqttSensor>("weather", "invalid", out _));
 
         IEntityBuilder<MqttSensor> valid = ValidSensorTemplate(manager);
         IHassMqttEntity first = valid.Build("weather", "duplicate");
         Assert.Throws<InvalidOperationException>(() => valid.Build("weather", "duplicate"));
-        Assert.True(manager.TryGetEntity("weather", "duplicate", out IHassMqttEntity found));
+        Assert.True(manager.TryGetEntity<MqttSensor>("weather", "duplicate", out IHassMqttEntity found));
         Assert.Same(first, found);
     }
 
@@ -278,11 +370,11 @@ public class EntityBuilderTests
         Assert.Throws<ValidationException>(() => customStateTemplate.Build("weather", "state-template"));
         Assert.Throws<ValidationException>(() => customAttributesTemplate.Build("weather", "attributes-template"));
         Assert.Throws<ValidationException>(() => additionalStateTemplate.Build("weather", "additional-template"));
-        Assert.False(manager.TryGetEntity("weather", "unequal", out _));
-        Assert.False(manager.TryGetEntity("weather", "one-sided", out _));
-        Assert.False(manager.TryGetEntity("weather", "state-template", out _));
-        Assert.False(manager.TryGetEntity("weather", "attributes-template", out _));
-        Assert.False(manager.TryGetEntity("weather", "additional-template", out _));
+        Assert.False(manager.TryGetEntity<MqttSensor>("weather", "unequal", out _));
+        Assert.False(manager.TryGetEntity<MqttSensor>("weather", "one-sided", out _));
+        Assert.False(manager.TryGetEntity<MqttSensor>("weather", "state-template", out _));
+        Assert.False(manager.TryGetEntity<MqttSensor>("weather", "attributes-template", out _));
+        Assert.False(manager.TryGetEntity<MqttSensor>("weather", "additional-template", out _));
     }
 
     [Fact]
@@ -293,7 +385,7 @@ public class EntityBuilderTests
             .PublishStateAndAttributesTogether();
 
         Assert.Throws<NotSupportedException>(() => builder.Build("button", "unsupported"));
-        Assert.False(manager.TryGetEntity("button", "unsupported", out _));
+        Assert.False(manager.TryGetEntity<MqttButton>("button", "unsupported", out _));
     }
 
     [Fact]

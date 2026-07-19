@@ -122,7 +122,7 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
         string discoveryTopic = _hassMqttManager.TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId);
         TEntity discovery = Materialize(discoveryTopic, null);
 
-        string defaultUniqueId = $"{deviceId}_{entityId}".ToLowerInvariant();
+        string defaultUniqueId = $"{deviceId}_{entityId}";
         string configuredUniqueId = (discovery as IHasUniqueId)?.UniqueId;
         string resolvedUniqueId = uniqueId ?? (string.IsNullOrWhiteSpace(configuredUniqueId) ? defaultUniqueId : configuredUniqueId);
         if (discovery is IHasUniqueId hasUniqueId)
@@ -150,7 +150,7 @@ internal sealed class EntityBuilder<TEntity> : IEntityBuilder<TEntity> where TEn
         Validate(discovery);
 
         Dictionary<HassTopicKind, MqttStateValueTopic> valueSenders = new Dictionary<HassTopicKind, MqttStateValueTopic>();
-        Dictionary<string, MqttStateValueTopic> valueSendersByTopic = new Dictionary<string, MqttStateValueTopic>(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, MqttStateValueTopic> valueSendersByTopic = new Dictionary<string, MqttStateValueTopic>(StringComparer.Ordinal);
         List<CompiledPublishOperation> publishingPlan = new List<CompiledPublishOperation>();
         MqttAttributesTopic attributesSender = null;
 

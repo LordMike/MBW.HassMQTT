@@ -45,10 +45,10 @@ public class HassMqttManager : IMqttEventReceiver
         _mqttClient = mqttClient;
         TopicBuilder = topicBuilder;
         _logger = logger;
-        _entities = new ConcurrentDictionary<string, HassMqttEntity>(StringComparer.OrdinalIgnoreCase);
-        _values = new ConcurrentDictionary<string, MqttStateValueTopic>(StringComparer.OrdinalIgnoreCase);
-        _attributes = new ConcurrentDictionary<string, MqttAttributesTopic>(StringComparer.OrdinalIgnoreCase);
-        _removeTopics = new ConcurrentDictionary<string, byte>(StringComparer.OrdinalIgnoreCase);
+        _entities = new ConcurrentDictionary<string, HassMqttEntity>(StringComparer.Ordinal);
+        _values = new ConcurrentDictionary<string, MqttStateValueTopic>(StringComparer.Ordinal);
+        _attributes = new ConcurrentDictionary<string, MqttAttributesTopic>(StringComparer.Ordinal);
+        _removeTopics = new ConcurrentDictionary<string, byte>(StringComparer.Ordinal);
     }
 
     /// <summary>Creates an unregistered, reusable entity builder.</summary>
@@ -57,16 +57,20 @@ public class HassMqttManager : IMqttEventReceiver
 
     public void RemoveEntity<TEntity>(string deviceId, string entityId) where TEntity : IHassDiscoveryDocument
     {
+        string discoveryTopic = TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId);
         lock (_entityRegistryLock)
         {
-            _entities.TryRemove(GetEntityKey(deviceId, entityId), out _);
-            _removeTopics.TryAdd(TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId), 0);
+            _entities.TryRemove(discoveryTopic, out _);
+            _removeTopics.TryAdd(discoveryTopic, 0);
         }
     }
 
-    public bool TryGetEntity(string deviceId, string entityId, out IHassMqttEntity entity)
+    public bool TryGetEntity<TEntity>(string deviceId, string entityId, out IHassMqttEntity entity)
+        where TEntity : IHassDiscoveryDocument
     {
-        bool found = _entities.TryGetValue(GetEntityKey(deviceId, entityId), out HassMqttEntity builtEntity);
+        bool found = _entities.TryGetValue(
+            TopicBuilder.GetDiscoveryTopic<TEntity>(deviceId, entityId),
+            out HassMqttEntity builtEntity);
         entity = builtEntity;
         return found;
     }
@@ -95,9 +99,13 @@ public class HassMqttManager : IMqttEventReceiver
             value.MarkDirty();
     }
 
-    public async Task<MqttFlushResult> FlushAll(CancellationToken token = default)
+    public Task<MqttFlushResult> FlushAll(CancellationToken token = default) => FlushAll(false, token);
+
+    private async Task<MqttFlushResult> FlushAll(bool waitForLock, CancellationToken token)
     {
-        if (!await _flushLock.WaitAsync(0, token))
+        if (waitForLock)
+            await _flushLock.WaitAsync(token);
+        else if (!await _flushLock.WaitAsync(0, token))
             return new MqttFlushResult(MqttFlushStatus.Busy);
 
         int discoveryDocuments = 0, removedTopics = 0, values = 0, attributes = 0;
@@ -247,7 +255,7 @@ public class HassMqttManager : IMqttEventReceiver
         {
             if (_removeTopics.ContainsKey(entity.Discovery.Topic))
                 throw new InvalidOperationException($"Entity {entity.DeviceId}/{entity.EntityId} has a pending removal");
-            if (!_entities.TryAdd(GetEntityKey(entity.DeviceId, entity.EntityId), entity))
+            if (!_entities.TryAdd(entity.Discovery.Topic, entity))
                 throw new InvalidOperationException($"An entity is already registered for {entity.DeviceId}/{entity.EntityId}");
         }
     }
@@ -262,12 +270,10 @@ public class HassMqttManager : IMqttEventReceiver
 
     internal T GetService<T>() => ServiceProvider.GetService(typeof(T)) is T service ? service : default;
 
-    private static string GetEntityKey(string deviceId, string entityId) => $"{deviceId}\u001f{entityId}";
-
     async Task IMqttEventReceiver.OnConnect(MqttClientConnectedEventArgs args, CancellationToken token)
     {
         MarkAllValuesDirty();
-        await FlushAll(token);
+        await FlushAll(true, token);
     }
 
     Task IMqttEventReceiver.OnDisconnect(MqttClientDisconnectedEventArgs args, CancellationToken token) => Task.CompletedTask;
