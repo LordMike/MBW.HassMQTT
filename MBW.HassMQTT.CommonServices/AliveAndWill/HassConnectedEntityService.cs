@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.DiscoveryModels.Enum;
@@ -10,6 +11,7 @@ using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MQTTnet;
+using MQTTnet.Protocol;
 
 namespace MBW.HassMQTT.CommonServices.AliveAndWill;
 
@@ -79,9 +81,7 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
         if (token.IsCancellationRequested)
             return;
 
-        IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
-        sensor.SetValue(HassTopicKind.State, OkMessage);
-        await _hassMqttManager.FlushAll(token);
+        await PublishStatus(OkMessage, token);
     }
 
     Task IMqttEventReceiver.OnDisconnect(MqttClientDisconnectedEventArgs args, CancellationToken token)
@@ -93,11 +93,22 @@ public class HassConnectedEntityService : BackgroundService, IMqttEventReceiver
     async Task IMqttEventReceiver.OnStopping(CancellationToken token)
     {
         if (_mqttClient.IsConnected)
-        {
-            IHassMqttEntity sensor = _hassMqttManager.GetEntity(_config.DeviceId, _config.EntityId);
-            sensor.SetValue(HassTopicKind.State, ProblemMessage);
-            await _hassMqttManager.FlushAll(token);
-        }
+            await PublishStatus(ProblemMessage, token);
+    }
+
+    private async Task PublishStatus(string value, CancellationToken token)
+    {
+        MqttApplicationMessage message = new MqttApplicationMessageBuilder()
+            .WithTopic(StateTopic)
+            .WithPayload(Encoding.UTF8.GetBytes(value))
+            .WithRetainFlag()
+            .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
+            .Build();
+
+        MqttClientPublishResult result = await _mqttClient.PublishAsync(message, token);
+        if (!result.IsSuccess)
+            throw new InvalidOperationException(
+                $"MQTT broker rejected lifecycle status publish to {StateTopic}: {result.ReasonCode} {result.ReasonString}");
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
