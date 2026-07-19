@@ -17,6 +17,14 @@ public class MqttStateValueTopic : IMqttValueContainer
     public string PublishTopic { get; }
     public bool Dirty => Revision != Interlocked.Read(ref _publishedRevision);
     public long Revision => Interlocked.Read(ref _revision);
+    internal bool Initialized
+    {
+        get
+        {
+            lock (_syncRoot)
+                return _initialized;
+        }
+    }
 
     public object Value
     {

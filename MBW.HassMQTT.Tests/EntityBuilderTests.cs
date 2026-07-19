@@ -166,6 +166,319 @@ public class EntityBuilderTests
     }
 
     [Fact]
+    public async Task Combined_plan_publishes_state_and_attributes_as_one_payload()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IHassMqttEntity entity = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .PublishStateAndAttributesTogether()
+            .Build("weather", "combined");
+
+        entity.SetValue(HassTopicKind.State, 21.4);
+        entity.SetAttribute("quality", "good");
+        MqttFlushResult result = await manager.FlushAll();
+
+        Assert.Equal(MqttFlushStatus.Completed, result.Status);
+        Assert.Equal(1, result.DiscoveryDocuments);
+        Assert.Equal(1, result.Values);
+        Assert.Equal(0, result.Attributes);
+        Assert.Equal(2, client.Messages.Count);
+
+        JObject discovery = DiscoveryPayload(client, "homeassistant/sensor/weather/combined/config");
+        Assert.Equal("test/weather/combined/state", (string)discovery["state_topic"]);
+        Assert.Equal((string)discovery["state_topic"], (string)discovery["json_attributes_topic"]);
+        Assert.Equal("{{ value_json.state }}", (string)discovery["value_template"]);
+        Assert.Equal("{{ value_json.attributes | tojson }}", (string)discovery["json_attributes_template"]);
+
+        MqttApplicationMessage valueMessage = Assert.Single(client.Messages, message => message.Topic == "test/weather/combined/state");
+        Assert.Equal(
+            JObject.Parse("{\"state\":21.4,\"attributes\":{\"quality\":\"good\"}}"),
+            JObject.Parse(valueMessage.ConvertPayloadToString()));
+    }
+
+    [Fact]
+    public async Task Combined_plan_preserves_identical_custom_topics_and_supports_state_value_template_models()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        manager.CreateEntity<MqttSiren>()
+            .ConfigureDevice(device => device.Identifiers.Add("siren-hardware"))
+            .ConfigureDiscovery(discovery =>
+            {
+                discovery.StateTopic = "custom/siren/state";
+                discovery.JsonAttributesTopic = "custom/siren/state";
+            })
+            .PublishStateAndAttributesTogether()
+            .Build("siren", "combined");
+
+        await manager.FlushAll();
+
+        JObject discovery = DiscoveryPayload(client, "homeassistant/siren/siren/combined/config");
+        Assert.Equal("custom/siren/state", (string)discovery["state_topic"]);
+        Assert.Equal("custom/siren/state", (string)discovery["json_attributes_topic"]);
+        Assert.Equal("{{ value_json.state }}", (string)discovery["state_value_template"]);
+    }
+
+    [Fact]
+    public void Combined_plan_rejects_unequal_topics_and_custom_templates_without_registration()
+    {
+        HassMqttManager manager = CreateManager(new FakeMqttClient());
+
+        IEntityBuilder<MqttSensor> unequalTopics = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .ConfigureDiscovery(discovery =>
+            {
+                discovery.StateTopic = "custom/State";
+                discovery.JsonAttributesTopic = "custom/state";
+            })
+            .PublishStateAndAttributesTogether();
+        IEntityBuilder<MqttSensor> oneSidedTopic = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .ConfigureDiscovery(discovery => discovery.StateTopic = "custom/state")
+            .PublishStateAndAttributesTogether();
+        IEntityBuilder<MqttSensor> customStateTemplate = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .ConfigureDiscovery(discovery => discovery.ValueTemplate = "{{ value | upper }}")
+            .PublishStateAndAttributesTogether();
+        IEntityBuilder<MqttSensor> customAttributesTemplate = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .ConfigureDiscovery(discovery => discovery.JsonAttributesTemplate = "{{ value_json.custom | tojson }}")
+            .PublishStateAndAttributesTogether();
+        IEntityBuilder<MqttSensor> additionalStateTemplate = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .ConfigureDiscovery(discovery => discovery.LastResetValueTemplate = "{{ value_json.last_reset }}")
+            .PublishStateAndAttributesTogether();
+
+        Assert.Throws<ValidationException>(() => unequalTopics.Build("weather", "unequal"));
+        Assert.Throws<ValidationException>(() => oneSidedTopic.Build("weather", "one-sided"));
+        Assert.Throws<ValidationException>(() => customStateTemplate.Build("weather", "state-template"));
+        Assert.Throws<ValidationException>(() => customAttributesTemplate.Build("weather", "attributes-template"));
+        Assert.Throws<ValidationException>(() => additionalStateTemplate.Build("weather", "additional-template"));
+        Assert.False(manager.TryGetEntity("weather", "unequal", out _));
+        Assert.False(manager.TryGetEntity("weather", "one-sided", out _));
+        Assert.False(manager.TryGetEntity("weather", "state-template", out _));
+        Assert.False(manager.TryGetEntity("weather", "attributes-template", out _));
+        Assert.False(manager.TryGetEntity("weather", "additional-template", out _));
+    }
+
+    [Fact]
+    public void Combined_plan_rejects_unsupported_models_at_build()
+    {
+        HassMqttManager manager = CreateManager(new FakeMqttClient());
+        IEntityBuilder<MqttButton> builder = manager.CreateEntity<MqttButton>()
+            .PublishStateAndAttributesTogether();
+
+        Assert.Throws<NotSupportedException>(() => builder.Build("button", "unsupported"));
+        Assert.False(manager.TryGetEntity("button", "unsupported", out _));
+    }
+
+    [Fact]
+    public async Task Combined_plan_waits_for_initialized_state_and_includes_explicit_null()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IHassMqttEntity entity = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .PublishStateAndAttributesTogether()
+            .Build("weather", "initialization");
+        await manager.FlushAll();
+        client.Messages.Clear();
+
+        entity.SetAttribute("quality", "pending");
+        MqttFlushResult attributesOnly = await manager.FlushAll();
+
+        Assert.Equal(MqttFlushStatus.Completed, attributesOnly.Status);
+        Assert.Empty(client.Messages);
+        Assert.True(entity.GetAttributesSender().Dirty);
+
+        entity.SetValue(HassTopicKind.State, null);
+        MqttFlushResult initialized = await manager.FlushAll();
+
+        Assert.Equal(1, initialized.Values);
+        MqttApplicationMessage message = Assert.Single(client.Messages);
+        JObject payload = JObject.Parse(message.ConvertPayloadToString());
+        Assert.Equal(JTokenType.Null, payload["state"]?.Type);
+        Assert.Equal("pending", (string)payload["attributes"]?["quality"]);
+        Assert.False(entity.GetValueSender(HassTopicKind.State).Dirty);
+        Assert.False(entity.GetAttributesSender().Dirty);
+    }
+
+    [Fact]
+    public async Task Combined_plan_rejection_leaves_both_sources_dirty()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IHassMqttEntity entity = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .PublishStateAndAttributesTogether()
+            .Build("weather", "rejected-combined");
+        await manager.FlushAll();
+
+        entity.SetValue(HassTopicKind.State, "pending");
+        entity.SetAttribute("quality", "pending");
+        client.PublishOverride = _ => Task.FromResult(new MqttClientPublishResult(
+            null,
+            MqttClientPublishReasonCode.UnspecifiedError,
+            "rejected",
+            Array.Empty<MqttUserProperty>()));
+
+        MqttFlushResult result = await manager.FlushAll();
+
+        Assert.Equal(MqttFlushStatus.BrokerRejected, result.Status);
+        Assert.True(entity.GetValueSender(HassTopicKind.State).Dirty);
+        Assert.True(entity.GetAttributesSender().Dirty);
+    }
+
+    [Fact]
+    public async Task Combined_plan_preserves_state_conversion_and_publishes_attribute_removal()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IHassMqttEntity entity = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .PublishStateAndAttributesTogether()
+            .Build("weather", "conversion");
+        DateTimeOffset state = new DateTimeOffset(2026, 7, 19, 14, 30, 0, TimeSpan.FromHours(2));
+
+        entity.SetValue(HassTopicKind.State, state);
+        await manager.FlushAll();
+
+        string stateOnlyPayload = client.Messages[^1].ConvertPayloadToString();
+        JObject stateOnly = JObject.Parse(stateOnlyPayload);
+        Assert.Contains("\"state\":\"2026-07-19T14:30:00.0000000+02:00\"", stateOnlyPayload);
+        Assert.Empty((JObject)stateOnly["attributes"]);
+
+        entity.SetAttribute("quality", "good");
+        await manager.FlushAll();
+        entity.GetAttributesSender().RemoveAttribute("quality");
+        await manager.FlushAll();
+
+        string removedPayload = client.Messages[^1].ConvertPayloadToString();
+        JObject removed = JObject.Parse(removedPayload);
+        Assert.Contains("\"state\":\"2026-07-19T14:30:00.0000000+02:00\"", removedPayload);
+        Assert.Empty((JObject)removed["attributes"]);
+    }
+
+    [Fact]
+    public async Task Combined_plan_changes_during_publish_remain_dirty_together()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IHassMqttEntity entity = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .PublishStateAndAttributesTogether()
+            .Build("weather", "concurrent-combined");
+        await manager.FlushAll();
+
+        entity.SetValue(HassTopicKind.State, "first");
+        entity.SetAttribute("quality", "first");
+        TaskCompletionSource started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        TaskCompletionSource<MqttClientPublishResult> pending = new TaskCompletionSource<MqttClientPublishResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+        client.PublishOverride = _ =>
+        {
+            started.TrySetResult();
+            return pending.Task;
+        };
+
+        Task<MqttFlushResult> flush = manager.FlushAll();
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        entity.SetValue(HassTopicKind.State, "second");
+        entity.SetAttribute("quality", "second");
+        pending.SetResult(Success());
+
+        Assert.Equal(MqttFlushStatus.Completed, (await flush).Status);
+        Assert.True(entity.GetValueSender(HassTopicKind.State).Dirty);
+        Assert.True(entity.GetAttributesSender().Dirty);
+
+        client.PublishOverride = null;
+        await manager.FlushAll();
+        JObject payload = JObject.Parse(client.Messages[^1].ConvertPayloadToString());
+        Assert.Equal("second", (string)payload["state"]);
+        Assert.Equal("second", (string)payload["attributes"]?["quality"]);
+        Assert.False(entity.GetValueSender(HassTopicKind.State).Dirty);
+        Assert.False(entity.GetAttributesSender().Dirty);
+    }
+
+    [Fact]
+    public async Task Combined_plan_reconnect_republishes_only_initialized_state()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IHassMqttEntity untouched = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .PublishStateAndAttributesTogether()
+            .Build("weather", "untouched-combined");
+        IHassMqttEntity initialized = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .PublishStateAndAttributesTogether()
+            .Build("weather", "initialized-combined");
+        initialized.SetValue(HassTopicKind.State, "ready");
+        initialized.SetAttribute("quality", "good");
+        await manager.FlushAll();
+        client.Messages.Clear();
+
+        manager.MarkAllValuesDirty();
+        MqttFlushResult result = await manager.FlushAll();
+
+        Assert.Equal(2, result.DiscoveryDocuments);
+        Assert.Equal(1, result.Values);
+        Assert.Equal(3, client.Messages.Count);
+        Assert.DoesNotContain(client.Messages, message => message.Topic == untouched.GetValueSender(HassTopicKind.State).PublishTopic);
+        Assert.Single(client.Messages, message => message.Topic == initialized.GetValueSender(HassTopicKind.State).PublishTopic);
+    }
+
+    [Fact]
+    public async Task Combined_marker_is_idempotent_and_does_not_contaminate_builder_branches()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IEntityBuilder<MqttSensor> common = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"));
+        IEntityBuilder<MqttSensor> combined = common
+            .PublishStateAndAttributesTogether()
+            .PublishStateAndAttributesTogether();
+        IEntityBuilder<MqttSensor> separate = common.ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes);
+
+        combined.Build("weather", "combined-branch");
+        separate.Build("weather", "separate-branch");
+        await manager.FlushAll();
+
+        JObject combinedDiscovery = DiscoveryPayload(client, "homeassistant/sensor/weather/combined-branch/config");
+        JObject separateDiscovery = DiscoveryPayload(client, "homeassistant/sensor/weather/separate-branch/config");
+        Assert.Equal((string)combinedDiscovery["state_topic"], (string)combinedDiscovery["json_attributes_topic"]);
+        Assert.NotEqual((string)separateDiscovery["state_topic"], (string)separateDiscovery["json_attributes_topic"]);
+        Assert.Null(separateDiscovery["value_template"]);
+        Assert.Null(separateDiscovery["json_attributes_template"]);
+    }
+
+    [Fact]
+    public async Task Combined_plan_interruption_leaves_both_sources_dirty()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IHassMqttEntity entity = manager.CreateEntity<MqttSensor>()
+            .ConfigureDevice(device => device.Identifiers.Add("weather-hardware"))
+            .PublishStateAndAttributesTogether()
+            .Build("weather", "interrupted-combined");
+        await manager.FlushAll();
+
+        entity.SetValue(HassTopicKind.State, "pending");
+        entity.SetAttribute("quality", "pending");
+        using CancellationTokenSource cancellation = new CancellationTokenSource();
+        client.PublishOverride = _ =>
+        {
+            cancellation.Cancel();
+            return Task.FromCanceled<MqttClientPublishResult>(cancellation.Token);
+        };
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => manager.FlushAll(cancellation.Token));
+
+        Assert.True(entity.GetValueSender(HassTopicKind.State).Dirty);
+        Assert.True(entity.GetAttributesSender().Dirty);
+    }
+
+    [Fact]
     public async Task Broker_rejection_leaves_entity_source_dirty()
     {
         FakeMqttClient client = new FakeMqttClient();
