@@ -105,8 +105,8 @@ public class MqttValve : MqttSensorDiscoveryBase<MqttValve, MqttValve.MqttValveV
 
             When(x => x.ReportsPosition == true, () =>
             {
-                RuleFor(x => x.PayloadClose).Must(optional => !optional.IsSet || optional.Value == null);
-                RuleFor(x => x.PayloadOpen).Must(optional => !optional.IsSet || optional.Value == null);
+                RuleFor(x => x.PayloadClose).Must(optional => !optional.IsSet);
+                RuleFor(x => x.PayloadOpen).Must(optional => !optional.IsSet);
                 RuleFor(x => x.StateClosed).Null();
                 RuleFor(x => x.StateOpen).Null();
             });

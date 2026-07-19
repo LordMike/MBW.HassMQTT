@@ -135,6 +135,11 @@ public class DiscoveryModelCapabilityTests
         model.PayloadOpen = null;
         result = MqttValve.Validator.Validate(model);
 
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(MqttValve.PayloadOpen));
+
+        model.PayloadOpen = default;
+        result = MqttValve.Validator.Validate(model);
+
         Assert.DoesNotContain(result.Errors, error => error.PropertyName == nameof(MqttValve.PayloadOpen));
     }
 
