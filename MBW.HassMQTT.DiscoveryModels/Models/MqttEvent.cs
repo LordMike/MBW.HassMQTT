@@ -27,7 +27,7 @@ public class MqttEvent : MqttSensorDiscoveryBase<MqttEvent, MqttEvent.MqttEventV
     /// <summary>
     /// The type/class of the event to set the icon in the frontend. The `device_class` can be `null`.
     /// </summary>
-    public HassEventDeviceClass? DeviceClass { get; set; }
+    public Optional<HassEventDeviceClass?> DeviceClass { get; set; }
 
     /// <summary>
     /// A list of valid `event_type` strings.
@@ -69,7 +69,7 @@ public class MqttEvent : MqttSensorDiscoveryBase<MqttEvent, MqttEvent.MqttEventV
     /// <inheritdoc />
     public string? JsonAttributesTopic { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
     /// <inheritdoc />
     public string? DefaultEntityId { get; set; }
     /// <inheritdoc />

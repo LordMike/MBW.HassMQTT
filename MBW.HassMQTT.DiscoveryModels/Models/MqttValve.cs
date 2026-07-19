@@ -25,11 +25,11 @@ public class MqttValve : MqttSensorDiscoveryBase<MqttValve, MqttValve.MqttValveV
     /// <summary>The MQTT topic to which valve commands are published.</summary>
     public string? CommandTopic { get; set; }
     /// <summary>The Home Assistant valve device class, which changes the displayed state and icon.</summary>
-    public HassValveDeviceClass? DeviceClass { get; set; }
-    /// <summary>The command payload that closes the valve when <see cref="ReportsPosition" /> is not <see langword="true" />. The documented default is <c>CLOSE</c>.</summary>
-    public string? PayloadClose { get; set; }
-    /// <summary>The command payload that opens the valve when <see cref="ReportsPosition" /> is not <see langword="true" />. The documented default is <c>OPEN</c>.</summary>
-    public string? PayloadOpen { get; set; }
+    public Optional<HassValveDeviceClass?> DeviceClass { get; set; }
+    /// <summary>The command payload that closes the valve when <see cref="ReportsPosition" /> is not <see langword="true" />. Set to <see langword="null" /> to disable the close command. The documented default is <c>CLOSE</c>.</summary>
+    public Optional<string?> PayloadClose { get; set; }
+    /// <summary>The command payload that opens the valve when <see cref="ReportsPosition" /> is not <see langword="true" />. Set to <see langword="null" /> to disable the open command. The documented default is <c>OPEN</c>.</summary>
+    public Optional<string?> PayloadOpen { get; set; }
     /// <summary>The command payload that stops the valve.</summary>
     public string? PayloadStop { get; set; }
     /// <summary>The device value representing the closed position. The documented default is <c>0</c>.</summary>
@@ -84,7 +84,7 @@ public class MqttValve : MqttSensorDiscoveryBase<MqttValve, MqttValve.MqttValveV
     /// <inheritdoc />
     public MessageExpiryInterval? MessageExpiryInterval { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
     /// <inheritdoc />
     public bool? Optimistic { get; set; }
     /// <inheritdoc />
@@ -105,8 +105,8 @@ public class MqttValve : MqttSensorDiscoveryBase<MqttValve, MqttValve.MqttValveV
 
             When(x => x.ReportsPosition == true, () =>
             {
-                RuleFor(x => x.PayloadClose).Null();
-                RuleFor(x => x.PayloadOpen).Null();
+                RuleFor(x => x.PayloadClose).Must(optional => !optional.IsSet || optional.Value == null);
+                RuleFor(x => x.PayloadOpen).Must(optional => !optional.IsSet || optional.Value == null);
                 RuleFor(x => x.StateClosed).Null();
                 RuleFor(x => x.StateOpen).Null();
             });

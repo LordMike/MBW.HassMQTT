@@ -9,7 +9,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace MBW.HassMQTT.Serialization;
 
-internal class DoNotSerializeEmptyListsResolver : DefaultContractResolver
+internal class DoNotSerializeEmptyListsResolver : OptionalAwareContractResolver
 {
     private static readonly Type GenericCollectionType = typeof(ICollection<>);
 

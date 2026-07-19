@@ -144,7 +144,7 @@ public class MqttVacuum : MqttSensorDiscoveryBase<MqttVacuum, MqttVacuum.MqttVac
     /// <inheritdoc />
     public MessageExpiryInterval? MessageExpiryInterval { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
     /// <inheritdoc />
     public string? Encoding { get; set; }
 

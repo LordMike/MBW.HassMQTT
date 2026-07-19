@@ -19,6 +19,7 @@ public static class CustomJsonSerializer
             ContractResolver = new DoNotSerializeEmptyListsResolver { NamingStrategy = namingStrategy }
         };
 
+        settings.Converters.Add(new OptionalJsonConverter());
         settings.Converters.Add(new QosLevelConverter());
         settings.Converters.Add(new StringEnumConverter(namingStrategy));
         settings.Converters.Add(new ConnectionInfoConverter());

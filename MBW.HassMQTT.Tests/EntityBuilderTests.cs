@@ -88,6 +88,28 @@ public class EntityBuilderTests
     }
 
     [Fact]
+    public async Task Builder_snapshot_preserves_optional_presence_states()
+    {
+        FakeMqttClient client = new FakeMqttClient();
+        HassMqttManager manager = CreateManager(client);
+        IEntityBuilder<MqttSensor> builder = ValidSensorTemplate(manager)
+            .ConfigureDiscovery(discovery =>
+            {
+                discovery.Name = null;
+                discovery.UnitOfMeasurement = default;
+                discovery.DeviceClass = HassSensorDeviceClass.Temperature;
+            });
+
+        builder.Build("weather", "optional");
+        await manager.FlushAll();
+
+        JObject payload = DiscoveryPayload(client, "homeassistant/sensor/weather/optional/config");
+        Assert.Equal(JTokenType.Null, payload["name"]!.Type);
+        Assert.Null(payload.Property("unit_of_measurement"));
+        Assert.Equal("temperature", (string)payload["device_class"]);
+    }
+
+    [Fact]
     public async Task Build_preserves_explicit_topics_and_applies_unique_id_precedence()
     {
         FakeMqttClient client = new FakeMqttClient();

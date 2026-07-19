@@ -66,22 +66,22 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     /// <summary>
     /// Sets the [class of the device](/integrations/cover/), changing the device state and icon that is displayed on the frontend.
     /// </summary>
-    public string? DeviceClass { get; set; }
+    public Optional<string?> DeviceClass { get; set; }
 
     /// <summary>
-    /// The command payload that closes the cover.
+    /// The command payload that closes the cover. Set to <see langword="null" /> to disable the close command.
     /// </summary>
-    public string? PayloadClose { get; set; }
+    public Optional<string?> PayloadClose { get; set; }
 
     /// <summary>
-    /// The command payload that opens the cover.
+    /// The command payload that opens the cover. Set to <see langword="null" /> to disable the open command.
     /// </summary>
-    public string? PayloadOpen { get; set; }
+    public Optional<string?> PayloadOpen { get; set; }
 
     /// <summary>
-    /// The command payload that stops the cover.
+    /// The command payload that stops the cover. Set to <see langword="null" /> to disable the stop command.
     /// </summary>
-    public string? PayloadStop { get; set; }
+    public Optional<string?> PayloadStop { get; set; }
 
     /// <summary>
     /// The command payload that stops the tilt.
@@ -239,7 +239,7 @@ public class MqttCover : MqttSensorDiscoveryBase<MqttCover, MqttCover.MqttCoverV
     /// <inheritdoc />
     public string? Encoding { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
     /// <inheritdoc />
     public bool? Optimistic { get; set; }
 

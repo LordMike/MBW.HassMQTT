@@ -41,7 +41,7 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     /// See https://www.home-assistant.io/integrations/number/#device-class
     /// </summary>
     /// <remarks>Default value: 'None'</remarks>
-    public HassNumberDeviceClass? DeviceClass { get; set; }
+    public Optional<HassNumberDeviceClass?> DeviceClass { get; set; }
 
     /// <summary>
     /// Minimum value.
@@ -110,7 +110,7 @@ public class MqttNumber : MqttSensorDiscoveryBase<MqttNumber, MqttNumber.MqttNum
     /// <inheritdoc />
     public string? Encoding { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
     /// <inheritdoc />
     public bool? Optimistic { get; set; }
 

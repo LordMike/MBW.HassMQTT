@@ -16,9 +16,10 @@ internal static class DiscoverySnapshotSerializer
             NullValueHandling = NullValueHandling.Include,
             DefaultValueHandling = DefaultValueHandling.Include,
             ObjectCreationHandling = ObjectCreationHandling.Auto,
-            ContractResolver = new DefaultContractResolver { NamingStrategy = namingStrategy }
+            ContractResolver = new OptionalAwareContractResolver { NamingStrategy = namingStrategy }
         };
 
+        settings.Converters.Add(new OptionalJsonConverter());
         settings.Converters.Add(new StringEnumConverter(namingStrategy));
         return JsonSerializer.Create(settings);
     }

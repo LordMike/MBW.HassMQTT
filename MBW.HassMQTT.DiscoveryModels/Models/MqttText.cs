@@ -102,7 +102,7 @@ public class MqttText : MqttSensorDiscoveryBase<MqttText, MqttText.MqttTextValid
     /// <inheritdoc />
     public bool? Retain { get; set; }
     /// <inheritdoc />
-    public string? Name { get; set; }
+    public Optional<string?> Name { get; set; }
 
     public class MqttTextValidator : MqttSensorDiscoveryBaseValidator<MqttText>
     {
