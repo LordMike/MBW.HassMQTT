@@ -23,6 +23,7 @@
     <DebugType>portable</DebugType>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>false</IsPackable>
     
     <MinVerTagPrefix>v</MinVerTagPrefix>
     
