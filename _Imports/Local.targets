@@ -1,5 +1,9 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <PropertyGroup>
+    <RuntimeTargetFrameworks>net8.0;net10.0</RuntimeTargetFrameworks>
+  </PropertyGroup>
+
   <!-- Package -->
   <PropertyGroup>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
